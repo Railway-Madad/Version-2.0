@@ -4,8 +4,8 @@ const VALID_ISSUE_DOMAINS = [
     'Cleaning',
     'Catering',
     'Security',
-    'Facilities',
-    'Other'
+    'Maintenance',
+    'Medical'
 ];
 
 
