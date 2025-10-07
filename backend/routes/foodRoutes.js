@@ -11,7 +11,7 @@ foodRouter.get("/", foodcontroller.getAllFoods);
 
 foodRouter.get("/:id", foodcontroller.getFoodById);
 
-foodRouter.post("/",adminAuthentication,foodcontroller.addFood);
-foodRouter.delete("/:id",adminAuthentication,foodcontroller.deleteFood);
+foodRouter.post("/",foodcontroller.addFood);
+foodRouter.delete("/:id",foodcontroller.deleteFood);
 
 module.exports = foodRouter;

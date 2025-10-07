@@ -5,6 +5,7 @@ const mongoose = require("mongoose")
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const staffRouter = require("./routes/staffRoutes");
+const foodRouter = require("./routes/foodRoutes");
 
 const app = express()
 app.use(cors({
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/user',userRouter);
 // app.use('/admin',adminRouter);
 // app.use('/staff',staffRouter);
+app.use('/food',foodRouter)
 
 
 async function connect() {
