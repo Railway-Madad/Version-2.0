@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Complaint Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-train"></i>
+                Rail Madad
+            </a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Railway Complaint Dashboard</h1>
+                <p>Welcome, <span id="current-user">Guest</span></p>
+            </div>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+
+        <div class="form-section">
+            <h3>Submit New Complaint</h3>
+
+            <div id="success-message" class="success-message" style="display:none;">
+                <i class="fas fa-check-circle"></i> Complaint submitted successfully!
+            </div>
+            <div id="error-message" class="error-message" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i> Error submitting complaint. Please try again.
+            </div>
+
+            <form id="complaint-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" readonly required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pnr">PNR Number:</label>
+                    <input type="text" id="pnr" name="pnr" pattern="[0-9]{10}" title="PNR should be 10 digits" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Complaint Description:</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueDomain">Issue Domain:</label>
+                    <select id="issueDomain" name="issueDomain" required>
+                        <option value="Cleanliness">Cleanliness</option>
+                        <option value="Staff Behavior">Staff Behavior</option>
+                        <option value="Catering">Catering</option>
+                        <option value="Delay">Delay</option>
+                        <option value="Facilities">Facilities</option>
+                        <option value="Other">Other</option>    
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Upload Image (Optional):</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn">
+                    <i class="fas fa-paper-plane"></i> Submit Complaint
+                </button>
+                <button type="button" id="view-complaints-btn" class="btn btn-primary">
+                    <i class="fas fa-list"></i> View My Complaints
+                </button>
+            </form>
+
+            <!-- Complaints Table -->
+            <table id="complaints-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>PNR</th>
+                        <th>Description</th>
+                        <th>Issue Domain</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="complaints-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Rail Madad - Indian Railways. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/complaints.js"></script>
+</body>
+</html>
