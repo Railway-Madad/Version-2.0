@@ -15,13 +15,13 @@ const complaintSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    flightNumber: {
-        type: String,
-        required: true
-    },
     issueDomain: {
         type: String,
         enum: VALID_ISSUE_DOMAINS,
+        required: true
+    },
+    title: {
+        type: String,
         required: true
     },
     description: {
