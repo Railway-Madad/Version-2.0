@@ -1,18 +1,25 @@
-    const express = require('express');
-    const path = require('path');
-    const app = express();
-    const port = 3000;
+const express = require('express');
+const path = require('path');
+const app = express();
+const port = 3000;
 
-    app.use(express.static("./public"));
+// Serve static files from "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, 'index.html'));
-    });
+// Routes to serve HTML files from "views" folder
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
 
-    app.get('/order',(req, res) => {
-        res.sendFile(path.join(__dirname, 'order.html'));
-    });
+app.get('/order', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'order.html'));
+});
 
-    app.listen(port, () => {
-        console.log(`Frontend server listening at http://localhost:${port}`);
-    });
+app.get('/complaint', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'complaint.html'));
+});
+
+// Start server
+app.listen(port, () => {
+    console.log(`Frontend server listening at http://localhost:${port}`);
+});
