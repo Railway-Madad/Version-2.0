@@ -6,6 +6,10 @@ const adminRouter = require("./routes/adminRoutes");
 const staffRouter = require("./routes/staffRoutes");
 
 const app = express()
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    credentials: true 
+}));
 app.use(express.json());
 app.use('/user',userRouter);
 // app.use('/admin',adminRouter);
