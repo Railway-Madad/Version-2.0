@@ -8,15 +8,15 @@ const staffRouter = require("./routes/staffRoutes");
 const foodRouter = require("./routes/foodRoutes");
 
 const app = express()
-app.use(cors({
-    origin: 'http://localhost:3000', 
-    credentials: true 
-}));
+app.use(cors());
 app.use(express.json());
 app.use('/user',userRouter);
 // app.use('/admin',adminRouter);
 // app.use('/staff',staffRouter);
 app.use('/food',foodRouter)
+app.get('/',(req,res)=>{
+    res.send("Server is working");
+});
 
 
 async function connect() {
