@@ -9,6 +9,10 @@
         res.sendFile(path.join(__dirname, 'index.html'));
     });
 
+    app.get('/order',(req, res) => {
+        res.sendFile(path.join(__dirname, 'order.html'));
+    });
+
     app.listen(port, () => {
         console.log(`Frontend server listening at http://localhost:${port}`);
     });
