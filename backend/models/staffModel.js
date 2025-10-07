@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const VALID_ISSUE_DOMAINS = [
+    'Cleaning',
+    'Catering',
+    'Security',
+    'Facilities',
+    'Other'
+];
+
+
 const staffSchema = new mongoose.Schema({
     name: {
         type: String,
