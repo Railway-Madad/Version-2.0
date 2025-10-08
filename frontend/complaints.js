@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:4000';
-const currentUser = "Vedant"; //future
 document.getElementById('username').value = currentUser;
 document.getElementById('current-user').textContent = currentUser;
 
@@ -10,9 +9,32 @@ const viewBtn = document.getElementById('view-complaints-btn');
 const complaintsTable = document.getElementById('complaints-table');
 const complaintsBody = document.getElementById('complaints-body');
 const token = localStorage.getItem('token');
+let currentUser = "";
 if (!token) {
     window.location.href = "login.html";
+} else {
+    fetch(`${API_BASE}/user/profile`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return res.json();
+    })
+    .then(data => {
+        currentUser = data || "";
+        document.getElementById('username').value = currentUser.username;
+        console.log(currentUser);
+        console.log(currentUser.username);
+        document.getElementById('current-user').textContent = currentUser;
+    })
+    .catch(() => {
+        window.location.href = "login.html";
+    });
 }
+
 
 // submit complaint
 form.addEventListener('submit', async (e) => {
@@ -45,58 +67,6 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
-// view complaints
-viewBtn.addEventListener('click', async () => {
-    try {
-        const response = await fetch(`${API_BASE}/complaint/api/complaints/user/${currentUser}`);
-        if (!response.ok) throw new Error('Failed to fetch complaints');
-
-        const complaints = await response.json();
-        complaintsBody.innerHTML = '';
-
-        if (complaints.length === 0) {
-            complaintsBody.innerHTML = '<tr><td colspan="7">No complaints found.</td></tr>';
-        } else {
-            complaints.forEach(c => {
-                const createdAt = new Date(c.createdAt).toLocaleString();
-                complaintsBody.innerHTML += `
-                    <tr id="complaint-${c._id}">
-                        <td>${c._id}</td>
-                        <td>${c.pnr}</td>
-                        <td>${c.description}</td>
-                        <td>${c.issueDomain}</td>
-                        <td>${c.status}</td>
-                        <td>${createdAt}</td>
-                        <td>
-                            <button class="delete-btn" data-id="${c._id}">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            // delete functionality
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.target.dataset.id;
-                    if (!confirm('Delete this complaint?')) return;
-
-                    try {
-                        const res = await fetch(`${API_BASE}/complaint/api/complaints/${id}`, { method: 'DELETE' });
-                        if (!res.ok) throw new Error('Failed to delete complaint');
-                        document.getElementById(`complaint-${id}`).remove();
-                        alert('Deleted successfully');
-                    } catch (err) {
-                        console.error(err);
-                        alert('Delete failed');
-                    }
-                });
-            });
-        }
-
-        complaintsTable.style.display = 'table';
-    } catch (err) {
-        console.error(err);
-        complaintsBody.innerHTML = '<tr><td colspan="7">Error loading complaints.</td></tr>';
-        complaintsTable.style.display = 'table';
-    }
+viewBtn.addEventListener('click', () => {
+    window.location.href = 'view-complaints.html';
 });
