@@ -1,14 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>order</title>
-</head>
 <body>
-    
+     <main>
+        <section>
+            <h2>Menu</h2>
+            <div id="menu-container">
+                <!-- Menu items will be loaded here by JavaScript -->
+            </div>
+        </section>
+
+        <section>
+            <h2>Your Order</h2>
+            <div id="cart-items">
+                <!-- Cart items will be displayed here -->
+            </div>
+            <div>
+            </div>
+            <form id="order-form">
+  <h3>Delivery Details</h3>
+  <p>We only accept Pay on Delivery.</p>
+  
+  <label for="address">Delivery Seat Number and Coach number:</label><br>
+  <textarea id="address" name="address" rows="2" placeholder="Enter your delivery address" required></textarea><br><br>
+  
+  <label for="notes">Additional Notes:</label><br>
+  <textarea id="notes" name="notes" rows="3" placeholder="Any special instructions?"></textarea><br><br>
+  
+  <button type="submit">Place Order</button>
+</form>
+<div id="order-message"></div>
+        </section>
+        <section>
+            <h2>My Past Orders</h2>
+            <button id="load-orders-btn">Load My Orders</button>
+            <div id="past-orders-container">
+                <!-- User's orders will be loaded here -->
+            </div>
+        </section>
+    </main>
 </body>
+
 <script>
+   
+
 
 </script>
+
 </html>

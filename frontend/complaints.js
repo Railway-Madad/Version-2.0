@@ -12,7 +12,6 @@ const complaintsBody = document.getElementById('complaints-body');
 const token = localStorage.getItem('token');
 if (!token) {
     window.location.href = "login.html";
-    return;
 }
 
 // submit complaint
