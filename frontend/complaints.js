@@ -9,6 +9,10 @@ const errorMessage = document.getElementById('error-message');
 const viewBtn = document.getElementById('view-complaints-btn');
 const complaintsTable = document.getElementById('complaints-table');
 const complaintsBody = document.getElementById('complaints-body');
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = "login.html";
+}
 
 // submit complaint
 form.addEventListener('submit', async (e) => {
@@ -17,12 +21,15 @@ form.addEventListener('submit', async (e) => {
     errorMessage.style.display = 'none';
 
     const formData = new FormData(form);
-
+//pass the token in header
     try {
         console.log("done");
         const response = await fetch(`${API_BASE}/complaint/submit-complaint`, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
         console.log("done1");
 
