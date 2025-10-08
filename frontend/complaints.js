@@ -1,6 +1,5 @@
 const API_BASE = 'http://localhost:4000';
 
-
 const form = document.getElementById('complaint-form');
 const successMessage = document.getElementById('success-message');
 const errorMessage = document.getElementById('error-message');
