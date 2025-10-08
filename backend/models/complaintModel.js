@@ -15,32 +15,49 @@ const complaintSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    issueDomain: {
+   username: {
         type: String,
-        enum: VALID_ISSUE_DOMAINS,
-        required: true
+        required: true,
+        trim: true
     },
-    title: {
+    pnr: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        trim: true
+    },
+    issueDomain: {
+        type: String,
+        required: true,
+        enum: VALID_ISSUE_DOMAINS,
+        default: 'Other'
+    },
+    linkurl: {
+        type: String,
+        default: null // Cloudinary image URL, null if no image
     },
     status: {
         type: String,
-        enum: ['Pending', 'In Progress', 'Resolved'],
+        enum: ['Pending', 'Resolved'],
         default: 'Pending'
+    },
+    resolutionDetails: {
+        type: String,
+        default: ''
+    },
+    resolutionCategory: {
+        type: String,
+        default: ''
     },
     createdAt: {
         type: Date,
         default: Date.now
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+    resolvedAt: Date
 });
 
 module.exports = mongoose.model('Complaint', complaintSchema);

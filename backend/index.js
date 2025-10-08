@@ -1,19 +1,26 @@
 require("dotenv").config();
 const cors = require("cors");
 const express = require("express")
+const multer = require('multer');
+
 const mongoose = require("mongoose")
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const staffRouter = require("./routes/staffRoutes");
 const foodRouter = require("./routes/foodRoutes");
+const complaintRouter = require("./routes/complaintRoutes");
 
 const app = express()
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads')); 
 app.use('/user',userRouter);
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads')); 
 // app.use('/admin',adminRouter);
 // app.use('/staff',staffRouter);
 app.use('/food',foodRouter)
+app.use('/complaints', complaintRouter);
 app.get('/',(req,res)=>{
     res.send("Server is working");
 });
