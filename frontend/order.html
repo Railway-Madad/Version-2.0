@@ -80,6 +80,47 @@ async function loadMenu() {
 }
 
 
+function addToCart(foodId, name, price) {
+  const existing = cart.find(item => item.foodItem === foodId);
+  if (existing) existing.quantity++;
+  else cart.push({ foodItem: foodId, name, price, quantity: 1 });
+  renderCart();
+}
+
+function renderCart() {
+  const cartDiv = document.getElementById("cart-items");
+  cartDiv.innerHTML = "";
+  let total = 0;
+
+  cart.forEach((item, i) => {
+    total += item.price * item.quantity;
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p>${item.name} x ${item.quantity} = ₹${item.price * item.quantity}</p>
+      <button onclick="changeQty(${i}, 1)">+</button>
+      <button onclick="changeQty(${i}, -1)">-</button>
+      <button onclick="removeItem(${i})">Remove</button>
+    `;
+    cartDiv.appendChild(div);
+  });
+
+  const totalDiv = document.createElement("div");
+  totalDiv.innerHTML = `<h4>Total: ₹${total}</h4>`;
+  cartDiv.appendChild(totalDiv);
+}
+
+function changeQty(index, delta) {
+  cart[index].quantity += delta;
+  if (cart[index].quantity <= 0) cart.splice(index, 1);
+  renderCart();
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+}   
+
+
 
 
 </script>
