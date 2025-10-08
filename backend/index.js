@@ -20,7 +20,7 @@ app.use('/uploads', express.static('uploads'));
 // app.use('/admin',adminRouter);
 // app.use('/staff',staffRouter);
 app.use('/food',foodRouter)
-app.use('/complaints', complaintRouter);
+app.use('/complaint', complaintRouter);
 app.get('/',(req,res)=>{
     res.send("Server is working");
 });

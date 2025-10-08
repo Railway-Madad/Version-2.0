@@ -5,13 +5,12 @@ const multer = require('multer');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Ensure uploads directory exists
 const uploadDir = path.join(__dirname, '../uploads');
 fs.mkdir(uploadDir, { recursive: true }).catch(err => {
     console.error('Error creating uploads directory:', err);
 });
 
-// Configure multer for file uploads
+//  multer for file uploads
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
         try {
@@ -27,16 +26,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.get('/', complaintController.getComplaintForm);
+//chaning this for testing purpose put / insted of /xyz
+router.get('/', complaintController.getAllComplaints);
 router.post('/submit-complaint', upload.single('image'), complaintController.postComplaint);
-router.get('/api/complaints/:id', complaintController.getComplaintById);
+// router.get('/api/complaints/:id', complaintController.getComplaintById);
 router.get('/api/complaints/user/:username', complaintController.getComplaintsByUser);
 router.put('/api/complaints/:id/resolve', complaintController.resolveComplaint);
 router.delete('/api/complaints/:id', complaintController.deleteComplaint);
-router.get('/upload-image', complaintController.getUploadForm);
-router.get('/complaints', complaintController.getPaginatedComplaints);
+// router.get('/upload-image', complaintController.getUploadForm);
+// router.get('/complaints', complaintController.getPaginatedComplaints);
 router.get('/complaints/all', complaintController.getAllComplaints);
-router.post('/upload-image', upload.single('image'), complaintController.postImage);
+// router.post('/upload-image', upload.single('image'), complaintController.postImage);
 router.get('/api/images/user/:username', complaintController.getImagesByUser);
 
 module.exports = router;
