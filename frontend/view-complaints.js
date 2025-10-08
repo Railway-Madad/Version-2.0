@@ -1,36 +1,37 @@
 const API_BASE = "http://localhost:4000";
-document.getElementById("current-user").textContent = currentUser;
 
-const complaintsTable = document.getElementById("complaints-table");
-const complaintsBody = document.getElementById("complaints-body");
-let currentUser = "";
+
+let currentUser = {};
 if (!token) {
-  window.location.href = "login.html";
+    window.location.href = "login.html";
 } else {
-  fetch(`${API_BASE}/user/profile`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+    fetch(`${API_BASE}/user/profile`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
     .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch profile");
-      return res.json();
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        return res.json();
     })
     .then((data) => {
-      currentUser = data.username || "";
-      document.getElementById("username").value = currentUser;
-      document.getElementById("current-user").textContent = currentUser;
+        currentUser = data.user ;
+        document.getElementById("username").value = currentUser.username;
+        document.getElementById("current-user").textContent = currentUser.username;
     })
     .catch(() => {
-      window.location.href = "login.html";
+        window.location.href = "login.html";
     });
 }
+const complaintsTable = document.getElementById("complaints-table");
+const complaintsBody = document.getElementById("complaints-body");
+document.getElementById("current-user").textContent = currentUser.username;
 
 async function loadComplaints() {
   try {
     const response = await fetch(
-      `${API_BASE}/complaint/api/complaints/user/${currentUser}`,
+      `${API_BASE}/complaint/api/complaints/user/${currentUser.username}`,
       {
         method: "GET",
         headers: {

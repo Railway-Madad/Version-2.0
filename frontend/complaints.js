@@ -1,6 +1,5 @@
 const API_BASE = 'http://localhost:4000';
-document.getElementById('username').value = currentUser;
-document.getElementById('current-user').textContent = currentUser;
+
 
 const form = document.getElementById('complaint-form');
 const successMessage = document.getElementById('success-message');
@@ -9,7 +8,7 @@ const viewBtn = document.getElementById('view-complaints-btn');
 const complaintsTable = document.getElementById('complaints-table');
 const complaintsBody = document.getElementById('complaints-body');
 const token = localStorage.getItem('token');
-let currentUser = "";
+let currentUser = {};
 if (!token) {
     window.location.href = "login.html";
 } else {
@@ -24,16 +23,18 @@ if (!token) {
         return res.json();
     })
     .then(data => {
-        currentUser = data || "";
+        currentUser = data.user || "";
         document.getElementById('username').value = currentUser.username;
         console.log(currentUser);
         console.log(currentUser.username);
-        document.getElementById('current-user').textContent = currentUser;
+        document.getElementById('current-user').textContent = currentUser.username;
     })
     .catch(() => {
         window.location.href = "login.html";
     });
 }
+document.getElementById('username').value = currentUser.username;
+document.getElementById('current-user').textContent = currentUser.username;
 
 
 // submit complaint

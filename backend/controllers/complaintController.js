@@ -33,7 +33,7 @@ exports.postComplaint = async (req, res) => {
     }
 
     const complaint = new Complaint({
-      userId: req.userId || null,
+      userId: req.userId ,
       username,
       pnr,
       description,
