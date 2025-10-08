@@ -19,10 +19,12 @@ form.addEventListener('submit', async (e) => {
     const formData = new FormData(form);
 
     try {
+        console.log("done");
         const response = await fetch(`${API_BASE}/complaint/submit-complaint`, {
             method: 'POST',
             body: formData
         });
+        console.log("done1");
 
         if (!response.ok) throw new Error('Failed to submit complaint');
 
@@ -30,6 +32,7 @@ form.addEventListener('submit', async (e) => {
         form.reset();
         document.getElementById('username').value = currentUser;
     } catch (err) {
+        console.log("done2");
         console.error(err);
         errorMessage.style.display = 'block';
     }

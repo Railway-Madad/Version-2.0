@@ -1,34 +1,35 @@
 const { cloudinary } = require("../config/cloudinary");
 const Complaint = require("../models/complaintModel");
-const fs = require("fs").promises;
+const streamifier = require("streamifier");
 
-
-// POST 
+//post
 exports.postComplaint = async (req, res) => {
   try {
     const { username, pnr, description, issueDomain } = req.body;
     const file = req.file;
 
     if (!username || !pnr || !description || !issueDomain) {
-      if (file) await fs.unlink(file.path).catch(() => {});
       return res.status(400).json({ error: "All fields are required" });
     }
 
     let linkurl = null;
+
     if (file) {
-      try {
-        await fs.access(file.path);
-        const uploadResult = await cloudinary.uploader.upload(file.path, {
-          folder: "railmadad/complaints",
-          public_id: `complaint_${Date.now()}`,
-          resource_type: "image",
+      const streamUpload = (fileBuffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "railmadad/complaints" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(fileBuffer).pipe(stream);
         });
-        linkurl = uploadResult.secure_url;
-        await fs.unlink(file.path).catch(() => {});
-      } catch (err) {
-        if (file) await fs.unlink(file.path).catch(() => {});
-        return res.status(500).json({ error: "Image upload failed" });
-      }
+      };
+
+      const result = await streamUpload(file.buffer);
+      linkurl = result.secure_url;
     }
 
     const complaint = new Complaint({
@@ -44,46 +45,48 @@ exports.postComplaint = async (req, res) => {
     await complaint.save();
     res.json({ success: true, message: "Complaint submitted successfully", complaint });
   } catch (err) {
-    if (req.file) await fs.unlink(req.file.path).catch(() => {});
-    console.error(err);
+    console.error("Error submitting complaint:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// GET
+// GET: Get complaints by username
 exports.getComplaintsByUser = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ username: req.params.username }).sort({ createdAt: -1 });
+    const complaints = await Complaint.find({
+      username: req.params.username,
+    }).sort({ createdAt: -1 });
     res.json(complaints);
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// DELETE
+// DELETE: delete complaint
 exports.deleteComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
-    if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+    if (!complaint)
+      return res.status(404).json({ error: "Complaint not found" });
 
-    // Only allow owner to delete
     const currentUser = req.body.username || req.query.username;
-    if (!currentUser || complaint.username !== currentUser)
+    if (!currentUser || complaint.username !== currentUser) {
       return res.status(403).json({ error: "Unauthorized" });
+    }
 
-    await Complaint.deleteOne({ _id: req.params.id });
+    await complaint.deleteOne();
     res.json({ success: true, message: "Complaint deleted successfully" });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error deleting complaint:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// PUT 
+// PUT: Mark complaint as resolved
 exports.resolveComplaint = async (req, res) => {
   try {
-    const complaint = await Complaint.findByIdAndUpdate(
+    const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       {
         status: "Resolved",
@@ -93,36 +96,39 @@ exports.resolveComplaint = async (req, res) => {
       },
       { new: true }
     );
-    if (!complaint) return res.status(404).json({ error: "Complaint not found" });
 
-    res.json({ success: true, complaint });
-  } catch (err) {
-    console.error(err);
+    if (!updatedComplaint)
+      return res.status(404).json({ error: "Complaint not found" });
+
+    res.json({ success: true, complaint: updatedComplaint });
+  } catch (error) {
+    console.error("Error resolving complaint:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// GET 
+// GET: All user images
 exports.getImagesByUser = async (req, res) => {
   try {
-    const complaints = await Complaint.find({
+    const images = await Complaint.find({
       username: req.params.username,
       linkurl: { $ne: null },
     }).sort({ createdAt: -1 });
-    res.json(complaints);
-  } catch (err) {
-    console.error(err);
+
+    res.json(images);
+  } catch (error) {
+    console.error("Error fetching images:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// GET 
+// GET: All complaints (for admin)
 exports.getAllComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find().sort({ createdAt: -1 });
     res.json(complaints);
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error fetching all complaints:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
