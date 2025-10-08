@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <div class="message" id="msg"></div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script>
+        async function login() {
+                const username = document.getElementById("username").value.trim();
+                const password = document.getElementById("password").value.trim();
+                const msgEl = document.getElementById("msg");
+                msgEl.innerText = ""; // clear old message
+
+                try {
+                    const res = await fetch("http://localhost:4000/user/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password }),
+                    });
+
+                    // Try to parse response as JSON
+                    const data = await res.json().catch(() => ({}));
+
+                    if (res.ok) {
+                        localStorage.setItem("token", data.token);
+                        window.location.href = "userDashboard.html";
+                    } else {
+                        msgEl.innerText = data.message || "Invalid username or password.";
+                    }
+                } catch (error) {
+                    console.error("Login error:", error);
+                    msgEl.innerText = "Unable to connect to server. Please try again later.";
+                }
+            }
+    </script>
+</body>
+
+</html>
