@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:4000';
-const currentUser = "Vedant"; //future
 document.getElementById('username').value = currentUser;
 document.getElementById('current-user').textContent = currentUser;
 
@@ -10,9 +9,32 @@ const viewBtn = document.getElementById('view-complaints-btn');
 const complaintsTable = document.getElementById('complaints-table');
 const complaintsBody = document.getElementById('complaints-body');
 const token = localStorage.getItem('token');
+let currentUser = "";
 if (!token) {
     window.location.href = "login.html";
+} else {
+    fetch(`${API_BASE}/user/profile`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return res.json();
+    })
+    .then(data => {
+        currentUser = data || "";
+        document.getElementById('username').value = currentUser.username;
+        console.log(currentUser);
+        console.log(currentUser.username);
+        document.getElementById('current-user').textContent = currentUser;
+    })
+    .catch(() => {
+        window.location.href = "login.html";
+    });
 }
+
 
 // submit complaint
 form.addEventListener('submit', async (e) => {
