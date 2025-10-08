@@ -18,9 +18,9 @@ if (!token) {
       return res.json();
     })
     .then((data) => {
-      currentUser = data.username || "";
-      document.getElementById("username").value = currentUser;
-      document.getElementById("current-user").textContent = currentUser;
+      currentUser = data.user || "";
+      document.getElementById("username").value = currentUser.username;
+      document.getElementById("current-user").textContent = currentUser.username;
     })
     .catch(() => {
       window.location.href = "login.html";
