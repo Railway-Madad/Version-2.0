@@ -120,6 +120,58 @@ function removeItem(index) {
   renderCart();
 }   
 
+// place order
+document.getElementById("order-form").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const notes = document.getElementById("notes").value.trim();
+  const deliveryAddress = document.getElementById("address").value.trim();
+
+  if (!deliveryAddress) {
+    alert("Please enter a delivery address.");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  try {
+    const body = {
+      items: cart.map(c => ({
+        foodItem: c.foodItem,
+        quantity: c.quantity,
+      })),
+      deliveryAddress,
+      notes,
+    };
+
+    const res = await fetch(`${API_BASE}/catering/order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    const messageDiv = document.getElementById("order-message");
+
+    if (data.success) {
+      messageDiv.innerText = "Order placed successfully!";
+      cart = [];
+      renderCart();
+      document.getElementById("order-form").reset();
+    } else {
+      messageDiv.innerText = "❌ " + (data.message || "Failed to place order");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 
 
 
