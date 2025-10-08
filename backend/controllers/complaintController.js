@@ -33,7 +33,7 @@ exports.postComplaint = async (req, res) => {
     }
 
     const complaint = new Complaint({
-      userId: req.userId ,
+      userId: req.userId,
       username,
       pnr,
       description,
@@ -67,12 +67,8 @@ exports.getComplaintsByUser = async (req, res) => {
 exports.deleteComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
-    if (!complaint)
+    if (!complaint) {
       return res.status(404).json({ error: "Complaint not found" });
-
-    const currentUser = req.body.username || req.query.username;
-    if (!currentUser || complaint.username !== currentUser) {
-      return res.status(403).json({ error: "Unauthorized" });
     }
 
     await complaint.deleteOne();
@@ -82,6 +78,8 @@ exports.deleteComplaint = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
 
 // PUT: Mark complaint as resolved
 exports.resolveComplaint = async (req, res) => {

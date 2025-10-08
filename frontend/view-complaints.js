@@ -1,44 +1,53 @@
 const API_BASE = "http://localhost:4000";
+const token = localStorage.getItem("token");
+let currentUser = null;
 
-
-let currentUser = {};
 if (!token) {
-    window.location.href = "login.html";
-} else {
-    fetch(`${API_BASE}/user/profile`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
-    .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch profile");
-        return res.json();
-    })
-    .then((data) => {
-        currentUser = data.user ;
-        document.getElementById("username").value = currentUser.username;
-        document.getElementById("current-user").textContent = currentUser.username;
-    })
-    .catch(() => {
-        window.location.href = "login.html";
-    });
+  window.location.href = "login.html";
 }
+
 const complaintsTable = document.getElementById("complaints-table");
 const complaintsBody = document.getElementById("complaints-body");
-document.getElementById("current-user").textContent = currentUser.username;
+const usernameElem = document.getElementById("username");
+const currentUserElem = document.getElementById("current-user");
 
-async function loadComplaints() {
+// fetch user profile first
+async function fetchProfile() {
   try {
+    const res = await fetch(`${API_BASE}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch profile");
+
+    const data = await res.json();
+    currentUser = data.user;
+
+    // set username and UI
+    if (usernameElem) usernameElem.value = currentUser.username;
+    if (currentUserElem) currentUserElem.textContent = currentUser.username;
+
+    // load complaints after profile is ready
+    await loadComplaints();
+  } catch (err) {
+    console.error(err);
+    window.location.href = "login.html"; // redirect if auth fails
+  }
+}
+
+// get complaints
+async function loadComplaints() {
+  if (!currentUser) return;
+
+  try {
+    // Use userId if backend expects authenticated user
     const response = await fetch(
-      `${API_BASE}/complaint/api/complaints/user/${currentUser.username}`,
+      `${API_BASE}/complaint/api/complaints/user/${currentUser.username}`, // OR backend route that uses req.userId
       {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
+
     if (!response.ok) throw new Error("Failed to fetch complaints");
 
     const complaints = await response.json();
@@ -51,15 +60,15 @@ async function loadComplaints() {
       complaints.forEach((c) => {
         const createdAt = new Date(c.createdAt).toLocaleString();
         complaintsBody.innerHTML += `
-                    <tr>
+                    <tr id="complaint-${c._id}">
                         <td>${c._id}</td>
                         <td>${c.pnr}</td>
                         <td>${c.description}</td>
                         <td>${c.issueDomain}</td>
                         <td>${c.status}</td>
                         <td>${createdAt}</td>
-                        <td background-color: ${
-                          c.status === "Resolved" ? "#e4d8d9ff" : "#bc0b1aff"
+                        <td style="background-color: ${
+                          c.status === "Resolved" ? "#e4d8d9" : "#c81121ff"
                         };">
                             <button class="delete-btn" data-id="${
                               c._id
@@ -68,7 +77,7 @@ async function loadComplaints() {
                     </tr>
                 `;
       });
-      //delete shit
+      //delete
       document.querySelectorAll(".delete-btn").forEach((btn) => {
         btn.addEventListener("click", async (e) => {
           const id = e.target.dataset.id;
@@ -79,17 +88,26 @@ async function loadComplaints() {
               `${API_BASE}/complaint/api/complaints/${id}`,
               {
                 method: "DELETE",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
               }
             );
-            if (!res.ok) throw new Error("Failed to delete complaint");
-            document.getElementById(`complaint-${id}`).remove();
+
+            // Log status & response text for debugging
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(
+                `Failed to delete complaint: ${res.status} ${text}`
+              );
+            }
+
+            // Remove row from table
+            const row = document.getElementById(`complaint-${id}`);
+            if (row) row.remove();
+
             alert("Deleted successfully");
           } catch (err) {
             console.error(err);
-            alert("Delete failed");
+            alert(`Delete failed: ${err.message}`);
           }
         });
       });
@@ -104,4 +122,5 @@ async function loadComplaints() {
   }
 }
 
-window.onload = loadComplaints;
+// start
+fetchProfile();
