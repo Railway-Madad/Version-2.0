@@ -82,7 +82,7 @@ viewBtn.addEventListener('click', async () => {
                     if (!confirm('Delete this complaint?')) return;
 
                     try {
-                        const res = await fetch(`${API_BASE}/complaint/${id}`, { method: 'DELETE' });
+                        const res = await fetch(`${API_BASE}/complaint/api/complaints/${id}`, { method: 'DELETE' });
                         if (!res.ok) throw new Error('Failed to delete complaint');
                         document.getElementById(`complaint-${id}`).remove();
                         alert('Deleted successfully');
