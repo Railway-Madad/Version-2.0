@@ -10,7 +10,9 @@
 <body>
     <div class="container">
         <h2>User Dashboard</h2>
+
         <p id="welcome"></p>
+        <a href="complaint.html">File a Complaint</a>
         <button onclick="logout()">Logout</button>
     </div>
 
@@ -22,7 +24,7 @@
                 return;
             }
 
-            const res = await fetch("http://localhost:4000/test", {
+            const res = await fetch("http://localhost:4000/", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
