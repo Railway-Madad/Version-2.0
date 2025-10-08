@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints</title>    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="complaint.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="containercmp nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-train"></i>
+                Rail Madad
+            </a>
+        </div>
+        
+    </nav>
+    <div class="dashboard-container-view">
+        <div class="header">
+            <div class="header-content">
+                <h1>My Complaints</h1>
+                <p>Welcome, <span id="current-user">Guest</span></p>
+            </div>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+
+        <table id="complaints-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>PNR</th>
+                    <th>Description</th>
+                    <th>Issue Domain</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="complaints-body"></tbody>
+        </table>
+    </div>
+
+    <footer>
+        <div class="container">
+            <center><p>© 2025 Rail Madad - Indian Railways. All Rights Reserved.</p></center>
+        </div>
+    </footer>
+
+    <script src="view-complaints.js"></script>
+</body>
+</html>
