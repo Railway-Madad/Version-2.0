@@ -12,6 +12,7 @@ const complaintRouter = require("./routes/complaintRoutes");
 
 const app = express();
 app.use(cors());
+//purval and bapya 5500 var chalva he
 app.use(
   cors({
     origin: "http://localhost:5500",
