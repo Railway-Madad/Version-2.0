@@ -12,7 +12,7 @@ const placeOrder = async (req, res) => {
       });
     }
 
-    if (!req.user || !req.user._id) {
+    if (!req.userId) {
       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
     }
 
@@ -40,7 +40,7 @@ const placeOrder = async (req, res) => {
     }
 
     const newOrder = await Catering.create({
-      user: req.user._id,
+      user: req.userId,
       items: orderItems,
       totalPrice,
       deliveryAddress,
@@ -72,11 +72,11 @@ const getAllCateringOrders = async (req, res) => {
 
 const getMyCateringOrders = async (req, res) => {
   try {
-    if (!req.user || !req.user._id) {
+    if (!req.userId) {
       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
     }
 
-    const orders = await Catering.find({ user: req.user._id })
+    const orders = await Catering.find({ user: req.userId })
       .populate("items.foodItem", "name price");
 
     res.status(200).json({
