@@ -86,7 +86,29 @@ async function loadOrders() {
 
       const buttonContainer = document.createElement("div");
 
-     
+      // Chef
+      if (role === "chef" && order.status === "pending") {
+        const btn = document.createElement("button");
+        btn.innerText = "Accept Order (Preparing)";
+        btn.onclick = () => updateStatus(order._id, "preparing");
+        buttonContainer.appendChild(btn);
+      }
+
+      // Manager
+      if (role === "manager" && order.status === "preparing") {
+        const btn = document.createElement("button");
+        btn.innerText = "Mark Out for Delivery";
+        btn.onclick = () => updateStatus(order._id, "out for delivery");
+        buttonContainer.appendChild(btn);
+      }
+
+      // distributor
+      if (role === "distributor" && order.status === "out for delivery") {
+        const btn = document.createElement("button");
+        btn.innerText = "Deliver Order";
+        btn.onclick = () => updateStatus(order._id, "delivered");
+        buttonContainer.appendChild(btn);
+      }
 
       div.appendChild(buttonContainer);
       container.appendChild(div);
