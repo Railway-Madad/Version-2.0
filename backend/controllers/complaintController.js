@@ -104,6 +104,18 @@ exports.resolveComplaint = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+// GET: Get complaints by domain
+exports.getComplaintsByDomain = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({
+      issueDomain: req.params.domain,
+    }).sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching complaints by domain:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
 // GET: All user images
 exports.getImagesByUser = async (req, res) => {
