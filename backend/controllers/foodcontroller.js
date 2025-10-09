@@ -1,4 +1,6 @@
 const Food = require("../models/foodModel");
+const { cloudinary } = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
 const getAllFoods = async (req, res) => {
   try {
@@ -32,9 +34,17 @@ const getFoodById = async (req, res) => {
   }
 };
 
+const { cloudinary } = require("../config/cloudinary");
+const streamifier = require("streamifier");
+const Food = require("../models/foodModel");
+
 const addFood = async (req, res) => {
   try {
-    const { name, price } = req.body;
+    const { name, price, description, category } = req.body;
+    const file = req.file;
+    let linkurl = null;
+
+    const defaultImageUrl = "https://res.cloudinary.com/dmbvazgkw/image/upload/v1759990412/food_items/a8kcqemnj2arretoj0pt.png";
 
     if (!name || !price) {
       return res
@@ -42,7 +52,33 @@ const addFood = async (req, res) => {
         .json({ success: false, message: "Please provide name and price" });
     }
 
-    const newFood = await Food.create(req.body);
+    if (file) {
+      const streamUpload = (fileBuffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "railmadad/food_items" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(fileBuffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload(file.buffer);
+      linkurl = result.secure_url;
+    } else {
+      linkurl = defaultImageUrl;
+    }
+
+    const newFood = await Food.create({
+      name,
+      price,
+      description,
+      category,
+      imageUrl: linkurl,
+    });
 
     res.status(201).json({ success: true, data: newFood });
   } catch (error) {

@@ -1,17 +1,16 @@
-const {Router} = require("express");
-const Food = require("../models/foodModel");
-const adminAuthentication = require('../middlewares/adminAuthentication');
-
+const {Router} = require('express');
+const foodRouter = Router();
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const foodcontroller = require("../controllers/foodcontroller");
-
-const foodRouter = Router();
 
 foodRouter.get("/", foodcontroller.getAllFoods);
 
 foodRouter.get("/:id", foodcontroller.getFoodById);
 
-foodRouter.post("/",foodcontroller.addFood);
+foodRouter.post("/", upload.single("image"), foodcontroller.addFood);
 foodRouter.delete("/:id",foodcontroller.deleteFood);
 
 module.exports = foodRouter;
