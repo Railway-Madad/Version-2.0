@@ -31,6 +31,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/user", userRouter);
 app.use("/uploads", express.static("uploads"));
 // app.use('/admin',adminRouter);
+app.use('/admin',adminRouter);
 app.use('/staff',staffRouter);
 app.use("/food", foodRouter);
 app.use("/complaint", complaintRouter);

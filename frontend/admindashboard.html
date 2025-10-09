@@ -16,4 +16,22 @@
         <button onclick="logout()">Logout</button>
     </div>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("adminToken");
+        if (!token) {
+            alert("No admin token found, please login.");
+            window.location.href = "adminlogin.html";
+            return;
+        }
+        // Optionally, decode token to get admin info (if using JWT)
+        document.getElementById("welcome").innerText = "Welcome, Admin!";
+    });
+
+    function logout() {
+        localStorage.removeItem("adminToken");
+        alert("Logged out successfully.");
+        window.location.href = "adminlogin.html";
+    }
+</script>
 </html>

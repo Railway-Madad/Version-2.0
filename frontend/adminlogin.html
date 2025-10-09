@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+</head>
+<body>
+    <h2>Admin Login</h2>
+    <form onsubmit="login(event)">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function login(e) {
+            e.preventDefault(); // prevent page reload
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            try {
+                console.log("Attempting login for admin:", username);
+                const res = await axios.post("http://localhost:4000/admin/login", {
+                    username,
+                    password
+                });
+                const data = res.data;
+                if (res.status === 200 && data.token) {
+                    localStorage.setItem("adminToken", data.token);
+                    console.log("✅ Login successful, token stored:", data.token);
+                    window.location.href = "admindashboard.html"; // Redirect to admin dashboard
+                } else {
+                    alert(data.message || "Invalid username or password.");
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                if (error.response) {
+                    // server responded with an error
+                    alert(error.response.data.message || "Login failed.");
+                } else {
+                    // network or server unreachable
+                    alert("Unable to connect to server. Please try again later.");
+                }
+            }
+        }
+    </script>
+    
+</body>
+</html>
