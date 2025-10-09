@@ -59,7 +59,7 @@ form.addEventListener('submit', async (e) => {
 
         successMessage.style.display = 'block';
         form.reset();
-        document.getElementById('username').value = currentUser;
+        document.getElementById('username').value = currentUser.username;
     } catch (err) {
         console.log("done2");
         console.error(err);

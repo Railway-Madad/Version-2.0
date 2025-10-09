@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
 const VALID_ISSUE_DOMAINS = [
-    'Cleanliness',
-    'Staff Behavior',
+    'Cleaning',
     'Catering',
-    'Delay',
-    'Facilities',
-    'Other'
+    'Security',
+    'Maintenance',
+    'Medical'
 ];
 
 const complaintSchema = new mongoose.Schema({
@@ -34,7 +33,7 @@ const complaintSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: VALID_ISSUE_DOMAINS,
-        default: 'Other'
+        default: 'Maintenance'
     },
     linkurl: {
         type: String,
