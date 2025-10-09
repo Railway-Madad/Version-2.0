@@ -20,6 +20,108 @@
   <div id="orders-container"></div>
 
 
-  
+  <script>
+    const API_BASE = "http://localhost:4000";
+const token = localStorage.getItem("token");
+
+document.getElementById("load-orders-btn").addEventListener("click", loadOrders);
+
+async function loadOrders() {
+  const role = document.getElementById("role").value;
+  const container = document.getElementById("orders-container");
+  container.innerHTML = "Loading...";
+
+  try {
+    const res = await fetch(`${API_BASE}/catering/all-orders`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      container.innerText = "Failed to load orders.";
+      return;
+    }
+
+    let orders = data.data;
+
+    if (role === "chef") {
+      orders = orders.filter(o => o.status === "pending");
+    } else if (role === "manager") {
+      orders = orders.filter(o => o.status === "preparing");
+    } else if (role === "distributor") {
+      orders = orders.filter(o => o.status === "out for delivery");
+    } else if (role === "all") {
+
+    } else {
+      container.innerText = "Invalid role selected.";
+      return;
+    }
+
+    if (orders.length === 0) {
+      container.innerText = "No orders available.";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    orders.forEach(order => {
+      const div = document.createElement("div");
+      div.style.border = "1px solid black";
+      div.style.margin = "10px";
+      div.style.padding = "10px";
+
+      div.innerHTML = `
+        <p><b>Order ID:</b> ${order._id}</p>
+        <p><b>Customer:</b> ${order.user?.name || "N/A"} (${order.user?.email || ""})</p>
+        <p><b>Address:</b> ${order.deliveryAddress}</p>
+        <p><b>Status:</b> ${order.status}</p>
+        <p><b>Items:</b></p>
+        <ul>
+          ${order.items.map(i => `
+            <li>${i.foodItem?.name} — ${i.quantity} × ₹${i.priceAtOrder}</li>
+          `).join("")}
+        </ul>
+        <p><b>Total:</b> ₹${order.totalPrice}</p>
+      `;
+
+      const buttonContainer = document.createElement("div");
+
+     
+
+      div.appendChild(buttonContainer);
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerText = "Error loading orders.";
+  }
+}
+
+async function updateStatus(orderId, status) {
+  try {
+    const res = await fetch(`${API_BASE}/catering/${orderId}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert(`✅ Order status updated to ${status}`);
+      loadOrders();
+    } else {
+      alert(`❌ Failed: ${data.message}`);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+}
+
+  </script>
 </body>
 </html>
