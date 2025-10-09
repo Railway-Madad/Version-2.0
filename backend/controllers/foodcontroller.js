@@ -56,7 +56,7 @@ const addFood = async (req, res) => {
       const streamUpload = (fileBuffer) => {
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { folder: "food_items" },
+            { folder: "railmadad/food_items" },
             (error, result) => {
               if (result) resolve(result);
               else reject(error);
