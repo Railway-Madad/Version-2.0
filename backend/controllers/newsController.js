@@ -17,7 +17,7 @@ const addNews = async (req, res) => {
       const streamUpload = (fileBuffer) => {
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { folder: "news_updates", resource_type: "image" },
+            { folder: "railmadad/news_updates", resource_type: "image" },
             (error, result) => {
               if (result) resolve(result);
               else reject(error);
