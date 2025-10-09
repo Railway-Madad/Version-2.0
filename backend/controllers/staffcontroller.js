@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z, email } = require('zod');
 const Complaint = require('../models/complaintModel');
+const complaintModel = require('../models/complaintModel');
 
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -103,9 +104,62 @@ const getComplaints = async (req, res) => {
     }
 };
 
+const getStaffById = async (req, res) => {
+    try {
+        const staffId = req.params.id;
+        const staff = await staffModel.findById(staffId).select('name role email phone'); // Exclude password
+        if (!staff) {
+            return res.status(404).json({ message: "Staff not found" });
+        }
+        res.status(200).json({ staff });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+const resolveComplaint = async (req, res) => {
+    try {
+        const staffId = req.staffId;
+        const { id } = req.params;
+        const { resolutionDetails } = req.body;
+
+        const staff = await staffModel.findById(staffId);
+        if (!staff) {
+            return res.status(404).json({ message: "Staff not found" });
+        }
+
+        const complaint = await Complaint.findById(id);
+        if (!complaint) {
+            return res.status(404).json({ message: "Complaint not found" });
+        }
+
+        if (complaint.status === 'Resolved') {
+            return res.status(400).json({ message: "Complaint is already resolved" });
+        }
+
+        // Check if the complaint's issueDomain matches the staff's role
+        if (complaint.issueDomain !== staff.role) {
+            return res.status(403).json({ message: "You are not authorized to resolve this complaint" });
+        }
+
+        complaint.status = 'Resolved';
+        complaint.resolvedAt = new Date();
+        complaint.resolutionDetails = resolutionDetails || '';
+        complaint.resolvedBy = staff._id;
+
+        const updatedComplaint = await complaintModel.findByIdAndUpdate(id, complaint, { new: true });
+
+        res.status(200).json({ message: "Complaint resolved successfully", complaint: updatedComplaint });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
     getProfile,
-    getComplaints
+    getComplaints,
+    resolveComplaint,
+    getStaffById
 };

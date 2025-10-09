@@ -12,7 +12,16 @@
         <h2><span id="staff-role"></span> Dashboard</h2>
 
         <p id="welcome"></p>
-        // a table to show all complaints assigned to the staff's role and a side button to resolve each complaint
+        <!-- // search bar to filter complaints by username, pnr, issue domain, status -->
+        <input type="text" id="search-bar" placeholder="Search complaints..." onkeyup="filterComplaints()">
+        // the result of search bar should filter both pending and resolved complaints
+        // and the results should be shown in respective tables
+        <br><br>
+        
+
+
+        <h3>Assigned Complaints</h3>
+        <!-- Complaints Table -->
         <table border="1" cellpadding="10">
             <thead>
                 <tr>
@@ -32,7 +41,25 @@
         </table>
         <br>
 
-        
+        <h3>Resolved Complaints</h3>
+        <table border="1" cellpadding="10">
+            <thead>
+                <tr>
+                    <th>Complaint ID</th>
+                    <th>Username</th>
+                    <th>PNR</th>
+                    <th>Description</th>
+                    <th>Issue Domain</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="resolved-complaints-table-body">
+                <!-- Resolved complaints will be populated here -->
+            </tbody>
+        </table>
+        <br>
         <button onclick="logout()">Logout</button>
     </div>
 
@@ -77,7 +104,10 @@
                 const tbody = document.getElementById("complaints-table-body");
                 tbody.innerHTML = "";
 
-                data.complaints.forEach(complaint => {
+                // only show pending complaints
+                const pendingComplaints = data.complaints.filter(complaint => complaint.status === "Pending");
+
+                pendingComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${complaint._id}</td>
@@ -88,15 +118,166 @@
                         <td>${complaint.status}</td>
                         <td>${new Date(complaint.createdAt).toLocaleString()}</td>
                         <td>
-                            <button onclick="resolveComplaint('${complaint._id}')">Resolve</button>
+                            <button onclick="resolveComplaint('${complaint._id}')">Resolve</button> 
                         </td>
                     `;
+                    // when the resolved button is clicked, there should be a prompt to enter resolution details
+                    // and then call the resolveComplaint function with the complaint id and resolution details
                     tbody.appendChild(tr);
                 });
             } else {
                 console.error("Failed to fetch complaints");
             }
         }
+
+        async function fetchResolvedComplaints() {  
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "staff_login.html";
+                return;
+            }
+            console.log("Fetching resolved complaints for staff...");
+
+            const res = await fetch("http://localhost:4000/staff/complaints", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Resolved Complaints data:", data);
+                const tbody = document.getElementById("resolved-complaints-table-body");
+                tbody.innerHTML = "";
+
+                // only show resolved complaints
+                const resolvedComplaints = data.complaints.filter(complaint => complaint.status === "Resolved");
+                for (const complaint of resolvedComplaints) {
+                    console.log("Resolved complaint:", complaint);
+                }   
+                // fetch staff name by id for each complaint
+                for (const complaint of resolvedComplaints) {
+                    if (complaint.resolvedBy) {
+                        const staffRes = await fetch(`http://localhost:4000/staff/getname/${complaint.resolvedBy}`, {
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+                        if (staffRes.ok) {
+                            const staffData = await staffRes.json();
+                            complaint.resolvedBy = staffData.staff.name;
+                        } else {
+                            complaint.resolvedBy = 'N/A';
+                        }
+                    } else {
+                        complaint.resolvedBy = 'N/A';
+                    }
+                }   
+
+                resolvedComplaints.forEach(complaint => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${complaint._id}</td>
+                        <td>${complaint.username}</td>
+                        <td>${complaint.pnr}</td>
+                        <td>${complaint.description}</td>
+                        <td>${complaint.issueDomain}</td>
+                        <td>${complaint.status}</td>
+                        <td>${new Date(complaint.createdAt).toLocaleString()}</td>
+                        <td>Resolved by: ${complaint.resolvedBy ? complaint.resolvedBy : 'N/A'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                console.error("Failed to fetch resolved complaints");
+            }
+        }
+
+
+       async function filterComplaints() {
+            const searchTerm = document.getElementById("search-bar").value.toLowerCase();
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "staff_login.html";
+                return;
+            }
+
+            const res = await fetch("http://localhost:4000/staff/complaints", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Filtering complaints data:", data);
+
+                // replace resolvedBy id with name
+                for (const complaint of data.complaints) {
+                    if (complaint.resolvedBy) {
+                        const staffRes = await fetch(`http://localhost:4000/staff/getname/${complaint.resolvedBy}`, {
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+                        if (staffRes.ok) {
+                            const staffData = await staffRes.json();
+                            complaint.resolvedBy = staffData.staff.name;
+                        } else {
+                            complaint.resolvedBy = 'N/A';
+                        }
+                    } else {
+                        complaint.resolvedBy = 'N/A';
+                    }
+                }   
+
+                const filteredComplaints = data.complaints.filter(complaint => {
+                    return (
+                        complaint.username.toLowerCase().includes(searchTerm) ||
+                        complaint.pnr.toLowerCase().includes(searchTerm) ||
+                        complaint.issueDomain.toLowerCase().includes(searchTerm) ||
+                        complaint.status.toLowerCase().includes(searchTerm)
+                    );
+                });
+
+                // Separate pending and resolved complaints
+                const pendingComplaints = filteredComplaints.filter(complaint => complaint.status === "Pending");
+                const resolvedComplaints = filteredComplaints.filter(complaint => complaint.status === "Resolved");
+
+                // Populate pending complaints table
+                const pendingTbody = document.getElementById("complaints-table-body");
+                pendingTbody.innerHTML = "";
+                pendingComplaints.forEach(complaint => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${complaint._id}</td>
+                        <td>${complaint.username}</td>
+                        <td>${complaint.pnr}</td>
+                        <td>${complaint.description}</td>
+                        <td>${complaint.issueDomain}</td>
+                        <td>${complaint.status}</td>
+                        <td>${new Date(complaint.createdAt).toLocaleString()}</td>
+                        <td>
+                            <button onclick="resolveComplaint('${complaint._id}')">Resolve</button> 
+                        </td>
+                    `;
+                    pendingTbody.appendChild(tr);
+                });
+
+                // Populate resolved complaints table
+                const resolvedTbody = document.getElementById("resolved-complaints-table-body");
+                resolvedTbody.innerHTML = "";
+                resolvedComplaints.forEach(complaint => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${complaint._id}</td>
+                        <td>${complaint.username}</td>
+                        <td>${complaint.pnr}</td>
+                        <td>${complaint.description}</td>
+                        <td>${complaint.issueDomain}</td>
+                        <td>${complaint.status}</td>
+                        <td>${new Date(complaint.createdAt).toLocaleString()}</td>
+                        <td>Resolved by: ${complaint.resolvedBy ? complaint.resolvedBy : 'N/A'}</td>
+                    `;
+                    resolvedTbody.appendChild(tr);
+                });
+            } else {
+                console.error("Failed to fetch complaints for filtering");  
+            }       
+        }
+
         async function resolveComplaint(complaintId) {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -104,15 +285,27 @@
                 return;
             }
 
+            const resolutionDetails = prompt("Enter resolution details:");
+            if (!resolutionDetails) {
+                alert("Resolution details are required.");
+                return;
+            }
+
             const res = await fetch(`http://localhost:4000/staff/complaints/${complaintId}/resolve`, {
                 method: "PUT",
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ resolutionDetails })
             });
 
             if (res.ok) {
                 alert("Complaint resolved successfully");
                 fetchComplaints();
-            } else {
+            }
+
+            else {
                 alert("Failed to resolve complaint");
             }
         }
@@ -124,6 +317,8 @@
 
         loadDashboard();
         fetchComplaints();
+        fetchResolvedComplaints();
+
     </script>
 </body>
 
