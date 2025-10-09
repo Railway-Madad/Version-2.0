@@ -15,6 +15,7 @@ const loginSchema = z.object({
 });
 
 const register = async (req, res) => {
+    console.log("Register endpoint hit");
     const parsedBody = registerSchema.safeParse(req.body);
     if (!parsedBody.success) {
         return res.status(400).json({ errors: parsedBody.error.errors });

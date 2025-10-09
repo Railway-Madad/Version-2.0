@@ -15,5 +15,6 @@ router.put('/api/complaints/:id/resolve',userAuthentication, complaintController
 router.delete('/api/complaints/:id',userAuthentication, complaintController.deleteComplaint);
 router.get('/complaints/all',userAuthentication, complaintController.getAllComplaints);
 router.get('/api/images/user/:username',userAuthentication, complaintController.getImagesByUser);
+//reslove complaint
 
 module.exports = router;

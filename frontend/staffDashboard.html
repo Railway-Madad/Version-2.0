@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>staff Dashboard</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2><span id="staff-role"></span> Dashboard</h2>
+
+        <p id="welcome"></p>
+        <a href="complaint.html">File a Complaint</a>
+        <a href="order.html">food order</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        async function loadDashboard() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "staff_login.html";
+                return;
+            }
+
+            const res = await fetch("http://localhost:4000/staff/profile", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log(data);
+                document.getElementById("welcome").innerText = `Hello, ${data.staff.name}!`;
+                document.getElementById("staff-role").innerText = data.staff.role;
+            } else {
+                localStorage.removeItem("token");
+                window.location.href = "staff_login.html";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "staff_login.html";
+        }
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>

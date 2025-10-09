@@ -2,13 +2,15 @@ const {Router} = require('express');
 const Admin = require('../models/adminModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const staffController = require('../controllers/admincontroller');
+const staffController = require('../controllers/staffcontroller');
 const adminAuthentication = require('../middlewares/adminAuthentication');
+const staffAuthentication = require('../middlewares/staffAuthentication');
 
 const staffRouter = Router();
 
-staffRouter.post('/register',adminAuthentication, staffController.register);
+staffRouter.post('/register', staffController.register);
 staffRouter.post('/login', staffController.login);
+staffRouter.get('/profile', staffAuthentication, staffController.getProfile);
 staffRouter.get('/test', (req, res) => {
     res.send("Staff route is working");
 });

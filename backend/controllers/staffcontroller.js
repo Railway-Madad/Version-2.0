@@ -70,7 +70,22 @@ const login = async (req, res) => {
     }
 };
 
+
+const getProfile = async (req, res) => {
+    try {
+        const staffId = req.staffId;
+        const staff = await staffModel.findById(staffId).select('-password'); // Exclude password
+        if (!staff) {
+            return res.status(404).json({ message: "Staff not found" });
+        }
+        res.status(200).json({ staff });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    getProfile
 };

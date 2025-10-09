@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Login</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Include Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Staff Login</h2>
+        <div class="message" id="msg"></div>
+
+        <!-- Form captures the event -->
+        <form onsubmit="login(event)">
+            <input type="email" id="staffemail" placeholder="Staff Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        async function login(e) {
+            e.preventDefault(); // prevent page reload
+
+            const email = document.getElementById("staffemail").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const msgEl = document.getElementById("msg");
+            msgEl.innerText = ""; // clear old messages
+
+            try {
+                console.log("Attempting login for staff:", email);
+
+                // Axios POST request
+                const res = await axios.post("http://localhost:4000/staff/login", {
+                    email,
+                    password
+                });
+
+                const data = res.data;
+
+                if (res.status === 200 && data.token) {
+                    localStorage.setItem("token", data.token);
+                    console.log("✅ Login successful, token stored:", data.token);
+                    window.location.href = "staffDashboard.html";
+                } else {
+                    msgEl.innerText = data.message || "Invalid email or password.";
+                }
+
+            } catch (error) {
+                console.error("Login error:", error);
+                if (error.response) {
+                    // server responded with an error
+                    msgEl.innerText = error.response.data.message || "Login failed.";
+                } else {
+                    // network or server unreachable
+                    msgEl.innerText = "Unable to connect to server. Please try again later.";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

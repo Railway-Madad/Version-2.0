@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Register</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>staff Register</h2>
+        <div class="message" id="msg"></div>
+
+        <form onsubmit="register(event)">
+            <input type="text" id="name" placeholder="Name" required>
+            <select id="role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="Cleaning">Cleaning</option>
+                <option value="Catering">Catering</option>
+                <option value="Security">Security</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Medical">Medical</option>
+            </select>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="tel" id="phone" placeholder="Phone" required>
+            <button type="submit">Register</button>
+        </form>
+
+
+        <p>Already have an account? <a href="staff_login.html">Login here</a></p>
+    </div>
+
+    <script>
+        async function register(e) {
+            e.preventDefault(); // prevent reload
+
+            const name = document.getElementById("name").value.trim();
+            const role = document.getElementById("role").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const msgEl = document.getElementById("msg");
+            msgEl.innerText = "";
+
+            if (!name || !role || !email || !password || !phone) {
+                msgEl.innerText = "Please fill in all fields.";
+                return;
+            }
+
+            try {
+                console.log("Attempting registration for:", name);
+
+                const res = await axios.post("http://localhost:4000/staff/register", {
+                    name,
+                    role,
+                    email,
+                    password,
+                    phone
+                });
+
+                const data = res.data;
+                console.log("✅ Registration successful:", data);
+
+                msgEl.style.color = "green";
+                msgEl.innerText = data.message || "Registration successful! Redirecting to login...";
+
+                // Redirect to login page after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = "staff_login.html";
+                }, 1500);
+
+            } catch (error) {
+                console.error("Registration error:", error);
+                msgEl.style.color = "red";
+
+                if (error.response) {
+                    msgEl.innerText = error.response.data.message || "Registration failed.";
+                } else {
+                    msgEl.innerText = "Unable to connect to server. Please try again later.";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
