@@ -73,7 +73,16 @@ async function loadNews() {
   });
 }
 
-
+async function deleteNews(id) {
+  const res = await fetch(`${API_BASE}/news/${id}`, { method: "DELETE" });
+  const data = await res.json();
+  if (data.success) {
+    alert("🗑️ News deleted");
+    loadNews();
+  } else {
+    alert("❌ Failed to delete news");
+  }
+}
 
 loadNews();
 
