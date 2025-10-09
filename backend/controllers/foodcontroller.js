@@ -1,4 +1,6 @@
 const Food = require("../models/foodModel");
+const { cloudinary } = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
 const getAllFoods = async (req, res) => {
   try {
@@ -32,24 +34,11 @@ const getFoodById = async (req, res) => {
   }
 };
 
-const addFood = async (req, res) => {
-  try {
-    const { name, price } = req.body;
+const { cloudinary } = require("../config/cloudinary");
+const streamifier = require("streamifier");
+const Food = require("../models/foodModel");
 
-    if (!name || !price) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Please provide name and price" });
-    }
 
-    const newFood = await Food.create(req.body);
-
-    res.status(201).json({ success: true, data: newFood });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
 
 
 const deleteFood = async (req, res) => {
