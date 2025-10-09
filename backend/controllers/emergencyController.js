@@ -4,7 +4,7 @@ exports.createEmergency = async (req, res) => {
   try {
     const { username, trainNumber, seatNumber } = req.body;
 
-    if (!userId || !username || !trainNumber || !seatNumber) {
+    if (!username || !trainNumber || !seatNumber) {
       return res.status(400).json({ error: "All fields are required" });
     }
 

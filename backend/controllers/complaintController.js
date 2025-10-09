@@ -104,7 +104,7 @@ exports.resolveComplaint = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-// GET: Get complaints by domain
+// GET:
 exports.getComplaintsByDomain = async (req, res) => {
   try {
     const complaints = await Complaint.find({

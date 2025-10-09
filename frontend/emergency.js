@@ -3,8 +3,10 @@ const token = localStorage.getItem('token');
 let currentUser = {};
 
 if (!token) {
+  console.log("Not logged in");
   window.location.href = "login.html";
 } else {
+
   fetch(`${API_BASE}/user/profile`, {
     method: 'GET',
     headers: {
@@ -17,11 +19,11 @@ if (!token) {
   })
   .then(data => {
     currentUser = data.user || {};
-    document.getElementById('username').value = currentUser.username;
-    document.getElementById('current-user').textContent = currentUser.username;
+    
   })
-  .catch(() => {
+  .catch((e) => {
     window.location.href = "login.html";
+    // console.error(e);
   });
 }
 
