@@ -48,9 +48,10 @@ const complaintSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    resolutionCategory: {
-        type: String,
-        default: ''
+    resolvedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Staff',
+        default: null
     },
     createdAt: {
         type: Date,

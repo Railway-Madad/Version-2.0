@@ -89,8 +89,7 @@ exports.resolveComplaint = async (req, res) => {
       {
         status: "Resolved",
         resolvedAt: new Date(),
-        resolutionDetails: req.body.resolutionDetails || "",
-        resolutionCategory: req.body.resolutionCategory || "",
+        resolutionDetails: req.body.resolutionDetails || ""
       },
       { new: true }
     );
