@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Give Feedback</title>
+</head>
+<body>
+  <h1>We value your feedback!</h1>
+
+  <form id="feedback-form">
+    <input type="text" id="name" placeholder="Your Name" required><br><br>
+    <input type="email" id="email" placeholder="Your Email" required><br><br>
+    <label>Rating (1-5): </label>
+    <input type="number" id="rating" min="1" max="5" required><br><br>
+    <textarea id="comment" placeholder="Your Comment" required></textarea><br><br>
+    <button type="submit">Submit Feedback</button>
+  </form>
+
+  <p id="msg"></p>
+
+  <script>
+    const API_BASE = "http://localhost:4000";
+
+    document.getElementById("feedback-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const rating = document.getElementById("rating").value;
+      const comment = document.getElementById("comment").value.trim();
+
+      const res = await fetch(`${API_BASE}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, rating, comment }),
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("msg");
+
+      if (data.success) {
+        msg.textContent = "✅ Thank you for your feedback!";
+        document.getElementById("feedback-form").reset();
+      } else {
+        msg.textContent = "❌ Failed to submit feedback. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
