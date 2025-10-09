@@ -11,6 +11,7 @@ const foodRouter = require("./routes/foodRoutes");
 const complaintRouter = require("./routes/complaintRoutes");
 const cateringRouter = require("./routes/cateringRoutes");
 const emergencyRoutes = require("./routes/emergencyRoutes");
+const newsRouter = require("./routes/newsRouter")
 
 const app = express();
 app.use(cors());
@@ -34,6 +35,7 @@ app.use("/food", foodRouter);
 app.use("/complaint", complaintRouter);
 app.use('/catering',cateringRouter);
 app.use('/emergency', emergencyRoutes);
+app.use("/news", newsRouter);
 app.get("/", (req, res) => {
   res.send("Server is working");
 });

@@ -10,6 +10,8 @@ const staffRouter = Router();
 
 staffRouter.post('/register', staffController.register);
 staffRouter.post('/login', staffController.login);
+//get complaints of respective staff
+staffRouter.get('/complaints', staffAuthentication, staffController.getComplaints);
 staffRouter.get('/profile', staffAuthentication, staffController.getProfile);
 staffRouter.get('/test', (req, res) => {
     res.send("Staff route is working");
