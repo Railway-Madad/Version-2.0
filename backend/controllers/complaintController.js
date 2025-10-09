@@ -62,6 +62,18 @@ exports.getComplaintsByUser = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+//Get by status
+exports.getComplaintByStatus = async (req, res) => {
+ //by default get Important complaints
+  const status = "Important";
+  try {
+    const complaints = await Complaint.find({ status }).sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching complaints by status:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
 // DELETE: delete complaint
 exports.deleteComplaint = async (req, res) => {

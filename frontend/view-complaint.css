@@ -1,0 +1,269 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.containercmp {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2563eb;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo:hover {
+    color: #1d4ed8;
+}
+
+/* Dashboard Container */
+.dashboard-container-view {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.header {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    color: #1f2937;
+    margin-bottom: 5px;
+}
+
+.header-content p {
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.header-content #current-user {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.btn {
+    padding: 10px 20px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background: #1d4ed8;
+}
+
+/* Table Styles */
+#complaints-table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-collapse: collapse;
+}
+
+#complaints-table thead {
+    background: #2563eb;
+    color: white;
+}
+
+#complaints-table thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#complaints-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#complaints-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+#complaints-table tbody td {
+    padding: 15px;
+    font-size: 14px;
+    color: #374151;
+}
+
+/* First column (ID) */
+#complaints-table tbody td:first-child {
+    font-family: monospace;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Status Column Colors */
+#complaints-table tbody td:nth-child(5) {
+    font-weight: 600;
+}
+
+/* Pending - Red */
+#complaints-body td[style*="#c81121ff"] {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border-radius: 5px;
+}
+
+/* Important - Yellow */
+#complaints-body td[style*="yellow"] {
+    background: #fef3c7 !important;
+    color: #78350f !important;
+    border-radius: 5px;
+}
+
+/* Resolved - Green */
+#complaints-body td[style*="#e4d8d9"] {
+    background: #d1fae5 !important;
+    color: #15803d !important;
+    border-radius: 5px;
+}
+
+/* Progress Bar Row */
+#complaints-body tr td[colspan="7"] {
+    padding: 12px 15px;
+    background: #f9fafb;
+}
+
+/* Progress Bar Container */
+#complaints-body tr td > div {
+    background: #e5e7eb !important;
+    height: 10px !important;
+    border-radius: 5px !important;
+    overflow: hidden !important;
+    margin-top: 5px !important;
+}
+
+/* Progress Bar Fill */
+#complaints-body tr td > div > div {
+    height: 100% !important;
+    border-radius: 5px !important;
+    transition: width 0.5s ease !important;
+}
+
+/* Progress Bar Colors by Status */
+#complaints-body tr td > div > div[data-status="Pending"] {
+    background: #ef4444 !important;
+}
+
+#complaints-body tr td > div > div[data-status="Important"] {
+    background: #facc15 !important;
+}
+
+#complaints-body tr td > div > div[data-status="Resolved"] {
+    background: #22c55e !important;
+}
+
+/* Progress Text */
+#complaints-body small {
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    display: block;
+    margin-top: 6px;
+}
+
+/* Delete Button */
+.delete-btn {
+    padding: 8px 16px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* Row for Progress Bar Text */
+#complaints-body tr:has(td[colspan="7"]) td {
+    text-align: center;
+    padding: 40px 15px;
+    color: #9ca3af;
+    font-size: 15px;
+}
+
+footer {
+    background: white;
+    padding: 20px 0;
+    margin-top: 40px;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+}
+
+footer p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .header-content h1 {
+        font-size: 22px;
+    }
+
+    #complaints-table {
+        font-size: 13px;
+    }
+
+    #complaints-table thead th,
+    #complaints-table tbody td {
+        padding: 10px;
+    }
+
+    .dashboard-container-view {
+        overflow-x: auto;
+    }
+
+    #complaints-table {
+        min-width: 700px;
+    }
+}
