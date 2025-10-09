@@ -10,6 +10,7 @@ const staffRouter = require("./routes/staffRoutes");
 const foodRouter = require("./routes/foodRoutes");
 const complaintRouter = require("./routes/complaintRoutes");
 const cateringRouter = require("./routes/cateringRoutes");
+const newsRouter = require("./routes/newsRouter")
 
 const app = express();
 app.use(cors());
@@ -31,7 +32,8 @@ app.use("/uploads", express.static("uploads"));
 app.use('/staff',staffRouter);
 app.use("/food", foodRouter);
 app.use("/complaint", complaintRouter);
-app.use('/catering',cateringRouter)
+app.use('/catering',cateringRouter);
+app.use("/news", newsRouter);
 app.get("/", (req, res) => {
   res.send("Server is working");
 });

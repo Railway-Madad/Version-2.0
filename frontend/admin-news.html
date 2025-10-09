@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - News Dashboard</title>
+</head>
+<body>
+  <h1>Admin News Dashboard</h1>
+
+  <form id="news-form">
+    <input type="text" id="title" placeholder="Title" required><br><br>
+    <textarea id="description" placeholder="Description" required></textarea><br><br>
+    <input type="file" id="image"><br><br>
+    <button type="submit">Add News</button>
+  </form>
+
+  <h2>All News</h2>
+  <div id="news-container"></div>
+
+  <script>
+    const API_BASE = "http://localhost:4000";
+
+document.getElementById("news-form").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const file = document.getElementById("image").files[0];
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("description", description);
+  if (file) formData.append("image", file);
+
+  const res = await fetch(`${API_BASE}/news`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert("✅ News added successfully!");
+    document.getElementById("news-form").reset();
+    loadNews();
+  } else {
+    alert("❌ Failed to add news");
+  }
+});
+
+async function loadNews() {
+  const res = await fetch(`${API_BASE}/news`);
+  const data = await res.json();
+
+  console.log(data);
+
+  const container = document.getElementById("news-container");
+  container.innerHTML = "";
+
+  data.data.forEach(news => {
+    const div = document.createElement("div");
+    div.style.border = "1px solid black";
+    div.style.margin = "10px";
+    div.style.padding = "10px";
+
+    div.innerHTML = `
+      <h3>${news.title}</h3>
+      <p>${news.description}</p>
+      <img src="${news.imageUrl}" width="200">
+      <p><b>Created At:</b> ${new Date(news.createdAt).toLocaleString()}</p>
+      <button onclick="deleteNews('${news._id}')">Delete</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function deleteNews(id) {
+  const res = await fetch(`${API_BASE}/news/${id}`, { method: "DELETE" });
+  const data = await res.json();
+  if (data.success) {
+    alert("🗑️ News deleted");
+    loadNews();
+  } else {
+    alert("❌ Failed to delete news");
+  }
+}
+
+loadNews();
+
+  </script>
+</body>
+
+</html>
