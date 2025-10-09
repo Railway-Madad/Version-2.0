@@ -14,7 +14,6 @@ const emergencyRoutes = require("./routes/emergencyRoutes");
 const newsRouter = require("./routes/newsRouter");
 const feedbackRouter = require("./routes/feedbackRouter");
 
-
 const app = express();
 app.use(cors());
 //purval and bapya 5500 var chalva he
