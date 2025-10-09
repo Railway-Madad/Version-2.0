@@ -34,10 +34,6 @@ const getFoodById = async (req, res) => {
   }
 };
 
-const { cloudinary } = require("../config/cloudinary");
-const streamifier = require("streamifier");
-const Food = require("../models/foodModel");
-
 const addFood = async (req, res) => {
   try {
     const { name, price, description, category } = req.body;
