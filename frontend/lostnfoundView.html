@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Lost/Found Items</title>
+</head>
+<body>
+   
+    <h1>Lost and Found Items</h1>
+    <div>
+        <label for="filter">Filter by Category:</label>
+        <select id="filter" onchange="loadItems()">
+            <option value="">All</option>
+            <option value="Lost">Lost</option>
+            <option value="Found">Found</option>
+        </select>
+    </div>
+    <div id="user-submissions"></div>
+
+    <script>
+        const API_BASE = "http://localhost:4000";
+
+        async function loadItems() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const filter = document.getElementById("filter").value;
+            let url = `${API_BASE}/lostnfound`;
+
+            const res = await fetch(url, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const result = await res.json();
+            const container = document.getElementById("user-submissions");
+            container.innerHTML = "";
+            console.log(result);
+            //filter results based on category if filter is selected
+            if (filter) {
+                result.items = result.items.filter(item => item.category === filter);
+            }
+
+            if (res.ok) {
+                result.items.forEach(item => {
+                    const div = document.createElement("div");
+                    div.style.border = "1px solid black";
+                    div.style.margin = "10px";
+                    div.style.padding = "10px";
+
+                    div.innerHTML = `
+                        <h2>${item.title} (${item.category})</h2>
+                        <p>${item.description}</p>
+                        <p><b>Location:</b> ${item.location}</p>
+                        <p><b>Date:</b> ${new Date(item.date).toLocaleDateString()}</p>
+                        <p><b>Contact Info:</b> ${item.contactInfo}</p>
+                        ${item.imageUrl ? `<img src="${item.imageUrl}" width="200"><br>` : ''}
+                        <p><b>Status:</b> ${item.status}</p>
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                alert("Failed to load items");
+            }
+        }
+        loadItems();
+    </script>
+
+</body>
+</html>

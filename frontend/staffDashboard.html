@@ -105,7 +105,7 @@
                 tbody.innerHTML = "";
 
                 // only show pending complaints
-                const pendingComplaints = data.complaints.filter(complaint => complaint.status === "Pending");
+                const pendingComplaints = data.complaints.filter(complaint => complaint.status !== "Resolved");
 
                 pendingComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
@@ -233,7 +233,7 @@
                 });
 
                 // Separate pending and resolved complaints
-                const pendingComplaints = filteredComplaints.filter(complaint => complaint.status === "Pending");
+                const pendingComplaints = filteredComplaints.filter(complaint => complaint.status !== "Resolved");
                 const resolvedComplaints = filteredComplaints.filter(complaint => complaint.status === "Resolved");
 
                 // Populate pending complaints table
