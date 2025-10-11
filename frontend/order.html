@@ -3,47 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Onboard Meal Service</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-     <main>
-        <section>
-            <h2>Menu</h2>
-            <div id="menu-container">
-                <!-- menu -->
+    <main class="page-shell fade-in">
+        <section class="surface-card card-highlight">
+            <div class="page-header">
+                <div>
+                    <h1>Onboard Meal Service</h1>
+                    <p class="muted-text">Explore curated meals, build your cart, and track delivery without leaving your seat.</p>
+                </div>
+                <a class="btn btn-tonal" href="userDashboard.html">Back to Dashboard</a>
             </div>
         </section>
 
-        <section>
-            <h2>Your Order</h2>
-            <div id="cart-items">
-                <!-- cart -->
-            </div>
-            <div>
-            </div>
-            <form id="order-form">
-  <h3>Delivery Details</h3>
-  <p>We only accept Pay on Delivery.</p>
-  
-  <label for="address">Delivery Seat Number and Coach number:</label><br>
-  <textarea id="address" name="address" rows="2" placeholder="Enter your delivery address" required></textarea><br><br>
-  
-  <label for="notes">Additional Notes:</label><br>
-  <textarea id="notes" name="notes" rows="3" placeholder="Any special instructions?"></textarea><br><br>
-  
-  <button type="submit" id="place-order">Place Order</button>
-</form>
-<div id="order-message"></div>
+        <section class="content-grid two-column">
+            <article class="surface-card">
+                <div class="page-header">
+                    <div>
+                        <h2>Menu</h2>
+                        <p class="muted-text">Freshly prepared options updated by the catering team.</p>
+                    </div>
+                </div>
+                <div id="menu-container" class="menu-grid"></div>
+            </article>
+
+            <article class="surface-card">
+                <div class="page-header">
+                    <div>
+                        <h2>Your Cart</h2>
+                        <p class="muted-text">Adjust quantities or remove items before placing your order.</p>
+                    </div>
+                </div>
+                <div id="cart-items" class="cart-list"></div>
+            </article>
         </section>
-        <section>
-            <h2>My Past Orders</h2>
-            <button id="load-orders-btn">Load My Orders</button>
-            <div id="past-orders-container">
-                <!-- past order -->
+
+        <section class="surface-card">
+            <div class="page-header">
+                <div>
+                    <h2>Delivery Details</h2>
+                    <p class="muted-text">We currently support pay-on-delivery only.</p>
+                </div>
             </div>
+            <form id="order-form" class="form-grid">
+                <div class="input-group">
+                    <label for="address">Delivery Seat Number and Coach number</label>
+                    <textarea id="address" name="address" rows="2" placeholder="Enter your delivery details" required></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Any special instructions?"></textarea>
+                </div>
+                <button class="btn" type="submit" id="place-order">Place Order</button>
+            </form>
+            <p id="order-message" class="message" role="alert"></p>
+        </section>
+
+        <section class="surface-card">
+            <div class="page-header">
+                <div>
+                    <h2>My Past Orders</h2>
+                    <p class="muted-text">Review order history and monitor fulfilment statuses.</p>
+                </div>
+                <button class="btn btn-tonal" id="load-orders-btn" type="button">Load My Orders</button>
+            </div>
+            <div id="past-orders-container" class="orders-list"></div>
         </section>
     </main>
-</body>
 
 <script>
 
@@ -56,28 +84,43 @@ if (!token) {
 
 //display menu
 async function loadMenu() {
+  const menuContainer = document.getElementById("menu-container");
+  menuContainer.innerHTML = "<div class=\"empty-state\">Loading menu...</div>";
+
   try {
     const res = await fetch(`${API_BASE}/food`);
     const data = await res.json();
     if (!data.success) throw new Error("Failed to load menu");
 
-    const menuContainer = document.getElementById("menu-container");
     menuContainer.innerHTML = "";
 
+    if (!data.data || data.data.length === 0) {
+      menuContainer.innerHTML = "<div class=\"empty-state\">Menu will be available shortly.</div>";
+      return;
+    }
+
     data.data.forEach(food => {
-      const div = document.createElement("div");
-      div.classList.add("menu-item");
-      div.innerHTML = `
-        <img src="${food.imageUrl}" alt="${food.name}" width="100">
-        <h3>${food.name}</h3>
-        <p>${food.description || ""}</p>
-        <p><strong>₹${food.price}</strong></p>
-        <button onclick="addToCart('${food._id}', '${food.name}', ${food.price})">Add to Cart</button>
+      const priceValue = Number(food.price) || 0;
+      const card = document.createElement("article");
+      card.classList.add("menu-card");
+      card.innerHTML = `
+        ${food.imageUrl ? `<img class="menu-card__image" src="${food.imageUrl}" alt="${food.name}">` : ""}
+        <div class="menu-card__body">
+          <div>
+            <h3>${food.name}</h3>
+            <p class="muted-text">${food.description || ""}</p>
+          </div>
+          <div class="actions-inline" style="justify-content: space-between;">
+            <span class="menu-card__price">&#8377;${priceValue.toFixed(2)}</span>
+            <button class="btn btn-ghost" type="button" onclick="addToCart('${food._id}', '${food.name}', ${priceValue})">Add to Cart</button>
+          </div>
+        </div>
       `;
-      menuContainer.appendChild(div);
+      menuContainer.appendChild(card);
     });
   } catch (err) {
     console.error(err);
+    menuContainer.innerHTML = "<div class=\"empty-state\">Unable to load menu at the moment.</div>";
   }
 }
 
@@ -92,22 +135,43 @@ function addToCart(foodId, name, price) {
 function renderCart() {
   const cartDiv = document.getElementById("cart-items");
   cartDiv.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartDiv.innerHTML = "<div class=\"empty-state\">Your cart is currently empty.</div>";
+    return;
+  }
+
   let total = 0;
 
   cart.forEach((item, i) => {
     total += item.price * item.quantity;
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <p>${item.name} x ${item.quantity} = ₹${item.price * item.quantity}</p>
-      <button onclick="changeQty(${i}, 1)">+</button>
-      <button onclick="changeQty(${i}, -1)">-</button>
-      <button onclick="removeItem(${i})">Remove</button>
+    const card = document.createElement("div");
+    card.className = "cart-item";
+    card.innerHTML = `
+      <div class="cart-item__header">
+        <div>
+          <strong>${item.name}</strong>
+          <p class="muted-text">Quantity: ${item.quantity}</p>
+        </div>
+        <span class="menu-card__price">&#8377;${(item.price * item.quantity).toFixed(2)}</span>
+      </div>
+      <div class="cart-item__actions">
+        <button type="button" onclick="changeQty(${i}, 1)">+</button>
+        <button type="button" onclick="changeQty(${i}, -1)">-</button>
+        <button type="button" onclick="removeItem(${i})">Remove</button>
+      </div>
     `;
-    cartDiv.appendChild(div);
+    cartDiv.appendChild(card);
   });
 
   const totalDiv = document.createElement("div");
-  totalDiv.innerHTML = `<h4>Total: ₹${total}</h4>`;
+  totalDiv.className = "cart-item";
+  totalDiv.innerHTML = `
+    <div class="cart-item__header">
+      <strong>Total</strong>
+      <span class="menu-card__price">&#8377;${total.toFixed(2)}</span>
+    </div>
+  `;
   cartDiv.appendChild(totalDiv);
 }
 
@@ -126,8 +190,11 @@ function removeItem(index) {
 document.getElementById("order-form").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const notes = document.getElementById("notes").value.trim();
   const deliveryAddress = document.getElementById("address").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+  const messageDiv = document.getElementById("order-message");
+  messageDiv.classList.remove("success", "error");
+  messageDiv.innerText = "";
 
   if (!deliveryAddress) {
     alert("Please enter a delivery address.");
@@ -159,22 +226,28 @@ document.getElementById("order-form").addEventListener("submit", async e => {
     });
 
     const data = await res.json();
-    const messageDiv = document.getElementById("order-message");
 
     if (data.success) {
       messageDiv.innerText = "Order placed successfully!";
+      messageDiv.classList.add("success");
       cart = [];
       renderCart();
       document.getElementById("order-form").reset();
     } else {
-      messageDiv.innerText = "❌ " + (data.message || "Failed to place order");
+      messageDiv.innerText = "Warning: " + (data.message || "Failed to place order");
+      messageDiv.classList.add("error");
     }
   } catch (err) {
     console.error(err);
+    messageDiv.innerText = "Unable to process your order right now.";
+    messageDiv.classList.add("error");
   }
 });
 
 document.getElementById("load-orders-btn").addEventListener("click", async () => {
+  const container = document.getElementById("past-orders-container");
+  container.innerHTML = "<div class=\"empty-state\">Fetching your orders...</div>";
+
   try {
     const res = await fetch(`${API_BASE}/catering/my-orders`, {
       headers: {
@@ -183,43 +256,54 @@ document.getElementById("load-orders-btn").addEventListener("click", async () =>
     });
 
     const data = await res.json();
-    const container = document.getElementById("past-orders-container");
-    container.innerHTML = "";
 
     if (!data.success || data.data.length === 0) {
-      container.innerHTML = "<p>No past orders found.</p>";
+      container.innerHTML = "<div class=\"empty-state\">No past orders found.</div>";
       return;
     }
 
+    container.innerHTML = "";
+
     data.data.forEach(order => {
-      const div = document.createElement("div");
+      const statusClass =
+        order.status === "delivered"
+          ? "status-pill success"
+          : order.status === "cancelled"
+            ? "status-pill danger"
+            : "status-pill warning";
+
+      const div = document.createElement("article");
       div.classList.add("order-card");
       div.innerHTML = `
-  <h4>Order #${order._id}</h4>
-  <p>Status: <strong>${order.status}</strong></p>
-  <p>Total: ₹${order.totalPrice}</p>
-  <ul>
-    ${order.items
-      .map(
-        i =>
-          `<li>${i.foodItem.name} x ${i.quantity} (₹${i.priceAtOrder})</li>`
-      )
-      .join("")}
-  </ul>
-  <p><strong>Address:</strong> ${order.deliveryAddress}</p>
-  <small>Placed on: ${new Date(order.createdAt).toLocaleString()}</small>
-  <br>
-  ${
-    order.status === "pending" || order.status === "preparing"
-      ? `<button onclick="cancelOrder('${order._id}')">Cancel Order</button>`
-      : ""
-  }
-`;
+        <div class="order-card__header">
+          <div>
+            <h4>Order #${order._id}</h4>
+            <p class="muted-text">${new Date(order.createdAt).toLocaleString()}</p>
+          </div>
+          <span class="${statusClass}">${order.status}</span>
+        </div>
+        <p><strong>Total:</strong> &#8377;${order.totalPrice}</p>
+        <ul class="past-order-items">
+          ${order.items
+            .map(
+              i =>
+                `<li>${i.foodItem.name} × ${i.quantity} (&#8377;${i.priceAtOrder})</li>`
+            )
+            .join("")}
+        </ul>
+        <p><strong>Address:</strong> ${order.deliveryAddress}</p>
+        ${
+          order.status === "pending" || order.status === "preparing"
+            ? `<button class="btn btn-tonal" type="button" onclick="cancelOrder('${order._id}')">Cancel Order</button>`
+            : ""
+        }
+      `;
 
       container.appendChild(div);
     });
   } catch (err) {
     console.error(err);
+    container.innerHTML = "<div class=\"empty-state\">Unable to load your orders.</div>";
   }
 });
 
@@ -240,10 +324,10 @@ async function cancelOrder(orderId) {
     const data = await res.json();
 
     if (data.success) {
-      alert("✅ Order cancelled successfully!");
+      alert("Success! Order cancelled successfully.");
       document.getElementById("load-orders-btn").click(); // reload orders
     } else {
-      alert("❌ " + (data.message || "Failed to cancel order"));
+      alert("Warning: " + (data.message || "Failed to cancel order"));
     }
   } catch (err) {
     console.error(err);
@@ -255,5 +339,7 @@ loadMenu();
 
 
 </script>
+
+</body>
 
 </html>
