@@ -1,334 +1,609 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Administrator Dashboard</title>
-    <link rel="stylesheet" href="index.css">
-</head>
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-<body>
+  <body>
     <main class="page-shell fade-in">
-        <section class="surface-card card-highlight">
-            <div class="page-header">
-                <div>
-                    <h1>Administrator Dashboard</h1>
-                    <p id="welcome" class="muted-text">Verifying your session…</p>
-                </div>
-                <div class="dashboard-actions" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                    <a class="btn btn-ghost" href="index.html">Home</a>
-                    <button class="btn btn-tonal" onclick="logout()">Logout</button>
-                </div>
-            </div>
+      <section class="surface-card card-highlight">
+        <div class="page-header">
+          <div>
+            <h1>Administrator Dashboard</h1>
+            <p id="welcome" class="muted-text">Verifying your session…</p>
+          </div>
+          <div
+            class="dashboard-actions"
+            style="
+              display: flex;
+              gap: 1rem;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <a class="btn btn-ghost" href="index.html">Home</a>
+            <button class="btn btn-tonal" onclick="logout()">Logout</button>
+          </div>
+        </div>
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <h2 class="card-section-title">Control Centre</h2>
-            <p>Manage railway operations and keep every passenger interaction on track.</p>
+        <h2 class="card-section-title">Control Centre</h2>
+        <p>
+          Manage railway operations and keep every passenger interaction on
+          track.
+        </p>
 
-            <div class="link-grid">
-                <a class="link-tile" href="foodadmin.html">
-                    <strong>Food Menu Management</strong>
-                    <span>Update offerings, track orders, and analyse performance</span>
-                </a>
-                <a class="link-tile" href="admin-news.html">
-                    <strong>Publish News &amp; Alerts</strong>
-                    <span>Share critical updates with passengers instantly</span>
-                </a>
-                <a class="link-tile" href="adminfeedback.html">
-                    <strong>Review Feedback</strong>
-                    <span>Monitor comments and close the loop with teams</span>
-                </a>
-            </div>
-        </section>
+        <div class="link-grid">
+          <a class="link-tile" href="foodadmin.html">
+            <strong>Food Menu Management</strong>
+            <span>Update offerings, track orders, and analyse performance</span>
+          </a>
+          <a class="link-tile" href="admin-news.html">
+            <strong>Publish News &amp; Alerts</strong>
+            <span>Share critical updates with passengers instantly</span>
+          </a>
+          <a class="link-tile" href="adminfeedback.html">
+            <strong>Review Feedback</strong>
+            <span>Monitor comments and close the loop with teams</span>
+          </a>
+        </div>
+      </section>
 
-        <section class="surface-card" style="margin-top:2rem;">
-            <div class="page-header">
-                <div>
-                    <h2>Platform Insights</h2>
-                    <p class="muted-text">Key metrics and activity visualizations</p>
-                </div>
-            </div>
-            <div class="content-grid two-column"
-                style="grid-template-columns: repeat(auto-fit,minmax(350px,1fr)); gap:2rem;">
-                <!-- Revenue by Day Graph -->
-                <article class="link-tile" style="overflow:visible;">
-                    <span class="badge">Revenue Trend</span>
-                    <strong>Revenue per Day</strong>
-                    <div id="graph-revenue" style="margin:0.5rem 0 0.7rem 0; min-height:80px;width:100%"></div>
-                </article>
-                <!-- Orders by Status Bar -->
-                <article class="link-tile">
-                    <span class="badge">Orders</span>
-                    <strong>Orders by Status</strong>
-                    <div id="graph-orders-status" style="margin-top:.5rem;height:110px;width:100%"></div>
-                </article>
-                <!-- Orders per Day Bar -->
-                <article class="link-tile">
-                    <span class="badge">Orders</span>
-                    <strong>Orders per Day</strong>
-                    <div id="graph-orders-day" style="margin-top:.5rem;height:100px;width:100%"></div>
-                </article>
-                <!-- Complaints by Status Pie -->
-                <article class="link-tile">
-                    <span class="badge">Complaints</span>
-                    <strong>Complaints by Status</strong>
-                    <div id="graph-complaints-status" style="margin-top:.6rem;height:76px"></div>
-                </article>
-                <!-- Complaints by Day Line -->
-                <article class="link-tile">
-                    <span class="badge">Complaints</span>
-                    <strong>Complaints per Day</strong>
-                    <div id="graph-complaints-day" style="margin-top:.5rem;height:90px;width:100%"></div>
-                </article>
-                <!-- Complaints by Domain Bar -->
-                <article class="link-tile">
-                    <span class="badge">Complaints</span>
-                    <strong>Complaints by Domain</strong>
-                    <div id="graph-complaints-domain" style="margin-top:.5rem;height:110px;width:100%"></div>
-                </article>
-                <!-- User signups per Day Line -->
-                <article class="link-tile">
-                    <span class="badge">Users</span>
-                    <strong>User signups per Day</strong>
-                    <div id="graph-users-day" style="margin-top:.5rem;height:90px;width:100%"></div>
-                </article>
-                <!-- Feedback Rating Gauge -->
-                <article class="link-tile">
-                    <span class="badge">Feedback</span>
-                    <strong>Average Feedback Rating</strong>
-                    <div id="graph-feedback-rating"
-                        style="margin-top:.8rem;height:90px;width:100%;display:flex;justify-content:center;"></div>
-                    <p id="feedback-total-msg" style="margin-top:.3rem;font-size:.95rem;color:var(--color-muted)"></p>
-                </article>
-            </div>
-        </section>
+      <section class="surface-card" style="margin-top: 2rem">
+        <div class="page-header">
+          <div>
+            <h2>Platform Insights</h2>
+            <p class="muted-text">Key metrics and activity visualizations</p>
+          </div>
+        </div>
 
-        <section class="surface-card" style="margin-top:2.5rem;">
-            <div class="page-header">
-                <div>
-                    <h2>Complaints Management</h2>
-                    <p class="muted-text">Monitor and resolve passenger complaints (live).</p>
-                </div>
-            </div>
-            <div class="content-grid two-column">
-                <!-- Pending Complaints Table -->
-                <article class="surface-card compact">
-                    <h3 class="card-section-title">Pending Complaints</h3>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User</th>
-                                    <th>PNR</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pending-complaints"></tbody>
-                        </table>
-                    </div>
-                </article>
-                <!-- Resolved Complaints Table -->
-                <article class="surface-card compact">
-                    <h3 class="card-section-title">Resolved Complaints</h3>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User</th>
-                                    <th>PNR</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resolved-complaints"></tbody>
-                        </table>
-                    </div>
-                </article>
-            </div>
-        </section>
+        <div
+          class="content-grid four-column"
+          style="
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+          "
+        >
+          <div class="link-tile"><strong>Revenue</strong><p id="ad-revenue">₹0</p></div>
+          <div class="link-tile"><strong>Orders</strong><p id="ad-orders">0</p></div>
+          <div class="link-tile"><strong>Users</strong><p id="ad-users">0</p></div>
+          <div class="link-tile"><strong>Complaints</strong><p id="ad-complaints">0</p></div>
+          <div class="link-tile">
+            <strong>Resolved Pie</strong>
+            <svg height="66" width="54">
+              <circle id="pie-resolved" r="18" cx="26" cy="33" fill="none" stroke="#34d399" stroke-width="15" />
+            </svg>
+          </div>
+        </div>
 
+        <div
+          class="content-grid two-column"
+          style="
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+          "
+        >
+          <!-- Revenue by Day Graph -->
+          <article class="link-tile" style="overflow: visible">
+            <span class="badge">Revenue Trend</span>
+            <strong>Revenue per Day</strong>
+            <div
+              id="graph-revenue"
+              style="margin: 0.5rem 0 0.7rem 0; min-height: 80px; width: 100%"
+            ></div>
+          </article>
+          <!-- Orders by Status Bar -->
+          <article class="link-tile">
+            <span class="badge">Orders</span>
+            <strong>Orders by Status</strong>
+            <div
+              id="graph-orders-status"
+              style="margin-top: 0.5rem; height: 110px; width: 100%"
+            ></div>
+          </article>
+          <!-- Orders per Day Bar -->
+          <article class="link-tile">
+            <span class="badge">Orders</span>
+            <strong>Orders per Day</strong>
+            <div
+              id="graph-orders-day"
+              style="margin-top: 0.5rem; height: 100px; width: 100%"
+            ></div>
+          </article>
+          <!-- Complaints by Status Pie -->
+          <article class="link-tile">
+            <span class="badge">Complaints</span>
+            <strong>Complaints by Status</strong>
+            <div
+              id="graph-complaints-status"
+              style="margin-top: 0.6rem; height: 76px"
+            ></div>
+          </article>
+          <!-- Complaints by Day Line -->
+          <article class="link-tile">
+            <span class="badge">Complaints</span>
+            <strong>Complaints per Day</strong>
+            <div
+              id="graph-complaints-day"
+              style="margin-top: 0.5rem; height: 90px; width: 100%"
+            ></div>
+          </article>
+          <!-- Complaints by Domain Bar -->
+          <article class="link-tile">
+            <span class="badge">Complaints</span>
+            <strong>Complaints by Domain</strong>
+            <div
+              id="graph-complaints-domain"
+              style="margin-top: 0.5rem; height: 110px; width: 100%"
+            ></div>
+          </article>
+          <!-- User signups per Day Line -->
+          <article class="link-tile">
+            <span class="badge">Users</span>
+            <strong>User signups per Day</strong>
+            <div
+              id="graph-users-day"
+              style="margin-top: 0.5rem; height: 90px; width: 100%"
+            ></div>
+          </article>
+          <!-- Feedback Rating Gauge -->
+          <article class="link-tile">
+            <span class="badge">Feedback</span>
+            <strong>Average Feedback Rating</strong>
+            <div
+              id="graph-feedback-rating"
+              style="
+                margin-top: 0.8rem;
+                height: 90px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+              "
+            ></div>
+            <p
+              id="feedback-total-msg"
+              style="
+                margin-top: 0.3rem;
+                font-size: 0.95rem;
+                color: var(--color-muted);
+              "
+            ></p>
+          </article>
+        </div>
+      </section>
+
+      <section class="surface-card" style="margin-top: 2rem">
+        <h2>Important Complaints</h2>
+        <table id="complaintsTable" style="display: none; width: 100%; border-collapse: collapse; margin-top: 1rem;">
+          <thead>
+            <tr>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">PNR</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Description</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Bogie</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Seat</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Domain</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Created At</th>
+              <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #ddd;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="complaintsBody"></tbody>
+        </table>
+      </section>
     </main>
+  </body>
+  <script>
+    let token = "";
+    const API_BASE = "http://localhost:4000";
 
-</body>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const token = localStorage.getItem("adminToken");
-        if (!token) {
-            alert("No admin token found, please login.");
-            window.location.href = "adminlogin.html";
-            return;
-        }
-        // Optionally, decode token to get admin info (if using JWT)
-        document.getElementById("welcome").innerText = "Welcome back, Admin!";
+    document.addEventListener("DOMContentLoaded", async () => {
+      token = localStorage.getItem("adminToken");
+
+      if (!token) {
+        alert("No admin token found, please login.");
+        window.location.href = "adminlogin.html";
+        return;
+      }
+
+      const welcomeEl = document.getElementById("welcome");
+      if (welcomeEl) {
+        welcomeEl.innerText = "Welcome back, Admin!";
+      }
+
+      // Load all data
+      await Promise.all([
+        loadAdminStats(),
+        loadComplaints(),
+        loadGraphData()
+      ]);
     });
 
     function logout() {
-        localStorage.removeItem("adminToken");
-        alert("Logged out successfully.");
-        window.location.href = "adminlogin.html";
+      localStorage.removeItem("adminToken");
+      alert("Logged out successfully.");
+      window.location.href = "adminlogin.html";
     }
 
-    // ==== ADMIN ANALYTICS & COMPLAINTS JS ==== //
-    const API_BASE = "http://localhost:4000";
-    window.addEventListener('DOMContentLoaded', async () => {
-        await loadAdminStats();
-        await loadAdminComplaints();
-    });
+    async function loadComplaints() {
+      const complaintsTable = document.getElementById("complaintsTable");
+      const complaintsBody = document.getElementById("complaintsBody");
+
+      if (!complaintsBody || !complaintsTable) {
+        console.error("Missing table elements in HTML");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/complaint/api/complaintsIMP`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch complaints: ${response.status}`);
+        }
+
+        const complaints = await response.json();
+        complaintsBody.innerHTML = "";
+
+        if (!complaints || complaints.length === 0) {
+          complaintsBody.innerHTML =
+            '<tr><td colspan="8" style="padding: 1rem; text-align: center;">No important complaints found.</td></tr>';
+          complaintsTable.style.display = "table";
+          return;
+        }
+
+        complaints.forEach((c) => {
+          const createdAt = c.createdAt
+            ? new Date(c.createdAt).toLocaleString()
+            : "N/A";
+          const bgColor = c.status === "Resolved" ? "#d4edda" : "#f8d7da";
+
+          const row = document.createElement("tr");
+          row.id = `complaint-${c._id}`;
+          row.innerHTML = `
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.pnr || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.description || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.bogieNumber || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.seatNumber || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.issueDomain || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${c.status || "-"}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd;">${createdAt}</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid #ddd; background-color:${bgColor};">
+              <button class="resolve-btn" data-id="${c._id}" ${
+            c.status === "Resolved" ? "disabled" : ""
+          } style="padding: 0.5rem 1rem; cursor: pointer; border: none; border-radius: 4px; background: #4f46e5; color: white;">
+                Resolve
+              </button>
+            </td>
+          `;
+          complaintsBody.appendChild(row);
+        });
+
+        document.querySelectorAll(".resolve-btn").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const id = e.target.dataset.id;
+            if (!confirm("Mark this complaint as resolved?")) return;
+
+            try {
+              const res = await fetch(
+                `${API_BASE}/complaint/api/complaints/resolve/${id}`,
+                {
+                  method: "PUT",
+                  headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  },
+                }
+              );
+
+              if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Failed to resolve complaint: ${res.status} ${text}`);
+              }
+
+              const row = document.getElementById(`complaint-${id}`);
+              if (row) {
+                row.remove();
+              }
+
+              alert("Complaint resolved successfully");
+              await loadComplaints(); // Reload to update stats
+            } catch (err) {
+              console.error(err);
+              alert(`Resolve failed: ${err.message}`);
+            }
+          });
+        });
+
+        complaintsTable.style.display = "table";
+      } catch (err) {
+        console.error("Error loading complaints:", err);
+        complaintsBody.innerHTML =
+          '<tr><td colspan="8" style="padding: 1rem; text-align: center; color: red;">Error loading complaints. Please try again.</td></tr>';
+        complaintsTable.style.display = "table";
+      }
+    }
+
     async function loadAdminStats() {
-        // Simulate API stats for demo; in real use, fetch from backend endpoints
-        const res1 = await fetch(`${API_BASE}/catering/all-orders`); // for revenue/orders
-        const res2 = await fetch(`${API_BASE}/user/`); // for user stats
-        const res3 = await fetch(`${API_BASE}/complaint/`); // for complaints
-        const orders = (await res1.json()).data || [];
+      try {
+        // Fetch orders
+        const ordersRes = await fetch(`${API_BASE}/catering/all-orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const ordersData = await ordersRes.json();
+        const orders = ordersData.data || ordersData || [];
+        
         const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
-        document.getElementById('ad-revenue').innerText = `₹${totalRevenue.toLocaleString()}`;
-        document.getElementById('ad-orders').innerText = orders.length;
-        // Pie/Bar: Complaints
-        let users = 0;
-        try { users = (await res2.json()).data.length; } catch { users = 0; }
-        document.getElementById('ad-users').innerText = users;
-        const complaints = ((await res3.json()).data) || [];
-        document.getElementById('ad-complaints').innerText = complaints.length;
-        const pendingCount = complaints.filter(c => c.status.toLowerCase() === 'pending').length;
-        const resolvedCount = complaints.filter(c => c.status.toLowerCase() === 'resolved').length;
-        // Pie
-        document.getElementById('pie-resolved').setAttribute('stroke-dasharray', `${resolvedCount} ${Math.max(complaints.length - resolvedCount, 1)}`);
-    }
-    async function loadAdminComplaints() {
-        const res = await fetch(`${API_BASE}/complaint/`);
-        const data = (await res.json()).data || [];
-        const pending = data.filter(c => c.status.toLowerCase() === 'pending');
-        const resolved = data.filter(c => c.status.toLowerCase() === 'resolved');
-        // Populate pending
-        const pendingBody = document.getElementById('pending-complaints');
-        pendingBody.innerHTML = pending.length ? '' : `<tr><td colspan='7' style='text-align:center;color:var(--color-muted)'>No pending complaints!</td></tr>`;
-        pending.forEach(c => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${c._id}</td><td>${c.username || '-'}</td><td>${c.pnr || '-'}</td><td>${c.description || '-'}</td><td><span class="status-pill danger">Pending</span></td><td>${new Date(c.createdAt).toLocaleDateString()}</td><td><button class="btn btn-danger" onclick="resolveComplaint('${c._id}')">Resolve</button></td>`;
-            pendingBody.appendChild(tr);
+        document.getElementById("ad-revenue").innerText = `₹${totalRevenue.toLocaleString()}`;
+        document.getElementById("ad-orders").innerText = orders.length;
+
+        // Fetch users - using the getPendingComplaints endpoint as proxy for user count
+        // Since /user/ endpoint doesn't exist, we'll set a default
+        document.getElementById("ad-users").innerText = "N/A";
+
+        // Fetch complaints for resolved users endpoint
+        const complaintsRes = await fetch(`${API_BASE}/complaint/api/complaintsRES`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        // Populate resolved
-        const resolvedBody = document.getElementById('resolved-complaints');
-        resolvedBody.innerHTML = resolved.length ? '' : `<tr><td colspan='6' style='text-align:center;color:var(--color-muted)'>No resolved complaints yet.</td></tr>`;
-        resolved.forEach(c => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${c._id}</td><td>${c.username || '-'}</td><td>${c.pnr || '-'}</td><td>${c.description || '-'}</td><td><span class="status-pill success">Resolved</span></td><td>${new Date(c.createdAt).toLocaleDateString()}</td>`;
-            resolvedBody.appendChild(tr);
-        });
-    }
-    async function resolveComplaint(id) {
-        if (!confirm('Mark this complaint as resolved?')) return;
-        await fetch(`${API_BASE}/complaint/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'resolved' }) });
-        loadAdminComplaints();
+        const complaintsData = await complaintsRes.json();
+        const complaints = complaintsData || [];
+        
+        document.getElementById("ad-complaints").innerText = complaints.length;
+
+        const resolvedCount = complaints.filter(c => c.status?.toLowerCase() === "resolved").length;
+        const totalComplaints = complaints.length || 1;
+
+        // Update pie chart
+        document.getElementById("pie-resolved").setAttribute(
+          "stroke-dasharray",
+          `${resolvedCount} ${Math.max(totalComplaints - resolvedCount, 1)}`
+        );
+      } catch (err) {
+        console.error("Error loading admin stats:", err);
+      }
     }
 
-    // === BEGIN GRAPH DATA LOADING & RENDERING === //
-    window.addEventListener('DOMContentLoaded', async () => {
-        // Fetch all necessary data in parallel
-        const [ordersRes, usersRes, complaintsRes, fbStatsRes] = await Promise.all([
-            fetch(API_BASE + "/catering/all-orders"),
-            fetch(API_BASE + "/user/"),
-            fetch(API_BASE + "/complaint/"),
-            fetch(API_BASE + "/feedback/stats")
+    async function loadGraphData() {
+      try {
+        // Fetch all necessary data
+        const headers = { Authorization: `Bearer ${token}` };
+        
+        const [ordersRes, complaintsRes, fbStatsRes] = await Promise.all([
+          fetch(`${API_BASE}/catering/all-orders`, { headers }).catch(() => ({ ok: false })),
+          fetch(`${API_BASE}/complaint/api/complaintsRES`, { headers }).catch(() => ({ ok: false })),
+          fetch(`${API_BASE}/feedback/stats`, { headers }).catch(() => ({ ok: false }))
         ]);
-        const orders = ordersRes.ok ? (await ordersRes.json()).data : [];
-        const users = usersRes.ok ? (await usersRes.json()).data : [];
-        const complaints = complaintsRes.ok ? (await complaintsRes.json()).data : [];
-        const fb = fbStatsRes.ok ? (await fbStatsRes.json()).stats || {} : {};
+
+        const ordersData = ordersRes.ok ? await ordersRes.json() : {};
+        const orders = ordersData.data || ordersData || [];
+        
+        const complaints = complaintsRes.ok ? await complaintsRes.json() : [];
+        const fbData = fbStatsRes.ok ? await fbStatsRes.json() : {};
+        const fb = fbData.stats || fbData || {};
+
         // Revenue/Orders by Day
         if (orders && orders.length) {
-            // Revenue Line
-            const revDay = {};
-            orders.forEach(o => {
-                const d = (new Date(o.createdAt)).toLocaleDateString();
-                revDay[d] = (revDay[d] || 0) + (o.totalPrice || 0);
-            });
-            renderTinyLineGraph('graph-revenue', Object.keys(revDay), Object.values(revDay), 'var(--color-primary)');
-            // Orders by Day
-            const ordDay = {};
-            orders.forEach(o => {
-                const d = (new Date(o.createdAt)).toLocaleDateString();
-                ordDay[d] = (ordDay[d] || 0) + 1;
-            });
-            renderTinyBarGraph('graph-orders-day', Object.keys(ordDay), Object.values(ordDay), 'var(--color-accent)');
-            // Orders by Status
-            const st = {};
-            orders.forEach(o => { st[o.status] = (st[o.status] || 0) + 1; });
-            renderTinyBarGraph('graph-orders-status', Object.keys(st), Object.values(st), 'var(--color-primary-dark)');
+          // Revenue Line
+          const revDay = {};
+          orders.forEach((o) => {
+            const d = new Date(o.createdAt).toLocaleDateString();
+            revDay[d] = (revDay[d] || 0) + (o.totalPrice || 0);
+          });
+          renderTinyLineGraph(
+            "graph-revenue",
+            Object.keys(revDay),
+            Object.values(revDay),
+            "var(--color-primary)"
+          );
+
+          // Orders by Day
+          const ordDay = {};
+          orders.forEach((o) => {
+            const d = new Date(o.createdAt).toLocaleDateString();
+            ordDay[d] = (ordDay[d] || 0) + 1;
+          });
+          renderTinyBarGraph(
+            "graph-orders-day",
+            Object.keys(ordDay),
+            Object.values(ordDay),
+            "var(--color-accent)"
+          );
+
+          // Orders by Status
+          const st = {};
+          orders.forEach((o) => {
+            st[o.status] = (st[o.status] || 0) + 1;
+          });
+          renderTinyBarGraph(
+            "graph-orders-status",
+            Object.keys(st),
+            Object.values(st),
+            "var(--color-primary-dark)"
+          );
         } else {
-            document.getElementById('graph-revenue').innerHTML = '<div class="muted-text">No orders found.</div>';
-            document.getElementById('graph-orders-day').innerHTML = '<div class="muted-text">No data.</div>';
-            document.getElementById('graph-orders-status').innerHTML = '<div class="muted-text">No data.</div>';
+          document.getElementById("graph-revenue").innerHTML =
+            '<div class="muted-text">No orders found.</div>';
+          document.getElementById("graph-orders-day").innerHTML =
+            '<div class="muted-text">No data.</div>';
+          document.getElementById("graph-orders-status").innerHTML =
+            '<div class="muted-text">No data.</div>';
         }
-        // Complaints:
+
+        // Complaints
         if (complaints && complaints.length) {
-            // By Status
-            const cs = { pending: 0, resolved: 0 };
-            complaints.forEach(c => { cs[c.status.toLowerCase()] = (cs[c.status.toLowerCase()] || 0) + 1; });
-            renderTinyPie('graph-complaints-status', [cs.resolved, cs.pending], ["#34d399", "#f87171"]);
-            // By Day
-            const cDay = {};
-            complaints.forEach(c => { const d = (new Date(c.createdAt)).toLocaleDateString(); cDay[d] = (cDay[d] || 0) + 1; });
-            renderTinyLineGraph('graph-complaints-day', Object.keys(cDay), Object.values(cDay), "#f87171");
-            // By Domain
-            const doms = {};
-            complaints.forEach(c => { if (c.issueDomain) doms[c.issueDomain] = (doms[c.issueDomain] || 0) + 1; });
-            if (Object.keys(doms).length)
-                renderTinyBarGraph('graph-complaints-domain', Object.keys(doms), Object.values(doms), '#a855f7');
-            else document.getElementById('graph-complaints-domain').innerHTML = '<div class="muted-text">Domain data unavailable.</div>';
+          // By Status
+          const cs = { pending: 0, resolved: 0 };
+          complaints.forEach((c) => {
+            const status = (c.status || "").toLowerCase();
+            if (status === "resolved") cs.resolved++;
+            else cs.pending++;
+          });
+          renderTinyPie(
+            "graph-complaints-status",
+            [cs.resolved, cs.pending],
+            ["#34d399", "#f87171"]
+          );
+
+          // By Day
+          const cDay = {};
+          complaints.forEach((c) => {
+            const d = new Date(c.createdAt).toLocaleDateString();
+            cDay[d] = (cDay[d] || 0) + 1;
+          });
+          renderTinyLineGraph(
+            "graph-complaints-day",
+            Object.keys(cDay),
+            Object.values(cDay),
+            "#f87171"
+          );
+
+          // By Domain
+          const doms = {};
+          complaints.forEach((c) => {
+            if (c.issueDomain) doms[c.issueDomain] = (doms[c.issueDomain] || 0) + 1;
+          });
+          if (Object.keys(doms).length)
+            renderTinyBarGraph(
+              "graph-complaints-domain",
+              Object.keys(doms),
+              Object.values(doms),
+              "#a855f7"
+            );
+          else
+            document.getElementById("graph-complaints-domain").innerHTML =
+              '<div class="muted-text">Domain data unavailable.</div>';
         } else {
-            document.getElementById('graph-complaints-status').innerHTML = '<div class="muted-text">No complaints found.</div>';
-            document.getElementById('graph-complaints-day').innerHTML = '<div class="muted-text">No data.</div>';
-            document.getElementById('graph-complaints-domain').innerHTML = '<div class="muted-text">No data.</div>';
+          document.getElementById("graph-complaints-status").innerHTML =
+            '<div class="muted-text">No complaints found.</div>';
+          document.getElementById("graph-complaints-day").innerHTML =
+            '<div class="muted-text">No data.</div>';
+          document.getElementById("graph-complaints-domain").innerHTML =
+            '<div class="muted-text">No data.</div>';
         }
-        // Users graph
-        if (users && users.length) {
-            const userDay = {};
-            users.forEach(u => { if (u.createdAt) { const d = (new Date(u.createdAt)).toLocaleDateString(); userDay[d] = (userDay[d] || 0) + 1; } });
-            renderTinyLineGraph('graph-users-day', Object.keys(userDay), Object.values(userDay), '#38bdf8');
-        } else document.getElementById('graph-users-day').innerHTML = '<div class="muted-text">No data.</div>';
-        // Feedback (gauge, total)
-        if (typeof fb.averageRating !== 'undefined') renderGauge('graph-feedback-rating', fb.averageRating);
-        if (typeof fb.totalFeedbacks !== 'undefined') document.getElementById('feedback-total-msg').textContent = `Total feedback: ${fb.totalFeedbacks}`;
-    });
 
-    // --- Minimal helper chart functions ---
+        // Users graph - No endpoint available
+        document.getElementById("graph-users-day").innerHTML =
+          '<div class="muted-text">User endpoint not available.</div>';
+
+        // Feedback
+        if (typeof fb.averageRating !== "undefined")
+          renderGauge("graph-feedback-rating", fb.averageRating);
+        else
+          document.getElementById("graph-feedback-rating").innerHTML =
+            '<div class="muted-text">No feedback data.</div>';
+            
+        if (typeof fb.totalFeedbacks !== "undefined")
+          document.getElementById("feedback-total-msg").textContent = 
+            `Total feedback: ${fb.totalFeedbacks}`;
+      } catch (err) {
+        console.error("Error loading graph data:", err);
+      }
+    }
+
+    // --- Chart rendering functions ---
     function renderTinyLineGraph(el, labels, vals, color) {
-        if (!labels.length) { document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>'; return; }
-        const W = 180, H = 55, mT = 10, mB = 22, pts = vals.map((v, i) => ((H - mB) - v / Math.max(...vals) * ((H - mB) - mT)) + mT), xStep = (W - 18) / (vals.length - 1 || 1);
-        let poly = '', dots = '';
-        pts.forEach((y, i) => { const x = 9 + (i * xStep); poly += `${x},${y} `; dots += `<circle cx="${x}" cy="${y}" r="2.8" fill="${color}"/>`; });
-        let xLabels = labels.map((d, i) => `<text x="${9 + i * xStep}" y="${H}" style="font-size:9px;fill:#a5b4fc">${d.split("/").slice(0, 2).join("/")}</text>`).join('');
-        document.getElementById(el).innerHTML = `<svg width="${W}" height="${H}" style="width:100%"> <polyline fill="none" stroke="${color}" stroke-width="3" points="${poly.trim()}"/>${dots}${xLabels}</svg>`;
+      if (!labels.length) {
+        document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>';
+        return;
+      }
+      const W = 180, H = 55, mT = 10, mB = 22;
+      const maxVal = Math.max(...vals) || 1;
+      const pts = vals.map((v, i) => H - mB - (v / maxVal) * (H - mB - mT) + mT);
+      const xStep = (W - 18) / (vals.length - 1 || 1);
+      
+      let poly = "", dots = "";
+      pts.forEach((y, i) => {
+        const x = 9 + i * xStep;
+        poly += `${x},${y} `;
+        dots += `<circle cx="${x}" cy="${y}" r="2.8" fill="${color}"/>`;
+      });
+      
+      let xLabels = labels
+        .map((d, i) => 
+          `<text x="${9 + i * xStep}" y="${H}" style="font-size:9px;fill:#a5b4fc">${
+            d.split("/").slice(0, 2).join("/")
+          }</text>`
+        )
+        .join("");
+        
+      document.getElementById(el).innerHTML = 
+        `<svg width="${W}" height="${H}" style="width:100%">
+          <polyline fill="none" stroke="${color}" stroke-width="3" points="${poly.trim()}"/>
+          ${dots}${xLabels}
+        </svg>`;
     }
-    function renderTinyBarGraph(el, labels, vals, color) {
-        if (!labels.length) { document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>'; return; }
-        const W = 185, H = 50;
-        let bars = '';
-        vals.forEach((val, i) => { bars += `<rect x="${14 + i * 23}" y="${H - (val / Math.max(...vals) * 36 + 6)}" width="17" rx="4" height="${val / Math.max(...vals) * 36 + 1}" fill="${color}" />`; });
-        let xLabels = labels.map((l, i) => `<text x="${22 + i * 23}" y="${H}" style="font-size:9px;fill:#a5b4fc;">${l[0].toUpperCase() + l.slice(1, 6)}</text>`).join('');
-        document.getElementById(el).innerHTML = `<svg width="${W}" height="${H}" style="width:100%">${bars}${xLabels}</svg>`;
-    }
-    function renderTinyPie(el, vals, colors) {
-        if (!vals.reduce((a, b) => a + b, 0)) { document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>'; return; }
-        const total = vals.reduce((a, b) => a + b, 0); let offset = 0;
-        let arcs = vals.map((v, i) => { const p = v / total * 100, arc = `<circle r="18" cx="26" cy="33" fill="none" stroke="${colors[i]}" stroke-width="15" stroke-dasharray="${Math.round(p)} ${100 - Math.round(p)}" stroke-dashoffset="${offset}" />`; offset -= p; return arc; }).join('');
-        document.getElementById(el).innerHTML = `<svg height="66" width="54">${arcs}</svg>`;
-    }
-    function renderGauge(el, value) {
-        value = Math.max(1, Math.min(5, Number(value)));
-        const r = 27, c = 2 * Math.PI * r, vP = (value - 1) / 4 * c;
-        document.getElementById(el).innerHTML = `<svg width="70" height="64"><circle r="${r}" cx="35" cy="36" fill="none" stroke="#475569" stroke-width="14"/><circle r="${r}" cx="35" cy="36" fill="none" stroke="#34d399" stroke-width="10" stroke-dasharray="${vP} ${c}" stroke-dashoffset="-12"/><text x="35" y="37" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" style="font-size:1.7rem;font-weight:600">${value}</text></svg>`;
-    }
-    // === END GRAPH DATA LOADING === //
-</script>
 
+    function renderTinyBarGraph(el, labels, vals, color) {
+      if (!labels.length) {
+        document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>';
+        return;
+      }
+      const W = 185, H = 50;
+      const maxVal = Math.max(...vals) || 1;
+      
+      let bars = vals
+        .map((val, i) => 
+          `<rect x="${14 + i * 23}" y="${H - ((val / maxVal) * 36 + 6)}" 
+            width="17" rx="4" height="${(val / maxVal) * 36 + 1}" fill="${color}" />`
+        )
+        .join("");
+        
+      let xLabels = labels
+        .map((l, i) => 
+          `<text x="${22 + i * 23}" y="${H}" style="font-size:9px;fill:#a5b4fc;">
+            ${l[0].toUpperCase() + l.slice(1, 6)}
+          </text>`
+        )
+        .join("");
+        
+      document.getElementById(el).innerHTML = 
+        `<svg width="${W}" height="${H}" style="width:100%">${bars}${xLabels}</svg>`;
+    }
+
+    function renderTinyPie(el, vals, colors) {
+      const total = vals.reduce((a, b) => a + b, 0);
+      if (!total) {
+        document.getElementById(el).innerHTML = '<div class="muted-text">No data.</div>';
+        return;
+      }
+      
+      let offset = 0;
+      let arcs = vals
+        .map((v, i) => {
+          const p = (v / total) * 100;
+          const arc = `<circle r="18" cx="26" cy="33" fill="none" stroke="${colors[i]}" 
+            stroke-width="15" stroke-dasharray="${Math.round(p)} ${100 - Math.round(p)}" 
+            stroke-dashoffset="${offset}" />`;
+          offset -= p;
+          return arc;
+        })
+        .join("");
+        
+      document.getElementById(el).innerHTML = 
+        `<svg height="66" width="54">${arcs}</svg>`;
+    }
+
+    function renderGauge(el, value) {
+      value = Math.max(1, Math.min(5, Number(value)));
+      const r = 27, c = 2 * Math.PI * r;
+      const vP = ((value - 1) / 4) * c;
+      
+      document.getElementById(el).innerHTML = 
+        `<svg width="70" height="64">
+          <circle r="${r}" cx="35" cy="36" fill="none" stroke="#475569" stroke-width="14"/>
+          <circle r="${r}" cx="35" cy="36" fill="none" stroke="#34d399" stroke-width="10" 
+            stroke-dasharray="${vP} ${c}" stroke-dashoffset="-12"/>
+          <text x="35" y="37" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" 
+            style="font-size:1.7rem;font-weight:600">${value.toFixed(1)}</text>
+        </svg>`;
+    }
+  </script>
 </html>
