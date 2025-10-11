@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catering Staff Login</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <h2>Catering Staff Login</h2>
-    <form onsubmit="login(event)">
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Login</button>
-    </form>
+    <main class="auth-layout fade-in">
+        <section class="surface-card auth-card">
+            <div class="stack">
+                <div>
+                    <h2>Catering Staff Login</h2>
+                    <p>Coordinate meal orders, update delivery statuses, and serve passengers efficiently.</p>
+                </div>
+            </div>
+
+            <form class="form-grid" onsubmit="login(event)">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="name@railway.gov.in" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button class="btn" type="submit">Sign In</button>
+            </form>
+        </section>
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function login(e) {
@@ -33,7 +44,7 @@
                 const data = res.data;
                 if (res.status === 200 && data.token) {
                     localStorage.setItem("token", data.token);
-                    console.log("✅ Login successful, token stored:", data.token);
+                    console.log("Login successful, token stored:", data.token);
                     window.location.href = "foodstaff.html"; // Redirect to food staff dashboard
                 } else {
                     alert(data.message || "Invalid email or password.");
@@ -51,5 +62,4 @@
         }
     </script>
 </body>
-
 </html>
