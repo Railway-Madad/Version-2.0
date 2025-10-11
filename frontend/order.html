@@ -74,36 +74,36 @@
     </main>
 
 <script>
+  const token = localStorage.getItem('token');
+  const API_BASE = "http://localhost:4000";
+  let cart = [];
 
-const token = localStorage.getItem('token');
-const API_BASE = "http://localhost:4000"; 
-let cart = [];
-if (!token) {
+  if (!token) {
     window.location.href = "login.html";
-}
+  }
 
-//display menu
-async function loadMenu() {
-  const menuContainer = document.getElementById("menu-container");
-  menuContainer.innerHTML = "<div class=\"empty-state\">Loading menu...</div>";
+  // =================== LOAD MENU ===================
+  async function loadMenu() {
+    const menuContainer = document.getElementById("menu-container");
+    menuContainer.innerHTML = "<div class=\"empty-state\">Loading menu...</div>";
 
-  try {
-    const res = await fetch(`${API_BASE}/food`);
-    const data = await res.json();
-    if (!data.success) throw new Error("Failed to load menu");
+    try {
+      const res = await fetch(`${API_BASE}/food`);
+      const data = await res.json();
+      if (!data.success) throw new Error("Failed to load menu");
 
-    menuContainer.innerHTML = "";
+      menuContainer.innerHTML = "";
 
-    if (!data.data || data.data.length === 0) {
-      menuContainer.innerHTML = "<div class=\"empty-state\">Menu will be available shortly.</div>";
-      return;
-    }
+      if (!data.data || data.data.length === 0) {
+        menuContainer.innerHTML = "<div class=\"empty-state\">Menu will be available shortly.</div>";
+        return;
+      }
 
-    data.data.forEach(food => {
-      const priceValue = Number(food.price) || 0;
-      const card = document.createElement("article");
-      card.classList.add("menu-card");
-      card.innerHTML = `
+      data.data.forEach(food => {
+        const priceValue = Number(food.price) || 0;
+        const card = document.createElement("article");
+        card.classList.add("menu-card");
+        card.innerHTML = `
         ${food.imageUrl ? `<img class="menu-card__image" src="${food.imageUrl}" alt="${food.name}">` : ""}
         <div class="menu-card__body">
           <div>
@@ -116,38 +116,38 @@ async function loadMenu() {
           </div>
         </div>
       `;
-      menuContainer.appendChild(card);
-    });
-  } catch (err) {
-    console.error(err);
-    menuContainer.innerHTML = "<div class=\"empty-state\">Unable to load menu at the moment.</div>";
-  }
-}
-
-
-function addToCart(foodId, name, price) {
-  const existing = cart.find(item => item.foodItem === foodId);
-  if (existing) existing.quantity++;
-  else cart.push({ foodItem: foodId, name, price, quantity: 1 });
-  renderCart();
-}
-
-function renderCart() {
-  const cartDiv = document.getElementById("cart-items");
-  cartDiv.innerHTML = "";
-
-  if (cart.length === 0) {
-    cartDiv.innerHTML = "<div class=\"empty-state\">Your cart is currently empty.</div>";
-    return;
+        menuContainer.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+      menuContainer.innerHTML = "<div class=\"empty-state\">Unable to load menu at the moment.</div>";
+    }
   }
 
-  let total = 0;
+  // =================== CART FUNCTIONS ===================
+  function addToCart(foodId, name, price) {
+    const existing = cart.find(item => item.foodItem === foodId);
+    if (existing) existing.quantity++;
+    else cart.push({ foodItem: foodId, name, price, quantity: 1 });
+    renderCart();
+  }
 
-  cart.forEach((item, i) => {
-    total += item.price * item.quantity;
-    const card = document.createElement("div");
-    card.className = "cart-item";
-    card.innerHTML = `
+  function renderCart() {
+    const cartDiv = document.getElementById("cart-items");
+    cartDiv.innerHTML = "";
+
+    if (cart.length === 0) {
+      cartDiv.innerHTML = "<div class=\"empty-state\">Your cart is currently empty.</div>";
+      return;
+    }
+
+    let total = 0;
+
+    cart.forEach((item, i) => {
+      total += item.price * item.quantity;
+      const card = document.createElement("div");
+      card.className = "cart-item";
+      card.innerHTML = `
       <div class="cart-item__header">
         <div>
           <strong>${item.name}</strong>
@@ -161,120 +161,158 @@ function renderCart() {
         <button type="button" onclick="removeItem(${i})">Remove</button>
       </div>
     `;
-    cartDiv.appendChild(card);
-  });
+      cartDiv.appendChild(card);
+    });
 
-  const totalDiv = document.createElement("div");
-  totalDiv.className = "cart-item";
-  totalDiv.innerHTML = `
+    const totalDiv = document.createElement("div");
+    totalDiv.className = "cart-item";
+    totalDiv.innerHTML = `
     <div class="cart-item__header">
       <strong>Total</strong>
       <span class="menu-card__price">&#8377;${total.toFixed(2)}</span>
     </div>
   `;
-  cartDiv.appendChild(totalDiv);
-}
-
-function changeQty(index, delta) {
-  cart[index].quantity += delta;
-  if (cart[index].quantity <= 0) cart.splice(index, 1);
-  renderCart();
-}
-
-function removeItem(index) {
-  cart.splice(index, 1);
-  renderCart();
-}   
-
-// place order
-document.getElementById("order-form").addEventListener("submit", async e => {
-  e.preventDefault();
-
-  const deliveryAddress = document.getElementById("address").value.trim();
-  const notes = document.getElementById("notes").value.trim();
-  const messageDiv = document.getElementById("order-message");
-  messageDiv.classList.remove("success", "error");
-  messageDiv.innerText = "";
-
-  if (!deliveryAddress) {
-    alert("Please enter a delivery address.");
-    return;
+    cartDiv.appendChild(totalDiv);
   }
 
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
+  function changeQty(index, delta) {
+    cart[index].quantity += delta;
+    if (cart[index].quantity <= 0) cart.splice(index, 1);
+    renderCart();
   }
 
-  try {
-    const body = {
-      items: cart.map(c => ({
-        foodItem: c.foodItem,
-        quantity: c.quantity,
-      })),
-      deliveryAddress,
-      notes,
-    };
-
-    const res = await fetch(`${API_BASE}/catering/order`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      messageDiv.innerText = "Order placed successfully!";
-      messageDiv.classList.add("success");
-      cart = [];
-      renderCart();
-      document.getElementById("order-form").reset();
-    } else {
-      messageDiv.innerText = "Warning: " + (data.message || "Failed to place order");
-      messageDiv.classList.add("error");
-    }
-  } catch (err) {
-    console.error(err);
-    messageDiv.innerText = "Unable to process your order right now.";
-    messageDiv.classList.add("error");
+  function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
   }
-});
 
-document.getElementById("load-orders-btn").addEventListener("click", async () => {
-  const container = document.getElementById("past-orders-container");
-  container.innerHTML = "<div class=\"empty-state\">Fetching your orders...</div>";
+  // =================== PLACE ORDER ===================
+  document.getElementById("order-form").addEventListener("submit", async e => {
+    e.preventDefault();
 
-  try {
-    const res = await fetch(`${API_BASE}/catering/my-orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const deliveryAddress = document.getElementById("address").value.trim();
+    const notes = document.getElementById("notes").value.trim();
+    const messageDiv = document.getElementById("order-message");
+    messageDiv.classList.remove("success", "error");
+    messageDiv.innerText = "";
 
-    const data = await res.json();
-
-    if (!data.success || data.data.length === 0) {
-      container.innerHTML = "<div class=\"empty-state\">No past orders found.</div>";
+    if (!deliveryAddress) {
+      alert("Please enter a delivery address.");
       return;
     }
 
-    container.innerHTML = "";
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
 
-    data.data.forEach(order => {
-      const statusClass =
-        order.status === "delivered"
-          ? "status-pill success"
-          : order.status === "cancelled"
-            ? "status-pill danger"
-            : "status-pill warning";
+    try {
+      const body = {
+        items: cart.map(c => ({
+          foodItem: c.foodItem, // Only the ID (backend will populate)
+          quantity: c.quantity,
+        })),
+        deliveryAddress,
+        notes,
+      };
 
-      const div = document.createElement("article");
-      div.classList.add("order-card");
-      div.innerHTML = `
+      const res = await fetch(`${API_BASE}/catering/order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        messageDiv.innerText = "Order placed successfully!";
+        messageDiv.classList.add("success");
+        cart = [];
+        renderCart();
+        document.getElementById("order-form").reset();
+      } else {
+        messageDiv.innerText = "Warning: " + (data.message || "Failed to place order");
+        messageDiv.classList.add("error");
+      }
+    } catch (err) {
+      console.error(err);
+      messageDiv.innerText = "Unable to process your order right now.";
+      messageDiv.classList.add("error");
+    }
+  });
+
+  // =================== LOAD PAST ORDERS ===================
+  document.getElementById("load-orders-btn").addEventListener("click", async () => {
+    const container = document.getElementById("past-orders-container");
+    container.innerHTML = "<div class=\"empty-state\">Fetching your orders...</div>";
+
+    try {
+      const res = await fetch(`${API_BASE}/catering/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      if (!data.success || data.data.length === 0) {
+        container.innerHTML = "<div class=\"empty-state\">No past orders found.</div>";
+        return;
+      }
+
+      container.innerHTML = "";
+
+      for (const order of data.data) {
+        // Resolve each order item. Backend sometimes returns a populated `foodItem` object
+        // (with name/price) or only the foodItem ID string. Handle both cases and
+        // fetch details only when necessary.
+        console.log('order.items:', order.items);
+
+        const resolvedItems = await Promise.all(
+          order.items.map(async i => {
+            try {
+              // If backend already populated the foodItem as an object, use it directly
+              if (i.foodItem && typeof i.foodItem === 'object' && i.foodItem.name) {
+                return {
+                  name: i.foodItem.name || 'Unknown Item',
+                  quantity: i.quantity,
+                  price: (i.priceAtOrder != null ? i.priceAtOrder : (i.foodItem.price || 0)),
+                };
+              }
+
+              // Determine the ID when foodItem is a string or an object with _id
+              const foodId = typeof i.foodItem === 'string' ? i.foodItem : (i.foodItem && i.foodItem._id) ? i.foodItem._id : null;
+              if (!foodId) {
+                return { name: 'Unknown Item', quantity: i.quantity, price: i.priceAtOrder || 0 };
+              }
+
+              const foodRes = await fetch(`${API_BASE}/food/${foodId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              const foodData = await foodRes.json();
+              const food = foodData.data || foodData;
+              return {
+                name: food.name || 'Unknown Item',
+                quantity: i.quantity,
+                price: (i.priceAtOrder != null ? i.priceAtOrder : (food.price || 0)),
+              };
+            } catch (err) {
+              console.error('Failed to resolve order item', i, err);
+              return { name: 'Unknown Item', quantity: i.quantity, price: i.priceAtOrder || 0 };
+            }
+          })
+        );
+
+        const statusClass =
+          order.status === "delivered"
+            ? "status-pill success"
+            : order.status === "cancelled"
+              ? "status-pill danger"
+              : "status-pill warning";
+
+        const div = document.createElement("article");
+        div.classList.add("order-card");
+  div.innerHTML = `
         <div class="order-card__header">
           <div>
             <h4>Order #${order._id}</h4>
@@ -284,60 +322,53 @@ document.getElementById("load-orders-btn").addEventListener("click", async () =>
         </div>
         <p><strong>Total:</strong> &#8377;${order.totalPrice}</p>
         <ul class="past-order-items">
-          ${order.items
-            .map(
-              i =>
-                `<li>${i.foodItem.name} × ${i.quantity} (&#8377;${i.priceAtOrder})</li>`
-            )
-            .join("")}
+          ${resolvedItems
+            .map(i => `<li>${i.name} × ${i.quantity} (&#8377;${Number(i.price || 0).toFixed(2)})</li>`)
+            .join('')}
         </ul>
         <p><strong>Address:</strong> ${order.deliveryAddress}</p>
-        ${
-          order.status === "pending" || order.status === "preparing"
+        ${order.status === "pending" || order.status === "preparing"
             ? `<button class="btn btn-tonal" type="button" onclick="cancelOrder('${order._id}')">Cancel Order</button>`
             : ""
-        }
+          }
       `;
-
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "<div class=\"empty-state\">Unable to load your orders.</div>";
-  }
-});
-
-async function cancelOrder(orderId) {
-  const confirmCancel = confirm("Are you sure you want to cancel this order?");
-  if (!confirmCancel) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/catering/${orderId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ status: "cancelled" }),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("Success! Order cancelled successfully.");
-      document.getElementById("load-orders-btn").click(); // reload orders
-    } else {
-      alert("Warning: " + (data.message || "Failed to cancel order"));
+        container.appendChild(div);
+      }
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = "<div class=\"empty-state\">Unable to load your orders.</div>";
     }
-  } catch (err) {
-    console.error(err);
+  });
+
+  // =================== CANCEL ORDER ===================
+  async function cancelOrder(orderId) {
+    const confirmCancel = confirm("Are you sure you want to cancel this order?");
+    if (!confirmCancel) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/catering/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Success! Order cancelled successfully.");
+        document.getElementById("load-orders-btn").click();
+      } else {
+        alert("Warning: " + (data.message || "Failed to cancel order"));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
-}
 
-
-loadMenu();
-
-
+  loadMenu();
 </script>
 
 </body>

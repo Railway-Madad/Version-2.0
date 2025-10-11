@@ -7,10 +7,10 @@ const upload = multer({ storage });
 const foodcontroller = require("../controllers/foodcontroller");
 
 foodRouter.get("/", foodcontroller.getAllFoods);
+foodRouter.post("/", upload.single("image"), foodcontroller.addFood);
 
 foodRouter.get("/:id", foodcontroller.getFoodById);
 
-foodRouter.post("/", upload.single("image"), foodcontroller.addFood);
 foodRouter.delete("/:id",foodcontroller.deleteFood);
 
 module.exports = foodRouter;
