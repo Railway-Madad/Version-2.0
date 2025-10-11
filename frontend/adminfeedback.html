@@ -2,15 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Feedback Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Intelligence</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h1>Feedback Dashboard</h1>
+  <main class="page-shell fade-in">
+    <section class="surface-card card-highlight">
+      <div class="page-header">
+        <div>
+          <h1>Feedback Intelligence</h1>
+          <p class="muted-text">Track sentiment across journeys and identify areas that need attention.</p>
+        </div>
+        <a class="btn btn-tonal" href="admindashboard.html">Back to Dashboard</a>
+      </div>
 
-  <div id="stats"></div>
+      <div id="stats" class="content-grid two-column"></div>
+    </section>
 
-  <h2>All Feedbacks</h2>
-  <div id="feedbacks"></div>
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h2>Latest Feedback</h2>
+          <p class="muted-text">Every submission includes the passenger’s comments and rating.</p>
+        </div>
+      </div>
+      <div id="feedbacks" class="stack"></div>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "http://localhost:4000";
@@ -21,32 +40,53 @@
 
       const statsDiv = document.getElementById("stats");
       statsDiv.innerHTML = `
-        <p><b>Total Feedbacks:</b> ${data.stats.totalFeedbacks}</p>
-        <p><b>Average Rating:</b> ${data.stats.averageRating} ⭐</p>
+        <article class="link-tile">
+          <span class="badge">Overview</span>
+          <strong>Total Feedbacks</strong>
+          <p>${data.stats.totalFeedbacks}</p>
+        </article>
+          <article class="link-tile">
+            <span class="badge">Satisfaction</span>
+            <strong>Average Rating</strong>
+            <p>${data.stats.averageRating} &#9733;</p>
+          </article>
       `;
     }
 
     async function loadFeedbacks() {
-      const res = await fetch(`${API_BASE}/feedback`);
-      const data = await res.json();
-
       const container = document.getElementById("feedbacks");
-      container.innerHTML = "";
+      container.innerHTML = "<p class=\"muted-text\">Loading feedback…</p>";
 
-      data.data.forEach(fb => {
-        const div = document.createElement("div");
-        div.style.border = "1px solid black";
-        div.style.margin = "10px";
-        div.style.padding = "10px";
+      try {
+        const res = await fetch(`${API_BASE}/feedback`);
+        const data = await res.json();
 
-        div.innerHTML = `
-          <h3>${fb.name} (${fb.email})</h3>
-          <p>Rating: ${fb.rating} ⭐</p>
-          <p>${fb.comment}</p>
-          <p><i>${new Date(fb.createdAt).toLocaleString()}</i></p>
-        `;
-        container.appendChild(div);
-      });
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = "<p class=\"muted-text\">No feedback received yet.</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        data.data.forEach(fb => {
+          const card = document.createElement("article");
+          card.className = "list-card-item";
+          card.innerHTML = `
+            <div class="actions-inline" style="justify-content: space-between;">
+              <div>
+                <h3>${fb.name} <span class="muted-text">(${fb.email})</span></h3>
+              </div>
+              <span class="badge-accent">Rating: ${fb.rating} &#9733;</span>
+            </div>
+            <p>${fb.comment}</p>
+            <p class="muted-text">${new Date(fb.createdAt).toLocaleString()}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p class=\"message error\">Unable to load feedback.</p>";
+      }
     }
 
     loadStats();

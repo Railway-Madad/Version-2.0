@@ -2,19 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Emergency Request</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Assistance</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h2>Emergency Request Form</h2>
-  <form id="emergencyForm">
-    
-    <input type="text" id="username" placeholder="Username" required><br><br>
-    <input type="text" id="trainNumber" placeholder="Train Number" required><br><br>
-    <input type="text" id="seatNumber" placeholder="Seat Number" required><br><br>
-    <button type="submit">Submit</button>
-  </form>
+  <main class="auth-layout fade-in">
+    <section class="surface-card auth-card">
+      <div class="stack">
+        <div>
+          <h2>Emergency Assistance Request</h2>
+          <p>Please confirm your details so our response team can reach you instantly.</p>
+        </div>
+        <p class="message" id="result" role="alert"></p>
+      </div>
 
-  <p id="result"></p>
+      <form id="emergencyForm" class="form-grid">
+        <div class="input-group">
+          <label for="username">Passenger Username</label>
+          <input type="text" id="username" placeholder="Registered username" required>
+        </div>
+        <div class="input-group">
+          <label for="trainNumber">Train Number</label>
+          <input type="text" id="trainNumber" placeholder="e.g. 12627" required>
+        </div>
+        <div class="input-group">
+          <label for="seatNumber">Coach &amp; Seat</label>
+          <input type="text" id="seatNumber" placeholder="Coach and seat details" required>
+        </div>
+        <button class="btn" type="submit">Submit Request</button>
+      </form>
+    </section>
+  </main>
 
   <script src="emergency.js"></script>
 </body>

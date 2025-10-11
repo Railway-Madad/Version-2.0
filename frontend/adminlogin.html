@@ -1,23 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
-    <h2>Admin Login</h2>
-    <form onsubmit="login(event)">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Login</button>
-    </form>
+    <main class="auth-layout fade-in">
+        <section class="surface-card auth-card">
+            <div class="stack">
+                <div>
+                    <h2>Administrator Login</h2>
+                    <p>Authenticate to access the operations dashboard, manage updates, and monitor feedback.</p>
+                </div>
+            </div>
+
+            <form class="form-grid" onsubmit="login(event)">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Admin username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button class="btn" type="submit">Sign In</button>
+            </form>
+
+            <p class="form-meta">
+                Need an account?
+                <a href="adminregister.html">Register a new administrator</a>
+            </p>
+        </section>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function login(e) {
@@ -33,7 +52,7 @@
                 const data = res.data;
                 if (res.status === 200 && data.token) {
                     localStorage.setItem("adminToken", data.token);
-                    console.log("✅ Login successful, token stored:", data.token);
+                    console.log("Login successful, token stored:", data.token);
                     window.location.href = "admindashboard.html"; // Redirect to admin dashboard
                 } else {
                     alert(data.message || "Invalid username or password.");
@@ -50,6 +69,6 @@
             }
         }
     </script>
-    
+
 </body>
 </html>

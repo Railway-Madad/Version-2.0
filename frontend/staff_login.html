@@ -3,24 +3,43 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Staff Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail Staff Login</title>
     <link rel="stylesheet" href="index.css">
     <!-- Include Axios CDN -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <h2>Staff Login</h2>
-        <div class="message" id="msg"></div>
+    <main class="auth-layout fade-in">
+        <section class="surface-card auth-card">
+            <div class="stack">
+                <div>
+                    <h2>Rail Staff Login</h2>
+                    <p>Access your assignments, review passenger updates, and keep journeys running smoothly.</p>
+                </div>
+                <div class="message" id="msg" role="alert"></div>
+            </div>
 
-        <!-- Form captures the event -->
-        <form onsubmit="login(event)">
-            <input type="email" id="staffemail" placeholder="Staff Email" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+            <!-- Form captures the event -->
+            <form class="form-grid" onsubmit="login(event)">
+                <div class="input-group">
+                    <label for="staffemail">Staff Email</label>
+                    <input type="email" id="staffemail" placeholder="name@railway.gov.in" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button class="btn" type="submit">Login</button>
+            </form>
+
+            <p class="form-meta">
+                Need access?
+                <a href="staff_register.html">Create a staff account</a>
+            </p>
+        </section>
+    </main>
 
     <script>
         async function login(e) {
@@ -44,7 +63,7 @@
 
                 if (res.status === 200 && data.token) {
                     localStorage.setItem("token", data.token);
-                    console.log("✅ Login successful, token stored:", data.token);
+                    console.log("Login successful, token stored:", data.token);
                     window.location.href = "staffDashboard.html";
                 } else {
                     msgEl.innerText = data.message || "Invalid email or password.";

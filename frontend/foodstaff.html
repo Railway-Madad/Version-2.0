@@ -2,147 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>food staff dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Service Crew</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h1>food staff dashboard</h1>
+  <main class="page-shell fade-in">
+    <section class="surface-card card-highlight">
+      <div class="page-header">
+        <div>
+          <h1>Food Service Crew Dashboard</h1>
+          <p class="muted-text">Filter orders based on your role and keep passengers nourished right on time.</p>
+        </div>
+        <a class="btn btn-ghost" href="index.html" style="margin-left: 0.5rem;">Logout</a>
+      </div>
 
-  <label for="role">Select Role:</label>
-  <select id="role">
-    <option value="chef">Chef</option>
-    <option value="manager">Manager</option>
-    <option value="distributor">Distributor</option>
-    <option value="all">All Orders</option>
+      <div class="actions-inline">
+        <div class="input-group" style="flex:1;">
+          <label for="role">Select Role</label>
+          <select id="role">
+            <option value="chef">Chef</option>
+            <option value="manager">Manager</option>
+            <option value="distributor">Distributor</option>
+            <option value="all">All Orders</option>
+          </select>
+        </div>
+        <button class="btn" id="load-orders-btn" type="button">Load Orders</button>
+      </div>
+    </section>
 
-  </select>
-  <button id="load-orders-btn">Load Orders</button>
-
-  <div id="orders-container"></div>
-
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h2>Orders Overview</h2>
+          <p class="muted-text">Actions appear based on your selection above.</p>
+        </div>
+      </div>
+      <div id="orders-container" class="orders-list"></div>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "http://localhost:4000";
-const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-document.getElementById("load-orders-btn").addEventListener("click", loadOrders);
+    document.getElementById("load-orders-btn").addEventListener("click", loadOrders);
 
-async function loadOrders() {
-  const role = document.getElementById("role").value;
-  const container = document.getElementById("orders-container");
-  container.innerHTML = "Loading...";
+    async function loadOrders() {
+      const role = document.getElementById("role").value;
+      const container = document.getElementById("orders-container");
+      container.innerHTML = "<div class=\"empty-state\">Loading orders...</div>";
 
-  try {
-    const res = await fetch(`${API_BASE}/catering/all-orders`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      try {
+        const res = await fetch(`${API_BASE}/catering/all-orders`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    const data = await res.json();
-    if (!data.success) {
-      container.innerText = "Failed to load orders.";
-      return;
-    }
+        const data = await res.json();
+        if (!data.success) {
+          container.innerHTML = "<div class=\"empty-state\">Failed to load orders.</div>";
+          return;
+        }
 
-    let orders = data.data;
+        let orders = data.data;
 
-    if (role === "chef") {
-      orders = orders.filter(o => o.status === "pending");
-    } else if (role === "manager") {
-      orders = orders.filter(o => o.status === "preparing");
-    } else if (role === "distributor") {
-      orders = orders.filter(o => o.status === "out for delivery");
-    } else if (role === "all") {
+        if (role === "chef") {
+          orders = orders.filter(o => o.status === "pending");
+        } else if (role === "manager") {
+          orders = orders.filter(o => o.status === "preparing");
+        } else if (role === "distributor") {
+          orders = orders.filter(o => o.status === "out for delivery");
+        } else if (role === "all") {
+          // no filter
+        } else {
+          container.innerHTML = "<div class=\"empty-state\">Invalid role selected.</div>";
+          return;
+        }
 
-    } else {
-      container.innerText = "Invalid role selected.";
-      return;
-    }
+        if (orders.length === 0) {
+          container.innerHTML = "<div class=\"empty-state\">No orders available right now.</div>";
+          return;
+        }
 
-    if (orders.length === 0) {
-      container.innerText = "No orders available.";
-      return;
-    }
+        container.innerHTML = "";
 
-    container.innerHTML = "";
+        orders.forEach(order => {
+          const statusClass =
+            order.status === "delivered"
+              ? "status-pill success"
+              : order.status === "cancelled"
+                ? "status-pill danger"
+                : "status-pill warning";
 
-    orders.forEach(order => {
-      const div = document.createElement("div");
-      div.style.border = "1px solid black";
-      div.style.margin = "10px";
-      div.style.padding = "10px";
+          const div = document.createElement("article");
+          div.className = "order-card";
 
-      div.innerHTML = `
-        <p><b>Order ID:</b> ${order._id}</p>
-        <p><b>Customer:</b> ${order.user?.name || "N/A"} (${order.user?.email || ""})</p>
-        <p><b>Address:</b> ${order.deliveryAddress}</p>
-        <p><b>Status:</b> ${order.status}</p>
-        <p><b>Items:</b></p>
-        <ul>
-          ${order.items.map(i => `
-            <li>${i.foodItem?.name} — ${i.quantity} × ₹${i.priceAtOrder}</li>
-          `).join("")}
-        </ul>
-        <p><b>Total:</b> ₹${order.totalPrice}</p>
-      `;
+          div.innerHTML = `
+            <div class="order-card__header">
+              <div>
+                <h4>Order ID: ${order._id}</h4>
+                <p class="muted-text">${new Date(order.createdAt).toLocaleString()}</p>
+                <p class="muted-text">Customer: ${order.user?.name || "N/A"} (${order.user?.email || ""})</p>
+              </div>
+              <span class="${statusClass}">${order.status}</span>
+            </div>
+            <p><strong>Delivery address:</strong> ${order.deliveryAddress}</p>
+            <p><strong>Total:</strong> &#8377;${order.totalPrice}</p>
+            <p><strong>Items:</strong></p>
+            <ul class="past-order-items">
+              ${order.items.map(i => `<li>${i.foodItem?.name || "Item"} x ${i.quantity} (&#8377;${i.priceAtOrder})</li>`).join("")}
+            </ul>
+          `;
 
-      const buttonContainer = document.createElement("div");
+          const buttonContainer = document.createElement("div");
+          buttonContainer.className = "actions-inline";
 
-      // Chef
-      if (role === "chef" && order.status === "pending") {
-        const btn = document.createElement("button");
-        btn.innerText = "Accept Order (Preparing)";
-        btn.onclick = () => updateStatus(order._id, "preparing");
-        buttonContainer.appendChild(btn);
+          // Chef
+          if (role === "chef" && order.status === "pending") {
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Accept Order (Preparing)";
+            btn.onclick = () => updateStatus(order._id, "preparing");
+            buttonContainer.appendChild(btn);
+          }
+
+          // Manager
+          if (role === "manager" && order.status === "preparing") {
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Mark Out for Delivery";
+            btn.onclick = () => updateStatus(order._id, "out for delivery");
+            buttonContainer.appendChild(btn);
+          }
+
+          // Distributor
+          if (role === "distributor" && order.status === "out for delivery") {
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Mark Delivered";
+            btn.onclick = () => updateStatus(order._id, "delivered");
+            buttonContainer.appendChild(btn);
+          }
+
+          if (buttonContainer.children.length > 0) {
+            div.appendChild(buttonContainer);
+          }
+
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<div class=\"empty-state\">Error loading orders.</div>";
       }
-
-      // Manager
-      if (role === "manager" && order.status === "preparing") {
-        const btn = document.createElement("button");
-        btn.innerText = "Mark Out for Delivery";
-        btn.onclick = () => updateStatus(order._id, "out for delivery");
-        buttonContainer.appendChild(btn);
-      }
-
-      // distributor
-      if (role === "distributor" && order.status === "out for delivery") {
-        const btn = document.createElement("button");
-        btn.innerText = "Deliver Order";
-        btn.onclick = () => updateStatus(order._id, "delivered");
-        buttonContainer.appendChild(btn);
-      }
-
-      div.appendChild(buttonContainer);
-      container.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    container.innerText = "Error loading orders.";
-  }
-}
-
-async function updateStatus(orderId, status) {
-  try {
-    const res = await fetch(`${API_BASE}/catering/${orderId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ status }),
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      alert(`✅ Order status updated to ${status}`);
-      loadOrders();
-    } else {
-      alert(`❌ Failed: ${data.message}`);
     }
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-}
+
+    async function updateStatus(orderId, status) {
+      try {
+        const res = await fetch(`${API_BASE}/catering/${orderId}/status`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert(`Success! Order status updated to ${status}.`);
+          loadOrders();
+        } else {
+          alert(`Warning: ${data.message}`);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+    }
 
   </script>
 </body>

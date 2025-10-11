@@ -2,21 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Give Feedback</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Feedback</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h1>We value your feedback!</h1>
+  <main class="auth-layout fade-in">
+    <section class="surface-card auth-card">
+      <div class="stack">
+        <div>
+          <h2>We value your feedback</h2>
+          <p>Tell us how we can make your journey better. Your comments are reviewed by our service teams.</p>
+        </div>
+        <p class="message" id="msg" role="alert"></p>
+      </div>
 
-  <form id="feedback-form">
-    <input type="text" id="name" placeholder="Your Name" required><br><br>
-    <input type="email" id="email" placeholder="Your Email" required><br><br>
-    <label>Rating (1-5): </label>
-    <input type="number" id="rating" min="1" max="5" required><br><br>
-    <textarea id="comment" placeholder="Your Comment" required></textarea><br><br>
-    <button type="submit">Submit Feedback</button>
-  </form>
-
-  <p id="msg"></p>
+      <form id="feedback-form" class="form-grid">
+        <div class="input-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Your full name" required>
+        </div>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="name@example.com" required>
+        </div>
+        <div class="input-group">
+          <label for="rating">Rating (1-5)</label>
+          <input type="number" id="rating" min="1" max="5" placeholder="Rate your experience" required>
+        </div>
+        <div class="input-group">
+          <label for="comment">Comment</label>
+          <textarea id="comment" placeholder="Share your thoughts" required></textarea>
+        </div>
+        <button class="btn" type="submit">Submit Feedback</button>
+      </form>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "http://localhost:4000";
@@ -39,10 +60,14 @@
       const msg = document.getElementById("msg");
 
       if (data.success) {
-        msg.textContent = "✅ Thank you for your feedback!";
+        msg.textContent = "Thank you for your feedback!";
+        msg.classList.remove("error");
+        msg.classList.add("success");
         document.getElementById("feedback-form").reset();
       } else {
-        msg.textContent = "❌ Failed to submit feedback. Please try again.";
+        msg.textContent = "Failed to submit feedback. Please try again.";
+        msg.classList.remove("success");
+        msg.classList.add("error");
       }
     });
   </script>
