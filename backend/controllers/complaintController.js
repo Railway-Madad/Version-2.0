@@ -5,7 +5,7 @@ const streamifier = require("streamifier");
 //post
 exports.postComplaint = async (req, res) => {
   try {
-    const { username, pnr, description, issueDomain } = req.body;
+    const { username, pnr,bogieNumber,seatNumber,description, issueDomain } = req.body;
     const file = req.file;
 
     if (!username || !pnr || !description || !issueDomain) {
@@ -36,6 +36,8 @@ exports.postComplaint = async (req, res) => {
       userId: req.userId,
       username,
       pnr,
+      bogieNumber,
+      seatNumber,
       description,
       issueDomain,
       linkurl,

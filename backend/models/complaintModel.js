@@ -24,6 +24,16 @@ const complaintSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    bogieNumber:{
+        type: String,
+        required: true,
+        trim: true
+    },
+    seatNumber: {
+        type: String,
+        required: true,
+        trim: true
+    },
     description: {
         type: String,
         required: true,
