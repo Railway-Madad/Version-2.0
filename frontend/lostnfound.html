@@ -4,151 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lost and Found</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <h1>Lost and Found</h1>
-    <p>This is the Lost and Found page.</p>
-
-    <a href="userDashboard.html">Back to Dashboard</a>
-    <a href="lostnfoundView.html">View Lost/Found Items</a>
-    <form id="lost-found-form">
-        <h2>Submit a Lost/Found Item</h2>
-
-        <label for="title">Item Name:</label><br>
-        <input type="text" id="title" name="title" required><br><br>
-
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="description" required></textarea><br><br>
-
-        <label for="category">Category:</label><br>
+<main class="page-shell fade-in">
+  <header class="page-header">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <span class="badge">Rail Madad</span>
+      <h1 style="margin:0">Lost and Found</h1>
+    </div>
+    <div class="actions-inline">
+      <a class="btn btn-ghost" href="index.html">Home</a>
+      <a class="btn btn-tonal" href="userDashboard.html">Dashboard</a>
+      <a class="btn btn-ghost" href="lostnfoundView.html">View Items</a>
+    </div>
+  </header>
+  <section class="surface-card card-highlight" style="margin-bottom:2rem;max-width:540px;margin-left:auto;margin-right:auto;">
+    <h2 class="card-section-title" style="margin-bottom:1.2rem;">Report a Lost or Found Item</h2>
+    <form id="lost-found-form" class="form-grid" enctype="multipart/form-data">
+      <div class="input-group">
+        <label for="title">Item Name</label>
+        <input type="text" id="title" name="title" required>
+      </div>
+      <div class="input-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required></textarea>
+      </div>
+      <div class="input-group">
+        <label for="category">Category</label>
         <select id="category" name="category" required>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
-        </select><br><br>
-
-        <label for="date">Date Lost/Found:</label><br>
-        <input type="date" id="date" name="date" required><br><br>
-
-        <label for="location">Location:</label><br>
-        <input type="text" id="location" name="location" required><br><br>
-
-        <label for="image">Image (optional):</label><br>
-        <input type="file" id="image" name="image"><br><br>
-
-        <button type="submit">Submit</button>
-
-   
+          <option value="Lost">Lost</option>
+          <option value="Found">Found</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="date">Date Lost/Found</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div class="input-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" required>
+      </div>
+      <div class="input-group">
+        <label for="image">Image (optional)</label>
+        <input type="file" id="image" name="image">
+      </div>
+      <button type="submit" class="btn">Submit</button>
     </form>
-     // show user submissions
-    <h2>Your Submissions</h2>
-    <div id="user-submissions"></div>
-
-    <script>
-        const API_BASE = "http://localhost:4000";
-
-        document.getElementById("lost-found-form").addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            const token = localStorage.getItem("token");
-            if (!token) {
-                alert("Please log in to submit an item.");
-                return;
-            }
-
-            const formData = new FormData(this);
-
-            const res = await fetch(`${API_BASE}/lostnfound`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            const result = await res.json();
-            if (res.ok) {
-                alert("Item submitted successfully!");
-                loadUserSubmissions();
-                this.reset();
-            } else {
-                alert("Error: " + result.message);
-            }
-        });
-        async function loadUserSubmissions() {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            const res = await fetch(`${API_BASE}/lostnfound/myitems`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-
-            const result = await res.json();
-            const container = document.getElementById("user-submissions");
-            container.innerHTML = "";
-            console.log(result);
-
-            if (res.ok) {
-                result.items.forEach(item => {
-                    const div = document.createElement("div");
-                    div.style.border = "1px solid black";
-                    div.style.margin = "10px";
-                    div.style.padding = "10px";
-
-                    div.innerHTML = `
-                        <h3>${item.title} (${item.category})</h3>
-                        <p>${item.description}</p>
-                        <p><strong>Date:</strong> ${new Date(item.date).toLocaleDateString()}</p>
-                        <p><strong>Location:</strong> ${item.location}</p>
-                        <p><strong>Status:</strong> ${item.status}</p>
-                        ${item.imageUrl ? `<img src="${item.imageUrl}" width="100">` : ""}
-                        <button onclick="markAsResolved('${item._id}')">Mark as Resolved</button>
-                        <button onclick="deleteItem('${item._id}')">Delete</button>
-                    `;
-                    container.appendChild(div);
-                });
-            } else {
-                container.innerText = "Error loading submissions: " + result.message;
-            }
-
-        }
-
-        async function markAsResolved(id) {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            const res = await fetch(`${API_BASE}/lostnfound/${id}/resolve`, {
-                method: "PUT",
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-
-            const result = await res.json();
-            if (res.ok) {
-                alert("Item marked as resolved.");
-                loadUserSubmissions();
-            } else {
-                alert("Error: " + result.message);
-            }
-        }
-        async function deleteItem(id) {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            const res = await fetch(`${API_BASE}/lostnfound/${id}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-
-            const result = await res.json();
-            if (res.ok) {
-                alert("Item deleted.");
-                loadUserSubmissions();
-            } else {
-                alert("Error: " + result.message);
-            }
-        }
+  </section>
+  <section class="surface-card" style="max-width:700px;margin:auto;">
+    <h2 class="card-section-title">Your Submissions</h2>
+    <div id="user-submissions" class="list-card"></div>
+  </section>
+  <footer style="margin-top:2.5rem;text-align:center;">
+    <p class="muted-text">© 2025 Rail Madad - Indian Railways. All Rights Reserved.</p>
+  </footer>
+</main>
+<script>
+const API_BASE = "http://localhost:4000";
+document.getElementById("lost-found-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please log in to submit an item."); return;
+    }
+    const formData = new FormData(this);
+    const res = await fetch(`${API_BASE}/lostnfound`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+    });
+    const result = await res.json();
+    if (res.ok) {
+        alert("Item submitted successfully!");
         loadUserSubmissions();
-
-    </script>
+        this.reset();
+    } else {
+        alert("Error: " + result.message);
+    }
+});
+async function loadUserSubmissions() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const res = await fetch(`${API_BASE}/lostnfound/myitems`, { headers: { "Authorization": `Bearer ${token}` } });
+    const result = await res.json();
+    const container = document.getElementById("user-submissions");
+    container.innerHTML = "";
+    if (res.ok && result.items && result.items.length) {
+        result.items.forEach(item => {
+            const div = document.createElement("article");
+            div.className = "list-card-item";
+            div.innerHTML = `
+              <h3 style='margin-bottom:0.25rem'>${item.title} <span class='badge-neutral' style='font-size:13px'>${item.category}</span></h3>
+              <p class='muted-text'>${item.description}</p>
+              <p><span class='badge'>Date</span> ${new Date(item.date).toLocaleDateString()} | <span class='badge'>Location</span> ${item.location}</p>
+              ${item.imageUrl ? `<img src="${item.imageUrl}" style='max-width:90px;border-radius:10px;margin-top:7px;'>` : ""}
+              <div class='actions-inline' style='margin-top:8px;'>
+                <button class='btn btn-tonal' onclick='markAsResolved("${item._id}")'>Mark as Resolved</button>
+                <button class='btn btn-danger' onclick='deleteItem("${item._id}")'>Delete</button>
+                <span class='status-pill ${item.status==='resolved'?'success':'warning'}'>${item.status}</span>
+              </div>
+            `;
+            container.appendChild(div);
+        });
+    } else {
+        container.innerHTML = `<div class="empty-state">No submissions found.</div>`;
+    }
+}
+window.markAsResolved = async function(id) {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const res = await fetch(`${API_BASE}/lostnfound/${id}/resolve`, { method: "PUT", headers: { "Authorization": `Bearer ${token}` } });
+    if (res.ok) { alert("Item marked as resolved."); loadUserSubmissions(); }
+    else { alert("Error marking as resolved"); }
+};
+window.deleteItem = async function(id) {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const res = await fetch(`${API_BASE}/lostnfound/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+    if (res.ok) { alert("Item deleted."); loadUserSubmissions(); }
+    else { alert("Error: " + (await res.json()).message); }
+};
+loadUserSubmissions();
+</script>
 </body>
 </html>
-
