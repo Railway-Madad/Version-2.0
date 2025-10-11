@@ -2,180 +2,270 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Operations Command</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h1>Admin Food Dashboard</h1>
+  <main class="page-shell fade-in">
+    <section class="surface-card card-highlight">
+      <div class="page-header">
+        <div>
+          <h1>Food Operations Command</h1>
+          <p class="muted-text">Manage the onboard menu, track order performance, and keep passengers well served.</p>
+        </div>
+        <a class="btn btn-tonal" href="admindashboard.html">Back to Admin</a>
+        <a class="btn btn-ghost" href="index.html" style="margin-left: 0.5rem;">Home</a>
+      </div>
 
-  <section>
-    <h2>Add New Food Item</h2>
-    <form id="add-food-form" enctype="multipart/form-data">
-      <input type="text" id="name" name="name" placeholder="Name" required />
-      <input type="number" id="price" name="price" placeholder="Price" required />
-      <input type="text" id="description" name="description" placeholder="Description" />
-      <input type="text" id="category" name="category" placeholder="Category" />
-      <input type="file" id="image" name="image" accept="image/*" />
-      <button type="submit">Add Food</button>
-    </form>
-    <div id="add-food-message"></div>
-  </section>
+      <form id="add-food-form" class="form-grid" enctype="multipart/form-data">
+        <div class="input-group">
+          <label for="name">Item Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Paneer Tikka Wrap" required>
+        </div>
+        <div class="input-group">
+          <label for="price">Price (₹)</label>
+          <input type="number" id="price" name="price" placeholder="Price" required>
+        </div>
+        <div class="input-group">
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description" placeholder="Short description">
+        </div>
+        <div class="input-group">
+          <label for="category">Category</label>
+          <input type="text" id="category" name="category" placeholder="Vegetarian, Combo, Snacks...">
+        </div>
+        <div class="input-group">
+          <label for="image">Image (optional)</label>
+          <input type="file" id="image" name="image" accept="image/*">
+        </div>
+        <button class="btn" type="submit">Add Food Item</button>
+      </form>
+      <p id="add-food-message" class="message" role="alert"></p>
+    </section>
 
-  <section>
-    <h2>Menu Items</h2>
-    <div id="menu-container"></div>
-  </section>
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h2>Live Menu</h2>
+          <p class="muted-text">Passengers see these items in real time within the ordering flow.</p>
+        </div>
+      </div>
+      <div id="menu-container" class="menu-grid"></div>
+    </section>
 
-  <section>
-    <h2>All Orders & Stats</h2>
-    <button id="load-orders-btn">Load Orders</button>
-    <div id="stats"></div>
-    <div id="orders-container"></div>
-  </section>
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h2>Orders &amp; Performance</h2>
+          <p class="muted-text">Understand the volume, revenue, and fulfilment status of onboard meals.</p>
+        </div>
+        <button class="btn btn-tonal" id="load-orders-btn" type="button">Load Orders</button>
+      </div>
+      <div id="stats" class="content-grid two-column"></div>
+      <div id="orders-container" class="orders-list"></div>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "http://localhost:4000";
 
-window.onload = () => {
-  loadMenu();
-};
-
-async function loadMenu() {
-  const container = document.getElementById("menu-container");
-  container.innerText = "Loading menu...";
-  try {
-    const res = await fetch(`${API_BASE}/food`);
-    const data = await res.json();
-    if (!data.success) {
-      container.innerText = "Failed to load menu.";
-      return;
-    }
-    console.log(data);
-
-    container.innerHTML = "";
-    data.data.forEach(food => {
-      const div = document.createElement("div");
-      div.style.border = "1px solid black";
-      div.style.margin = "10px";
-      div.style.padding = "10px";
-      div.innerHTML = `
-        <p><b>${food.name}</b> - ₹${food.price}</p>
-        <p>${food.description || ""}</p>
-        <p><i>${food.category || ""}</i></p>
-        ${food.imageUrl ? `<img src="${food.imageUrl}" width="100">` : ""}
-        <button onclick="deleteFood('${food._id}')">Delete</button>
-      `;
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error(err);
-    container.innerText = "Error loading menu.";
-  }
-}
-
-document.getElementById("add-food-form").addEventListener("submit", async e => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  try {
-    const res = await fetch(`${API_BASE}/food`, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    const msg = document.getElementById("add-food-message");
-
-    if (data.success) {
-      msg.innerText = "✅ Food item added successfully!";
-      e.target.reset();
+    window.onload = () => {
       loadMenu();
-    } else {
-      msg.innerText = "❌ " + (data.message || "Failed to add food");
+    };
+
+    async function loadMenu() {
+      const container = document.getElementById("menu-container");
+      container.innerHTML = "<div class=\"empty-state\">Loading menu...</div>";
+      try {
+        const res = await fetch(`${API_BASE}/food`);
+        const data = await res.json();
+        if (!data.success) {
+          container.innerHTML = "<div class=\"empty-state\">Failed to load menu.</div>";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = "<div class=\"empty-state\">No items have been added yet.</div>";
+          return;
+        }
+
+        data.data.forEach(food => {
+          const priceValue = Number(food.price) || 0;
+          const card = document.createElement("article");
+          card.className = "menu-card";
+          card.innerHTML = `
+            ${food.imageUrl ? `<img class="menu-card__image" src="${food.imageUrl}" alt="${food.name}">` : ""}
+            <div class="menu-card__body">
+              <div>
+                <h3>${food.name}</h3>
+                <p class="muted-text">${food.description || ""}</p>
+                <p class="muted-text">${food.category ? `Category: ${food.category}` : ""}</p>
+              </div>
+              <div class="actions-inline" style="justify-content: space-between;">
+                <span class="menu-card__price">&#8377;${priceValue.toFixed(2)}</span>
+                <button class="btn btn-danger" type="button" onclick="deleteFood('${food._id}')">Delete</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<div class=\"empty-state\">Error loading menu.</div>";
+      }
     }
-  } catch (err) {
-    console.error(err);
-  }
-});
 
-// Delete food item
-async function deleteFood(id) {
-  if (!confirm("Are you sure you want to delete this item?")) return;
+    document.getElementById("add-food-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const msg = document.getElementById("add-food-message");
+      msg.classList.remove("success", "error");
+      msg.innerText = "";
 
-  try {
-    const res = await fetch(`${API_BASE}/food/${id}`, {
-      method: "DELETE",
+      try {
+        const res = await fetch(`${API_BASE}/food`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          msg.innerText = "Food item added successfully!";
+          msg.classList.add("success");
+          e.target.reset();
+          loadMenu();
+        } else {
+          msg.innerText = "Warning: " + (data.message || "Failed to add food.");
+          msg.classList.add("error");
+        }
+      } catch (err) {
+        console.error(err);
+        msg.innerText = "Unable to add food at the moment.";
+        msg.classList.add("error");
+      }
     });
-    const data = await res.json();
-    if (data.success) {
-      alert("✅ Deleted successfully");
-      loadMenu();
-    } else {
-      alert("❌ " + (data.message || "Failed to delete"));
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
 
-// Load all orders and show stats
-document.getElementById("load-orders-btn").addEventListener("click", loadOrders);
+    // Delete food item
+    async function deleteFood(id) {
+      if (!confirm("Are you sure you want to delete this item?")) return;
 
-async function loadOrders() {
-  const statsDiv = document.getElementById("stats");
-  const container = document.getElementById("orders-container");
-  container.innerHTML = "Loading...";
-  try {
-    const res = await fetch(`${API_BASE}/catering/all-orders`);
-    const data = await res.json();
-    if (!data.success) {
-      container.innerText = "Failed to load orders.";
-      return;
+      try {
+        const res = await fetch(`${API_BASE}/food/${id}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("Success! Item deleted.");
+          loadMenu();
+        } else {
+          alert("Warning: " + (data.message || "Failed to delete."));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Unable to delete this item right now.");
+      }
     }
 
-    const orders = data.data;
-    container.innerHTML = "";
+    // Load all orders and show stats
+    document.getElementById("load-orders-btn").addEventListener("click", loadOrders);
 
-    // Stats
-    const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
-    const delivered = orders.filter(o => o.status === "delivered").length;
-    const pending = orders.filter(o => o.status === "pending").length;
-    const preparing = orders.filter(o => o.status === "preparing").length;
-    const outForDelivery = orders.filter(o => o.status === "out for delivery").length;
+    async function loadOrders() {
+      const statsDiv = document.getElementById("stats");
+      const container = document.getElementById("orders-container");
+      container.innerHTML = "<div class=\"empty-state\">Loading orders...</div>";
 
-    statsDiv.innerHTML = `
-      <h3>Order Statistics:</h3>
-      <p>Total Orders: ${totalOrders}</p>
-      <p>Pending: ${pending}</p>
-      <p>Preparing: ${preparing}</p>
-      <p>Out for Delivery: ${outForDelivery}</p>
-      <p>Delivered: ${delivered}</p>
-      <p>Total Revenue: ₹${totalRevenue}</p>
-    `;
+      try {
+        const res = await fetch(`${API_BASE}/catering/all-orders`);
+        const data = await res.json();
+        if (!data.success) {
+          container.innerHTML = "<div class=\"empty-state\">Failed to load orders.</div>";
+          return;
+        }
 
-    // Orders display
-    orders.forEach(order => {
-      const div = document.createElement("div");
-      div.style.border = "1px solid black";
-      div.style.margin = "10px";
-      div.style.padding = "10px";
-      div.innerHTML = `
-        <p><b>Order ID:</b> ${order._id}</p>
-        <p><b>User:</b> ${order.user?.name || "N/A"} (${order.user?.email || ""})</p>
-        <p><b>Status:</b> ${order.status}</p>
-        <p><b>Total:</b> ₹${order.totalPrice}</p>
-        <p><b>Address:</b> ${order.deliveryAddress}</p>
-        <ul>
-          ${order.items.map(i => `<li>${i.foodItem?.name} × ${i.quantity}</li>`).join("")}
-        </ul>
-      `;
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error(err);
-    container.innerText = "Error loading orders.";
-  }
-}
+        const orders = data.data;
+        container.innerHTML = "";
+
+        if (orders.length === 0) {
+          container.innerHTML = "<div class=\"empty-state\">No orders have been placed yet.</div>";
+        }
+
+        // Stats
+        const totalOrders = orders.length;
+        const totalRevenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
+        const delivered = orders.filter(o => o.status === "delivered").length;
+        const pending = orders.filter(o => o.status === "pending").length;
+        const preparing = orders.filter(o => o.status === "preparing").length;
+        const outForDelivery = orders.filter(o => o.status === "out for delivery").length;
+
+        statsDiv.innerHTML = `
+          <article class="link-tile">
+            <span class="badge">Summary</span>
+            <strong>Total Orders</strong>
+            <p>${totalOrders}</p>
+          </article>
+          <article class="link-tile">
+            <span class="badge">Revenue</span>
+            <strong>Total Revenue</strong>
+            <p>&#8377;${totalRevenue.toFixed(2)}</p>
+          </article>
+          <article class="link-tile">
+            <span class="badge">Status</span>
+            <strong>Delivered</strong>
+            <p>${delivered}</p>
+          </article>
+          <article class="link-tile">
+            <span class="badge">Status</span>
+            <strong>Pending</strong>
+            <p>${pending}</p>
+          </article>
+          <article class="link-tile">
+            <span class="badge">Status</span>
+            <strong>Preparing</strong>
+            <p>${preparing}</p>
+          </article>
+          <article class="link-tile">
+            <span class="badge">Status</span>
+            <strong>Out for Delivery</strong>
+            <p>${outForDelivery}</p>
+          </article>
+        `;
+
+        orders.forEach(order => {
+          const statusClass =
+            order.status === "delivered"
+              ? "status-pill success"
+              : order.status === "cancelled"
+                ? "status-pill danger"
+                : "status-pill warning";
+
+          const div = document.createElement("article");
+          div.className = "order-card";
+          div.innerHTML = `
+            <div class="order-card__header">
+              <div>
+                <h4>Order ID: ${order._id}</h4>
+                <p class="muted-text">${new Date(order.createdAt).toLocaleString()}</p>
+                <p class="muted-text">Customer: ${order.user?.name || "N/A"} (${order.user?.email || ""})</p>
+              </div>
+              <span class="${statusClass}">${order.status}</span>
+            </div>
+            <p><strong>Total:</strong> &#8377;${order.totalPrice}</p>
+            <p><strong>Address:</strong> ${order.deliveryAddress}</p>
+            <ul class="past-order-items">
+              ${order.items.map(i => `<li>${i.foodItem?.name || "Item"} x ${i.quantity}</li>`).join("")}
+            </ul>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<div class=\"empty-state\">Error loading orders.</div>";
+      }
+    }
 
   </script>
 </body>
