@@ -95,23 +95,19 @@ exports.deleteComplaint = async (req, res) => {
 
 
 
-// PUT: Mark complaint as resolved
+// PUT:  complaint as resolved
+//future imporovement required here 
 exports.resolveComplaint = async (req, res) => {
   try {
-    const updatedComplaint = await Complaint.findByIdAndUpdate(
-      req.params.id,
-      {
-        status: "Resolved",
-        resolvedAt: new Date(),
-        resolutionDetails: req.body.resolutionDetails || ""
-      },
-      { new: true }
-    );
-
-    if (!updatedComplaint)
+    const complaint = await Complaint.findById(req.params.id);
+    if (!complaint) {
       return res.status(404).json({ error: "Complaint not found" });
-
-    res.json({ success: true, complaint: updatedComplaint });
+    }
+    complaint.status = "Resolved";
+    complaint.resolutionDetails = "resolved by admin"; 
+    
+    await complaint.save();
+    res.json({ success: true, message: "Complaint marked as resolved", complaint });
   } catch (error) {
     console.error("Error resolving complaint:", error);
     res.status(500).json({ error: "Server error" });
@@ -152,6 +148,16 @@ exports.getAllComplaints = async (req, res) => {
     res.json(complaints);
   } catch (error) {
     console.error("Error fetching all complaints:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+//Get all complaints but not resolved
+exports.getPendingComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ status: { $ne: 'Resolved' } }).sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching pending complaints:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
