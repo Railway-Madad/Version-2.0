@@ -19,6 +19,7 @@ if (!token) {
   })
   .then(data => {
     currentUser = data.user || {};
+    document.getElementById('username').value = currentUser.username;
     
   })
   .catch((e) => {
@@ -48,6 +49,7 @@ document.getElementById('emergencyForm').addEventListener('submit', async (e) =>
 
     const result = await res.json();
     document.getElementById('result').innerText = result.message || result.error;
+    document.getElementById('emergencyForm').reset();
   } catch (err) {
     document.getElementById('result').innerText = 'Something went wrong!';
   }
