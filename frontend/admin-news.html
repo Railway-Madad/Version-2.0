@@ -2,91 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - News Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin News Console</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <h1>Admin News Dashboard</h1>
+  <main class="page-shell fade-in">
+    <section class="surface-card card-highlight">
+      <div class="page-header">
+        <div>
+          <h1>Admin News Console</h1>
+          <p class="muted-text">Create timely announcements and manage the latest railway updates.</p>
+        </div>
+        <a class="btn btn-tonal" href="admindashboard.html">Back to Dashboard</a>
+      </div>
 
-  <form id="news-form">
-    <input type="text" id="title" placeholder="Title" required><br><br>
-    <textarea id="description" placeholder="Description" required></textarea><br><br>
-    <input type="file" id="image"><br><br>
-    <button type="submit">Add News</button>
-  </form>
+      <form id="news-form" class="form-grid">
+        <div class="input-group">
+          <label for="title">Headline</label>
+          <input type="text" id="title" placeholder="Enter a concise headline" required>
+        </div>
+        <div class="input-group">
+          <label for="description">Summary</label>
+          <textarea id="description" placeholder="Provide a short description" required></textarea>
+        </div>
+        <div class="input-group">
+          <label for="image">Featured Image (optional)</label>
+          <input type="file" id="image" accept="image/*">
+        </div>
+        <button class="btn" type="submit">Publish Update</button>
+      </form>
+    </section>
 
-  <h2>All News</h2>
-  <div id="news-container"></div>
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h2>Published Updates</h2>
+          <p class="muted-text">These announcements appear on passenger dashboards in real time.</p>
+        </div>
+      </div>
+      <div id="news-container" class="content-grid two-column"></div>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "http://localhost:4000";
 
-document.getElementById("news-form").addEventListener("submit", async e => {
-  e.preventDefault();
+    document.getElementById("news-form").addEventListener("submit", async e => {
+      e.preventDefault();
 
-  const title = document.getElementById("title").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const file = document.getElementById("image").files[0];
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const file = document.getElementById("image").files[0];
 
-  const formData = new FormData();
-  formData.append("title", title);
-  formData.append("description", description);
-  if (file) formData.append("image", file);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      if (file) formData.append("image", file);
 
-  const res = await fetch(`${API_BASE}/news`, {
-    method: "POST",
-    body: formData,
-  });
+      const res = await fetch(`${API_BASE}/news`, {
+        method: "POST",
+        body: formData,
+      });
 
-  const data = await res.json();
-  if (data.success) {
-    alert("✅ News added successfully!");
-    document.getElementById("news-form").reset();
+      const data = await res.json();
+      if (data.success) {
+        alert("Success! News added successfully.");
+        document.getElementById("news-form").reset();
+        loadNews();
+      } else {
+        alert("Warning: Failed to add news.");
+      }
+    });
+
+    async function loadNews() {
+      const container = document.getElementById("news-container");
+      container.innerHTML = "<p class=\"muted-text\">Loading announcements…</p>";
+
+      try {
+        const res = await fetch(`${API_BASE}/news`);
+        const data = await res.json();
+
+        container.innerHTML = "";
+
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = "<p class=\"muted-text\">No announcements have been published yet.</p>";
+          return;
+        }
+
+        data.data.forEach(news => {
+          const card = document.createElement("article");
+          card.className = "news-card";
+
+          const hasImage = Boolean(news.imageUrl);
+          card.innerHTML = `
+            ${hasImage ? `<img src="${news.imageUrl}" alt="${news.title}">` : ""}
+            <div class="news-card__body">
+              <h3>${news.title}</h3>
+              <p>${news.description}</p>
+              <time>Created on ${new Date(news.createdAt).toLocaleString()}</time>
+              <div class="actions-inline">
+                <button class="btn btn-danger" onclick="deleteNews('${news._id}')">Delete</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p class=\"message error\">Unable to load news entries.</p>";
+      }
+    }
+
+    async function deleteNews(id) {
+      const confirmed = confirm("Delete this announcement?");
+      if (!confirmed) return;
+
+      const res = await fetch(`${API_BASE}/news/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        alert("Success! News deleted.");
+        loadNews();
+      } else {
+        alert("Warning: Failed to delete news.");
+      }
+    }
+
     loadNews();
-  } else {
-    alert("❌ Failed to add news");
-  }
-});
-
-async function loadNews() {
-  const res = await fetch(`${API_BASE}/news`);
-  const data = await res.json();
-
-  console.log(data);
-
-  const container = document.getElementById("news-container");
-  container.innerHTML = "";
-
-  data.data.forEach(news => {
-    const div = document.createElement("div");
-    div.style.border = "1px solid black";
-    div.style.margin = "10px";
-    div.style.padding = "10px";
-
-    div.innerHTML = `
-      <h3>${news.title}</h3>
-      <p>${news.description}</p>
-      <img src="${news.imageUrl}" width="200">
-      <p><b>Created At:</b> ${new Date(news.createdAt).toLocaleString()}</p>
-      <button onclick="deleteNews('${news._id}')">Delete</button>
-    `;
-    container.appendChild(div);
-  });
-}
-
-async function deleteNews(id) {
-  const res = await fetch(`${API_BASE}/news/${id}`, { method: "DELETE" });
-  const data = await res.json();
-  if (data.success) {
-    alert("🗑️ News deleted");
-    loadNews();
-  } else {
-    alert("❌ Failed to delete news");
-  }
-}
-
-loadNews();
-
   </script>
 </body>
-
 </html>
