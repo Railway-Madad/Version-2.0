@@ -11,7 +11,6 @@ const complaintsBody = document.getElementById("complaints-body");
 const usernameElem = document.getElementById("username");
 const currentUserElem = document.getElementById("current-user");
 
-// fetch user profile first
 async function fetchProfile() {
   try {
     const res = await fetch(`${API_BASE}/user/profile`, {
@@ -33,7 +32,6 @@ async function fetchProfile() {
   }
 }
 
-// load complaints and show progress bar
 async function loadComplaints() {
   if (!currentUser) return;
 
@@ -63,19 +61,29 @@ async function loadComplaints() {
       const timeDiff = currentTime - complaintTime;
       const oneHour = 60 * 60 * 1000;
 
-      // progress towards "Important" (0–100%)
       let progressPercent = Math.min((timeDiff / oneHour) * 100, 100);
 
       if (timeDiff > oneHour && c.status === "Pending") {
         c.status = "Important";
       }
 
-      const bgColor =
-        c.status === "Resolved"
-          ? "#13b013ff"
-          : c.status === "Important"
-          ? "#f8f8a4ff"
-          : "#c81121ff";
+      let buttonColor = "";
+      let progressBarColor = "";
+      let progressWidth = 0;
+
+      if (c.status === "Resolved") {
+        buttonColor = "#13b013ff";
+        progressBarColor = "#13b013ff"; 
+        progressWidth = 100;
+      } else if (c.status === "Important") {
+        buttonColor = "#f8f8a4ff";
+        progressBarColor = "#f8f8a4ff"; 
+        progressWidth = 100; // Full when important
+      } else {
+        buttonColor = "#c81121ff"; 
+        progressBarColor = "#df1515ff"; 
+        progressWidth = progressPercent;
+      }
 
       // complaint row + progress bar
       complaintsBody.innerHTML += `
@@ -86,30 +94,47 @@ async function loadComplaints() {
           <td>${c.issueDomain}</td>
           <td>${c.status}</td>
           <td>${createdAt}</td>
-          <td style="background-color:${bgColor};">
-        <button class="delete-btn" data-id="${c._id}" ${c.status === "Resolved" ? "disabled" : ""}>Delete</button>
+          <td>
+            <button 
+              class="delete-btn" 
+              data-id="${c._id}" 
+              ${c.status === "Resolved" ? "disabled" : ""}
+              style="
+                background-color: ${buttonColor};
+                color: ${c.status === "Resolved" ? "#fff" : c.status === "Important" ? "#000" : "#fff"};
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: ${c.status === "Resolved" ? "not-allowed" : "pointer"};
+                font-weight: 600;
+                opacity: ${c.status === "Resolved" ? "0.6" : "1"};
+              "
+            >
+              Delete
+            </button>
           </td>
         </tr>
         
         <tr>
-          <td colspan="7">
-        <div style="background:#e0e0e0;height:8px;border-radius:4px;overflow:hidden;margin-top:4px;">
-          <div style="
-            width:${progressPercent}%;
-            height:100%;
-            background:${
-          c.status === "Important" ? "#f8f8a4ff" : "#4caf50"
-            };
-            transition:width 0.5s ease;
-          "></div>
-        </div>
-        <small style="font-size:12px;color:#555;">
-          ${
-            c.status === "Important"
-          ? " Marked as Important"
-          : `Progress to Important: ${progressPercent.toFixed(1)}%`
-          }
-        </small>
+          <td colspan="7" style="padding: 0 8px 12px 8px;">
+            <div style="background:#e0e0e0;height:10px;border-radius:5px;overflow:hidden;margin-top:4px;">
+              <div style="
+                width:${progressWidth}%;
+                height:100%;
+                background:${progressBarColor};
+                transition:width 0.5s ease;
+                border-radius:5px;
+              "></div>
+            </div>
+            <small style="font-size:12px;color:#555;margin-top:4px;display:block;">
+              ${
+                c.status === "Resolved"
+                  ? "✓ Complaint Resolved - 100% Complete"
+                  : c.status === "Important"
+                  ? "⚠ Marked as Important - Requires Immediate Attention"
+                  : `Progress to Important: ${progressPercent.toFixed(1)}% (${Math.max(0, Math.ceil((oneHour - timeDiff) / 60000))} min remaining)`
+              }
+            </small>
           </td>
         </tr>
       `;
@@ -134,7 +159,7 @@ async function loadComplaints() {
 
           const row = document.getElementById(`complaint-${id}`);
           if (row) {
-            row.nextElementSibling?.remove(); // remove progress bar row
+            row.nextElementSibling?.remove();
             row.remove();
           }
 
@@ -155,8 +180,7 @@ async function loadComplaints() {
   }
 }
 
-// Start
 fetchProfile();
 
-// Auto-refresh progress bar every minute
+// progress bar every minute
 setInterval(loadComplaints, 60 * 1000);
