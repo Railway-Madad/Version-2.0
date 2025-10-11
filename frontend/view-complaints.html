@@ -3,52 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Complaints</title>    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="view-complaint.css">
+    <title>My Complaints</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="containercmp nav-container">
-            <a href="/" class="logo">
-                <i class="fas fa-train"></i>
-                Rail Madad
-            </a>
-        </div>
-        
-    </nav>
-    <div class="dashboard-container-view">
-        <div class="header">
-            <div class="header-content">
-                <h1>My Complaints</h1>
-                <p>Welcome, <span id="current-user">Guest</span></p>
+    <main class="page-shell fade-in">
+        <header class="page-header">
+            <div style="display:flex; align-items:center; gap:1.25rem">
+                <span class="badge"><i class="fas fa-train"></i> Rail Madad</span>
+                <h1 style="margin:0">My Complaints</h1>
             </div>
-            <a href="/" class="btn btn-primary">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
-        </div>
-
-        <table id="complaints-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>PNR</th>
-                    <th>Description</th>
-                    <th>Issue Domain</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody id="complaints-body"></tbody>
-        </table>
-    </div>
-
-    <footer>
-        <div class="container">
-            <center><p>© 2025 Rail Madad - Indian Railways. All Rights Reserved.</p></center>
-        </div>
-    </footer>
-
+            <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> Go to Home</a>
+        </header>
+        <section class="surface-card card-highlight" style="margin-bottom: 2.5rem;">
+            <div class="stack">
+                <h2 class="card-section-title" style="margin-bottom:0.5rem;">Welcome, <span id="current-user">Guest</span></h2>
+                <div class="divider"></div>
+                <h3 style="margin-bottom: 0.5rem">Your Submitted Complaints</h3>
+                <div class="table-wrapper">
+                    <table id="complaints-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>PNR</th>
+                                <th>Description</th>
+                                <th>Issue Domain</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complaints-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer style="margin-top: 2.5rem; width: 100%; text-align: center;" class="fade-in">
+            <p class="muted-text">© 2025 Rail Madad - Indian Railways. All Rights Reserved.</p>
+        </footer>
+    </main>
     <script src="view-complaints.js"></script>
 </body>
 </html>
