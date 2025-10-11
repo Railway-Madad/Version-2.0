@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Registration</title>
+    <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
-        // admin register form email username password
-    <h2>Admin Registration</h2>
-    <form onsubmit="register(event)">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Register</button>
-    </form>     
-    <p>Already have an account? <a href="adminlogin.html">Login here</a></p>
+    <main class="auth-layout fade-in">
+        <section class="surface-card auth-card">
+            <div class="stack">
+                <div>
+                    <h2>Register an Administrator</h2>
+                    <p>Grant secure access to oversee complaints, announcements, and onboard services.</p>
+                </div>
+            </div>
+
+            <form class="form-grid" onsubmit="register(event)">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Admin name" required>
+                </div>
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="name@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                </div>
+                <button class="btn" type="submit">Create Admin Account</button>
+            </form>
+
+            <p class="form-meta">
+                Already have access?
+                <a href="adminlogin.html">Return to login</a>
+            </p>
+        </section>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        async function register(e) {
-            e.preventDefault(); // prevent page reload
-            const username = document.getElementById("username").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
+        async function register(event) {
+            event.preventDefault();
+            const form = event.target;
+            const payload = {
+                name: form.name.value.trim(),
+                username: form.username.value.trim(),
+                email: form.email.value.trim(),
+                password: form.password.value.trim()
+            };
+
+            if (!payload.name || !payload.username || !payload.email || !payload.password) {
+                alert("All fields are required.");
+                return;
+            }
+
             try {
-                console.log("Attempting registration for admin:", username);
-                const res = await axios.post("http://localhost:4000/admin/register", {
-                    username,
-                    email,
-                    password
-                });
+                const res = await axios.post("http://localhost:4000/admin/register", payload);
                 const data = res.data;
-                if (res.status === 201) {
-                    alert("✅ Registration successful! Please login.");
-                    window.location.href = "adminlogin.html"; // Redirect to admin login
+                if (data.success) {
+                    alert(data.message || "Admin registered successfully!");
+                    form.reset();
+                    window.location.href = "adminlogin.html";
                 } else {
                     alert(data.message || "Registration failed.");
                 }
             } catch (error) {
-                console.error("Registration error:", error);
+                console.error(error);
                 if (error.response) {
-                    // server responded with an error
                     alert(error.response.data.message || "Registration failed.");
                 } else {
-                    // network or server unreachable
                     alert("Unable to connect to server. Please try again later.");
                 }
             }
         }
     </script>
 </body>
+
 </html>
