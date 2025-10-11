@@ -3,65 +3,92 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>staff Dashboard</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-    <div class="container">
-        <h2><span id="staff-role"></span> Dashboard</h2>
+    <main class="page-shell fade-in">
+        <section class="surface-card card-highlight">
+            <div class="page-header">
+                <div>
+                    <h1><span id="staff-role"></span> Dashboard</h1>
+                    <p id="welcome" class="muted-text">Authenticating your profile…</p>
+                </div>
+                <div class="dashboard-actions" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a class="btn btn-ghost" href="index.html">Home</a>
+                    <button class="btn btn-tonal" onclick="logout()">Logout</button>
+                </div>
+            </div>
 
-        <p id="welcome"></p>
-        <!-- // search bar to filter complaints by username, pnr, issue domain, status -->
-        <input type="text" id="search-bar" placeholder="Search complaints..." onkeyup="filterComplaints()">
-        // the result of search bar should filter both pending and resolved complaints
-        // and the results should be shown in respective tables
-        <br><br>
-        
+            <div class="divider"></div>
 
+            <div class="stack">
+                <div class="input-group">
+                    <label for="search-bar">Search Complaints</label>
+                    <input type="text" id="search-bar" placeholder="Search by username, PNR, domain, or status" onkeyup="filterComplaints()">
+                    <p class="muted-text">Results will update in both pending and resolved tables simultaneously.</p>
+                </div>
+            </div>
+        </section>
 
-        <h3>Assigned Complaints</h3>
-        <!-- Complaints Table -->
-        <table border="1" cellpadding="10">
-            <thead>
-                <tr>
-                    <th>Complaint ID</th>
-                    <th>Username</th>
-                    <th>PNR</th>
-                    <th>Description</th>
-                    <th>Issue Domain</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>// e.g., Resolve
-                </tr>
-            </thead>
-            <tbody id="complaints-table-body">
-                <!-- Complaints will be populated here -->
-            </tbody>
-        </table>
-        <br>
+        <section class="surface-card">
+            <div class="page-header">
+                <div>
+                    <h2>Assigned Complaints</h2>
+                    <p class="muted-text">Review items requiring action and mark them resolved once handled.</p>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Complaint Image</th>
+                            <th>Username</th>
+                            <th>PNR</th>
+                            <th>Description</th>
+                            <th>Issue Domain</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="complaints-table-body">
+                        <!-- Complaints will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-        <h3>Resolved Complaints</h3>
-        <table border="1" cellpadding="10">
-            <thead>
-                <tr>
-                    <th>Complaint ID</th>
-                    <th>Username</th>
-                    <th>PNR</th>
-                    <th>Description</th>
-                    <th>Issue Domain</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="resolved-complaints-table-body">
-                <!-- Resolved complaints will be populated here -->
-            </tbody>
-        </table>
-        <br>
-        <button onclick="logout()">Logout</button>
-    </div>
+        <section class="surface-card">
+            <div class="page-header">
+                <div>
+                    <h2>Resolved Complaints</h2>
+                    <p class="muted-text">Track outcomes and verify who completed each request.</p>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Complaint Image</th>
+                            <th>Username</th>
+                            <th>PNR</th>
+                            <th>Description</th>
+                            <th>Issue Domain</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resolved-complaints-table-body">
+                        <!-- Resolved complaints will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
     <script>
         async function loadDashboard() {
@@ -110,7 +137,7 @@
                 pendingComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${complaint._id}</td>
+                        <td><img src="${complaint.linkurl}" alt="Complaint Image" style="width: 100px; height: auto;"></td>
                         <td>${complaint.username}</td>
                         <td>${complaint.pnr}</td>
                         <td>${complaint.description}</td>
@@ -121,8 +148,6 @@
                             <button onclick="resolveComplaint('${complaint._id}')">Resolve</button> 
                         </td>
                     `;
-                    // when the resolved button is clicked, there should be a prompt to enter resolution details
-                    // and then call the resolveComplaint function with the complaint id and resolution details
                     tbody.appendChild(tr);
                 });
             } else {
@@ -130,7 +155,7 @@
             }
         }
 
-        async function fetchResolvedComplaints() {  
+        async function fetchResolvedComplaints() {
             const token = localStorage.getItem("token");
             if (!token) {
                 window.location.href = "staff_login.html";
@@ -152,7 +177,7 @@
                 const resolvedComplaints = data.complaints.filter(complaint => complaint.status === "Resolved");
                 for (const complaint of resolvedComplaints) {
                     console.log("Resolved complaint:", complaint);
-                }   
+                }
                 // fetch staff name by id for each complaint
                 for (const complaint of resolvedComplaints) {
                     if (complaint.resolvedBy) {
@@ -168,12 +193,12 @@
                     } else {
                         complaint.resolvedBy = 'N/A';
                     }
-                }   
+                }
 
                 resolvedComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${complaint._id}</td>
+                        <td><img src="${complaint.linkurl}" alt="Complaint Image" style="width: 100px; height: auto;"></td>
                         <td>${complaint.username}</td>
                         <td>${complaint.pnr}</td>
                         <td>${complaint.description}</td>
@@ -190,7 +215,7 @@
         }
 
 
-       async function filterComplaints() {
+        async function filterComplaints() {
             const searchTerm = document.getElementById("search-bar").value.toLowerCase();
             const token = localStorage.getItem("token");
             if (!token) {
@@ -221,7 +246,7 @@
                     } else {
                         complaint.resolvedBy = 'N/A';
                     }
-                }   
+                }
 
                 const filteredComplaints = data.complaints.filter(complaint => {
                     return (
@@ -242,7 +267,7 @@
                 pendingComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${complaint._id}</td>
+                        <td><img src="${complaint.linkurl}" alt="Complaint Image" style="width: 100px; height: auto;"></td>
                         <td>${complaint.username}</td>
                         <td>${complaint.pnr}</td>
                         <td>${complaint.description}</td>
@@ -262,7 +287,7 @@
                 resolvedComplaints.forEach(complaint => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${complaint._id}</td>
+                        <td><img src="${complaint.linkurl}" alt="Complaint Image" style="width: 100px; height: auto;"></td>
                         <td>${complaint.username}</td>
                         <td>${complaint.pnr}</td>
                         <td>${complaint.description}</td>
@@ -274,8 +299,8 @@
                     resolvedTbody.appendChild(tr);
                 });
             } else {
-                console.error("Failed to fetch complaints for filtering");  
-            }       
+                console.error("Failed to fetch complaints for filtering");
+            }
         }
 
         async function resolveComplaint(complaintId) {
