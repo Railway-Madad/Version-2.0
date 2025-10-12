@@ -7,9 +7,9 @@ A full-stack railway service management system that provides integrated solution
 
 Watch our project demonstration to see all features in action:
 
-[![RailMadad Demo](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](YOUR_VIDEO_LINK_HERE)
+[![RailMadad Demo](https://youtu.be/A5ZgRJDsmV0)](YOUR_VIDEO_LINK_HERE)
 
-**[Click here to view the demo video](YOUR_VIDEO_LINK_HERE)**
+**[Click here to view the demo video](https://youtu.be/A5ZgRJDsmV0)**
 
 
 ## 🚂 Features
@@ -310,10 +310,7 @@ For any queries or issues:
 
 **Current Version:** 2.0  
 **Status:** Active Development  
-**Last Updated:** 2024
+**Last Updated:** 2025
 
 ---
 
-**Developed with ❤️ by Team RailMadad**
-
-*Making railway services more accessible and efficient for every passenger*
