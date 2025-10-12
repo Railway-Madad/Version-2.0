@@ -57,6 +57,8 @@ form.addEventListener('submit', async (e) => {
 
         if (!response.ok) throw new Error('Failed to submit complaint');
 
+        successMessage.textContent = "Complaint successfully submitted!";
+        successMessage.style.color = "green";
         successMessage.style.display = 'block';
         form.reset();
         document.getElementById('username').value = currentUser.username;
