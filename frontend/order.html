@@ -47,17 +47,34 @@
                     <p class="muted-text">We currently support pay-on-delivery only.</p>
                 </div>
             </div>
-            <form id="order-form" class="form-grid">
-                <div class="input-group">
-                    <label for="address">Delivery Seat Number and Coach number</label>
-                    <textarea id="address" name="address" rows="2" placeholder="Enter your delivery details" required></textarea>
-                </div>
-                <div class="input-group">
-                    <label for="notes">Additional Notes</label>
-                    <textarea id="notes" name="notes" rows="3" placeholder="Any special instructions?"></textarea>
-                </div>
-                <button class="btn" type="submit" id="place-order">Place Order</button>
-            </form>
+          <form id="order-form" class="form-grid">
+  <div class="input-group">
+    <label for="address">Coach-Seat</label>
+    <textarea 
+      id="address" 
+      name="address" 
+      rows="2" 
+      placeholder="Enter your coach and seat details (e.g. S2-45)"
+      minlength="3"
+      maxlength="100"
+      title="Format: CoachSeat-SeatNumber (e.g., S1-45, B12-123)"
+      required></textarea>
+  </div>
+
+  <div class="input-group">
+    <label for="notes">Additional Notes</label>
+    <textarea 
+      id="notes" 
+      name="notes" 
+      rows="3" 
+      placeholder="Any special instructions?"
+      maxlength="200"></textarea>
+  </div>
+
+  <button class="btn" type="submit" id="place-order">Place Order</button>
+</form>
+
+
             <p id="order-message" class="message" role="alert"></p>
         </section>
 

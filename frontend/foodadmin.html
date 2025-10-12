@@ -14,33 +14,71 @@
           <h1>Food Operations Command</h1>
           <p class="muted-text">Manage the onboard menu, track order performance, and keep passengers well served.</p>
         </div>
-        <a class="btn btn-tonal" href="admindashboard.html">Back to Admin</a>
-        <a class="btn btn-ghost" href="index.html" style="margin-left: 0.5rem;">Home</a>
+        <a class="btn btn-ghost" href="admindashboard.html" style="margin-left: 0.5rem;">Back to Admin</a>
       </div>
 
       <form id="add-food-form" class="form-grid" enctype="multipart/form-data">
-        <div class="input-group">
-          <label for="name">Item Name</label>
-          <input type="text" id="name" name="name" placeholder="e.g. Paneer Tikka Wrap" required>
-        </div>
-        <div class="input-group">
-          <label for="price">Price (₹)</label>
-          <input type="number" id="price" name="price" placeholder="Price" required>
-        </div>
-        <div class="input-group">
-          <label for="description">Description</label>
-          <input type="text" id="description" name="description" placeholder="Short description">
-        </div>
-        <div class="input-group">
-          <label for="category">Category</label>
-          <input type="text" id="category" name="category" placeholder="Vegetarian, Combo, Snacks...">
-        </div>
-        <div class="input-group">
-          <label for="image">Image (optional)</label>
-          <input type="file" id="image" name="image" accept="image/*">
-        </div>
-        <button class="btn" type="submit">Add Food Item</button>
-      </form>
+  <div class="input-group">
+    <label for="name">Item Name</label>
+    <input 
+      type="text" 
+      id="name" 
+      name="name" 
+      placeholder="e.g. Paneer Tikka Wrap" 
+      minlength="3" 
+      maxlength="50" 
+      required>
+  </div>
+
+  <div class="input-group">
+    <label for="price">Price (₹)</label>
+    <input 
+      type="number" 
+      id="price" 
+      name="price" 
+      placeholder="Price" 
+      min="1" 
+      max="999999" 
+      step="0.01" 
+      required>
+  </div>
+
+  <div class="input-group">
+    <label for="description">Description</label>
+    <input 
+      type="text" 
+      id="description" 
+      name="description" 
+      placeholder="Short description" 
+      minlength="10" 
+      maxlength="200" 
+      required>
+  </div>
+
+  <div class="input-group">
+    <label for="category">Category</label>
+    <input 
+      type="text" 
+      id="category" 
+      name="category" 
+      placeholder="Vegetarian, Combo, Snacks..." 
+      minlength="3" 
+      maxlength="50" 
+      required>
+  </div>
+
+  <div class="input-group">
+    <label for="image">Image (optional)</label>
+    <input 
+      type="file" 
+      id="image" 
+      name="image" 
+      accept="image/*">
+  </div>
+
+  <button class="btn" type="submit">Add Food Item</button>
+</form>
+
       <p id="add-food-message" class="message" role="alert"></p>
     </section>
 
