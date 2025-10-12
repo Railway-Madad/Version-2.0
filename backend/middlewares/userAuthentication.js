@@ -9,7 +9,7 @@ const userAuthentication = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userId = decoded.userId; // Attach userId from decoded token to request object
+        req.userId = decoded.userId; 
         next();
     } catch (error) {
         return res.status(401).json({ message: "Invalid or expired token" });
@@ -18,12 +18,3 @@ const userAuthentication = (req, res, next) => {
 
 module.exports = userAuthentication;    
 
-
-
-//me testing 
-// middleware/fakeUser.js
-// module.exports = (req, res, next) => {
-//   req.userId = "650f1c2b5e1a2b3c4d5e6f7a"; 
-//   req.username = "TestUser"; 
-//   next();
-// };
