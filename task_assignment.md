@@ -44,11 +44,11 @@ This document outlines the feature-wise task distribution and implementation res
 ## 👨‍💻 **Vineet Tiwari (S20230010260)**
 **Features:** Admin Dashboard and Stats, Styling  
 **Responsibilities:**
-- Designed and implemented the **frontend**  
-- Worked on **UI styling** and **visual enhancements**  
-- Improved overall **interface consistency** across the platform
-- Use created API for admin dashboard
-  
+- Designed and implemented the entire frontend of the platform, ensuring a clean, responsive, and consistent UI.
+- Developed a dynamic Admin Dashboard with interactive graphs and analytics powered by real-time backend data.
+- Integrated multiple APIs to fetch and visualize statistics across all modules through a unified Stats API.
+- Implemented form validation and admin review-feedback features for accurate data handling and efficient management.
+- Enhanced overall UI/UX and styling, improving visual consistency, accessibility, and user experience across the platform. 
 ---
 
 ## 👩‍💻 **N. Shirley Chirstina (S20230010223)**
