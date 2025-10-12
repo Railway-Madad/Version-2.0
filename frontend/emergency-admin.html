@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Console</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <main class="page-shell fade-in">
+    <section class="surface-card">
+      <div class="page-header">
+        <div>
+          <h1>Emergency Console</h1>
+          <p class="muted-text">View all active train emergencies reported by passengers.</p>
+        </div>
+        <a class="btn btn-tonal" href="admindashboard.html">Back to Dashboard</a>
+      </div>
+      <div id="emergency-container" class="content-grid two-column"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "http://localhost:4000/emergency";
+
+    async function loadEmergencies() {
+      const container = document.getElementById("emergency-container");
+      container.innerHTML = "<p class='muted-text'>Loading emergencies…</p>";
+
+      try {
+        const res = await fetch(`${API_BASE}/getEmg`);
+        const emergencies = await res.json();
+
+        container.innerHTML = "";
+
+        if (!emergencies || emergencies.length === 0) {
+          container.innerHTML = "<p class='muted-text'>No emergencies reported yet.</p>";
+          return;
+        }
+
+        emergencies.forEach(emg => {
+          const card = document.createElement("article");
+          card.className = "news-card"; // reuse your existing card style
+
+          card.innerHTML = `
+            <div class="news-card__body">
+              <h3>${emg.username} (User ID: ${emg.userId})</h3>
+              <p>Train Number: ${emg.trainNumber}</p>
+              <p>Seat Number: ${emg.seatNumber}</p>
+              <p>Status: <strong>${emg.status}</strong></p>
+              <time>Reported on ${new Date(emg.createdAt).toLocaleString()}</time>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p class='message error'>Unable to load emergencies.</p>";
+      }
+    }
+
+    loadEmergencies();
+  </script>
+</body>
+</html>
