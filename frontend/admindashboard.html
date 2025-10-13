@@ -84,101 +84,88 @@
             </svg>
           </div>
         </div>
+<div
+  class="content-grid two-column"
+  style="
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  "
+>
+  <!-- Revenue by Day Graph -->
+  <article class="link-tile" style="overflow: visible">
+    <span class="badge">Revenue Trend</span>
+    <strong>Revenue per Day</strong>
+    <div
+      id="graph-revenue"
+      style="margin: 0.5rem 0 0.7rem 0; min-height: 80px; width: 100%"
+    ></div>
+  </article>
 
-        <div
-          class="content-grid two-column"
-          style="
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-          "
-        >
-          <!-- Revenue by Day Graph -->
-          <article class="link-tile" style="overflow: visible">
-            <span class="badge">Revenue Trend</span>
-            <strong>Revenue per Day</strong>
-            <div
-              id="graph-revenue"
-              style="margin: 0.5rem 0 0.7rem 0; min-height: 80px; width: 100%"
-            ></div>
-          </article>
-          <!-- Orders by Status Bar -->
-          <article class="link-tile">
-            <span class="badge">Orders</span>
-            <strong>Orders by Status</strong>
-            <div
-              id="graph-orders-status"
-              style="margin-top: 0.5rem; height: 110px; width: 100%"
-            ></div>
-          </article>
-          <!-- Orders per Day Bar -->
-          <article class="link-tile">
-            <span class="badge">Orders</span>
-            <strong>Orders per Day</strong>
-            <div
-              id="graph-orders-day"
-              style="margin-top: 0.5rem; height: 100px; width: 100%"
-            ></div>
-          </article>
-          <!-- Complaints by Status Pie -->
-          <article class="link-tile">
-            <span class="badge">Complaints</span>
-            <strong>Complaints by Status</strong>
-            <div
-              id="graph-complaints-status"
-              style="margin-top: 0.6rem; height: 76px"
-            ></div>
-          </article>
-          <!-- Complaints by Day Line -->
-          <article class="link-tile">
-            <span class="badge">Complaints</span>
-            <strong>Complaints per Day</strong>
-            <div
-              id="graph-complaints-day"
-              style="margin-top: 0.5rem; height: 90px; width: 100%"
-            ></div>
-          </article>
-          <!-- Complaints by Domain Bar -->
-          <article class="link-tile">
-            <span class="badge">Complaints</span>
-            <strong>Complaints by Domain</strong>
-            <div
-              id="graph-complaints-domain"
-              style="margin-top: 0.5rem; height: 110px; width: 100%"
-            ></div>
-          </article>
-          <!-- User signups per Day Line -->
-          <article class="link-tile">
-            <span class="badge">Users</span>
-            <strong>User signups per Day</strong>
-            <div
-              id="graph-users-day"
-              style="margin-top: 0.5rem; height: 90px; width: 100%"
-            ></div>
-          </article>
-          <!-- Feedback Rating Gauge -->
-          <article class="link-tile">
-            <span class="badge">Feedback</span>
-            <strong>Average Feedback Rating</strong>
-            <div
-              id="graph-feedback-rating"
-              style="
-                margin-top: 0.8rem;
-                height: 90px;
-                width: 100%;
-                display: flex;
-                justify-content: center;
-              "
-            ></div>
-            <p
-              id="feedback-total-msg"
-              style="
-                margin-top: 0.3rem;
-                font-size: 0.95rem;
-                color: var(--color-muted);
-              "
-            ></p>
-          </article>
-        </div>
+  <!-- Orders by Status Bar -->
+  <article class="link-tile">
+    <span class="badge">Orders</span>
+    <strong>Orders by Status</strong>
+    <div
+      id="graph-orders-status"
+      style="margin-top: 0.5rem; height: 110px; width: 100%"
+    ></div>
+  </article>
+
+  <!-- Orders per Day Bar -->
+  <article class="link-tile">
+    <span class="badge">Orders</span>
+    <strong>Orders per Day</strong>
+    <div
+      id="graph-orders-day"
+      style="margin-top: 0.5rem; height: 100px; width: 100%"
+    ></div>
+  </article>
+
+  <!-- Complaints by Day Line -->
+  <article class="link-tile">
+    <span class="badge">Complaints</span>
+    <strong>Complaints per Day</strong>
+    <div
+      id="graph-complaints-day"
+      style="margin-top: 0.5rem; height: 90px; width: 100%"
+    ></div>
+  </article>
+
+  <!-- Complaints by Domain Bar -->
+  <article class="link-tile">
+    <span class="badge">Complaints</span>
+    <strong>Complaints by Domain</strong>
+    <div
+      id="graph-complaints-domain"
+      style="margin-top: 0.5rem; height: 110px; width: 100%"
+    ></div>
+  </article>
+
+  <!-- Feedback Rating Gauge -->
+  <article class="link-tile">
+    <span class="badge">Feedback</span>
+    <strong>Average Feedback Rating</strong>
+    <div
+      id="graph-feedback-rating"
+      style="
+        margin-top: 0.8rem;
+        height: 90px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      "
+    ></div>
+    <p
+      id="feedback-total-msg"
+      style="
+        margin-top: 0.3rem;
+        font-size: 0.95rem;
+        color: var(--color-muted);
+      "
+    ></p>
+  </article>
+</div>
+
       </section>
 
       <section class="surface-card" style="margin-top: 2rem">
@@ -450,11 +437,11 @@
             if (status === "resolved") cs.resolved++;
             else cs.pending++;
           });
-          renderTinyPie(
-            "graph-complaints-status",
-            [cs.resolved, cs.pending],
-            ["#34d399", "#f87171"]
-          );
+          //  renderTinyPie(
+          //   "graph-complaints-status",
+          //   [cs.resolved, cs.pending],
+          //   ["#34d399", "#f87171"]
+          // );
 
           // By Day
           const cDay = {};
@@ -494,8 +481,8 @@
         }
 
         // Users graph - No endpoint available
-        document.getElementById("graph-users-day").innerHTML =
-          '<div class="muted-text">User endpoint not available.</div>';
+        // document.getElementById("graph-users-day").innerHTML =
+        //   '<div class="muted-text">User endpoint not available.</div>';
 
         // Feedback
         if (typeof fb.averageRating !== "undefined")
