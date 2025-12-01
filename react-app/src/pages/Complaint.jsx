@@ -131,7 +131,7 @@ const Complaint = () => {
             </div>
             <div className="actions-inline">
               <button type="submit" className="btn">
-                <i className="fas fa-paper-plane"></i> Submit Complaint
+                Submit Complaint
               </button>
               <button
                 type="button"
@@ -139,7 +139,7 @@ const Complaint = () => {
                 className="btn btn-ghost"
                 onClick={() => navigate("/view-complaints")}
               >
-                <i className="fas fa-list"></i> View My Complaints
+                View My Complaints
               </button>
             </div>
           </form>

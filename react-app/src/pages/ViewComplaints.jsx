@@ -202,7 +202,7 @@ const ViewComplaints = () => {
           <h1 style={{ margin: 0 }}>My Complaints</h1>
         </div>
         <Link to="/" className="btn btn-ghost">
-          <i className="fas fa-home" /> Go to Home
+           Go to Home
         </Link>
       </header>
       <section className="surface-card card-highlight" style={{ marginBottom: "2.5rem" }}>
