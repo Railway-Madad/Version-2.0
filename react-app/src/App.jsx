@@ -1,35 +1,314 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import UserDashboard from "./pages/UserDashboard";
+import Complaint from "./pages/Complaint";
+import ViewComplaints from "./pages/ViewComplaints";
+import OrderPage from "./pages/OrderPage";
+import Emergency from "./pages/Emergency";
+import Feedback from "./pages/Feedback";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRegister from "./pages/AdminRegister";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminNews from "./pages/AdminNews";
+import AdminFeedback from "./pages/AdminFeedback";
+import EmergencyAdmin from "./pages/EmergencyAdmin";
+import FoodAdmin from "./pages/FoodAdmin";
+import FoodStaff from "./pages/FoodStaff";
+import StaffLogin from "./pages/StaffLogin";
+import StaffRegister from "./pages/StaffRegister";
+import StaffDashboard from "./pages/StaffDashboard";
+import CateringLogin from "./pages/CateringLogin";
+import LostFound from "./pages/LostFound";
+import LostFoundView from "./pages/LostFoundView";
+import ProjectDashboard from "./pages/ProjectDashboard";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/index.html" element={<Home />} />
+
+      <Route path="/login" element={<Login />} />
+      <Route path="/login.html" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/register.html" element={<Register />} />
+
+      <Route
+        path="/userDashboard"
+        element={
+          <ProtectedRoute>
+            <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/userDashboard.html"
+        element={
+          <ProtectedRoute>
+            <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <ProjectDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard.html"
+        element={
+          <ProtectedRoute>
+            <ProjectDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/complaint"
+        element={
+          <ProtectedRoute>
+            <Complaint />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complaint.html"
+        element={
+          <ProtectedRoute>
+            <Complaint />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/view-complaints"
+        element={
+          <ProtectedRoute>
+            <ViewComplaints />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/view-complaints.html"
+        element={
+          <ProtectedRoute>
+            <ViewComplaints />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/order"
+        element={
+          <ProtectedRoute>
+            <OrderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/order.html"
+        element={
+          <ProtectedRoute>
+            <OrderPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/emergency"
+        element={
+          <ProtectedRoute>
+            <Emergency />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/emergency.html"
+        element={
+          <ProtectedRoute>
+            <Emergency />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/feedback" element={<Feedback />} />
+      <Route path="/feedback.html" element={<Feedback />} />
+
+      <Route path="/adminlogin" element={<AdminLogin />} />
+      <Route path="/adminlogin.html" element={<AdminLogin />} />
+      <Route path="/adminregister" element={<AdminRegister />} />
+      <Route path="/adminregister.html" element={<AdminRegister />} />
+
+      <Route
+        path="/admindashboard"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admindashboard.html"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin-news"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminNews />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-news.html"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminNews />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/adminfeedback"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminFeedback />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/adminfeedback.html"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminFeedback />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/emergency-admin"
+        element={
+          <ProtectedRoute type="admin">
+            <EmergencyAdmin />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/emergency-admin.html"
+        element={
+          <ProtectedRoute type="admin">
+            <EmergencyAdmin />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/foodadmin"
+        element={
+          <ProtectedRoute type="admin">
+            <FoodAdmin />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/foodadmin.html"
+        element={
+          <ProtectedRoute type="admin">
+            <FoodAdmin />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/foodstaff"
+        element={
+          <ProtectedRoute type="staff">
+            <FoodStaff />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/foodstaff.html"
+        element={
+          <ProtectedRoute type="staff">
+            <FoodStaff />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/cateringlogin" element={<CateringLogin />} />
+      <Route path="/cateringlogin.html" element={<CateringLogin />} />
+
+      <Route path="/staff_login" element={<StaffLogin />} />
+      <Route path="/staff_login.html" element={<StaffLogin />} />
+      <Route path="/staff_register" element={<StaffRegister />} />
+      <Route path="/staff_register.html" element={<StaffRegister />} />
+      <Route
+        path="/staffDashboard"
+        element={
+          <ProtectedRoute type="staff">
+            <StaffDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/staffDashboard.html"
+        element={
+          <ProtectedRoute type="staff">
+            <StaffDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/lostnfound"
+        element={
+          <ProtectedRoute>
+            <LostFound />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lostnfound.html"
+        element={
+          <ProtectedRoute>
+            <LostFound />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/lostnfoundView"
+        element={
+          <ProtectedRoute>
+            <LostFoundView />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lostnfoundView.html"
+        element={
+          <ProtectedRoute>
+            <LostFoundView />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
