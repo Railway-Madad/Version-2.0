@@ -14,7 +14,7 @@ import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminNews from "./pages/AdminNews";
 import AdminFeedback from "./pages/AdminFeedback";
-import EmergencyAdmin from "./pages/EmergencyAdmin.jsx";
+import EmergencyAdmin from "./pages/EmergencyAdmin";
 import FoodAdmin from "./pages/FoodAdmin";
 import FoodStaff from "./pages/FoodStaff";
 import StaffLogin from "./pages/StaffLogin";
@@ -56,7 +56,7 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute type="admin">
             <ProjectDashboard />
           </ProtectedRoute>
         }
@@ -64,7 +64,7 @@ function App() {
       <Route
         path="/dashboard.html"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute type="admin">
             <ProjectDashboard />
           </ProtectedRoute>
         }

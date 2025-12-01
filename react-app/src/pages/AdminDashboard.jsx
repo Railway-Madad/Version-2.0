@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { clearAdminToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
+import { useTheme } from "../context/ThemeContext";
 
 const TinyLineGraph = ({ labels = [], values = [], color }) => {
   if (!labels.length || !values.length) {
@@ -112,6 +113,7 @@ const AdminDashboard = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const adminToken = useSelector((state) => state.auth.adminToken);
 
   const [orders, setOrders] = useState([]);
@@ -288,6 +290,18 @@ const AdminDashboard = () => {
               flexWrap: "wrap",
             }}
           >
+            <button className="btn btn-ghost" onClick={toggleTheme} title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
+              {theme === "light" ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="5"/>
+                  <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+              )}
+            </button>
             <Link className="btn btn-ghost" to="/">
               Home
             </Link>
@@ -318,6 +332,10 @@ const AdminDashboard = () => {
           <Link className="link-tile" to="/emergency-admin">
             <strong>Emergency Management</strong>
             <span>see all emergencies</span>
+          </Link>
+          <Link className="link-tile" to="/dashboard">
+            <strong>Operations Dashboard</strong>
+            <span>Track stock, reports, and advanced analytics</span>
           </Link>
         </div>
       </section>
@@ -512,28 +530,24 @@ const AdminDashboard = () => {
               <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
                 Created At
               </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Action
-              </th>
             </tr>
           </thead>
           <tbody id="complaintsBody">
             {loading ? (
               <tr>
-                <td colSpan="8" style={{ padding: "1rem", textAlign: "center" }}>
+                <td colSpan="7" style={{ padding: "1rem", textAlign: "center" }}>
                   Loading...
                 </td>
               </tr>
             ) : importantComplaints.length === 0 ? (
               <tr>
-                <td colSpan="8" style={{ padding: "1rem", textAlign: "center" }}>
+                <td colSpan="7" style={{ padding: "1rem", textAlign: "center" }}>
                   No important complaints found.
                 </td>
               </tr>
             ) : (
               importantComplaints.map((c) => {
                 const createdAt = c.createdAt ? new Date(c.createdAt).toLocaleString() : "N/A";
-                const bgColor = c.status === "Resolved" ? "#d4edda" : "#f8d7da";
                 return (
                   <tr key={c._id} id={`complaint-${c._id}`}>
                     <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
@@ -556,29 +570,6 @@ const AdminDashboard = () => {
                     </td>
                     <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
                       {createdAt}
-                    </td>
-                    <td
-                      style={{
-                        padding: "0.75rem",
-                        borderBottom: "1px solid #ddd",
-                        backgroundColor: bgColor,
-                      }}
-                    >
-                      <button
-                        className="resolve-btn"
-                        disabled={c.status === "Resolved"}
-                        style={{
-                          padding: "0.5rem 1rem",
-                          cursor: c.status === "Resolved" ? "not-allowed" : "pointer",
-                          border: "none",
-                          borderRadius: "4px",
-                          background: "#4f46e5",
-                          color: "white",
-                        }}
-                        onClick={() => resolveComplaint(c._id)}
-                      >
-                        Resolve
-                      </button>
                     </td>
                   </tr>
                 );

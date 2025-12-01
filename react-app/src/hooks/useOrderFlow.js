@@ -15,7 +15,7 @@ import { useApi } from "../context/ApiContext";
 export const useOrderFlow = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
   const { cart, address, notes, message, messageType, orders } = useSelector(
     (state) => state.orders
   );
@@ -48,14 +48,18 @@ export const useOrderFlow = () => {
     const loadOrders = async () => {
       setOrdersLoading(true);
       try {
-        const res = await fetch(`${apiBase}/food/orders`, {
+        const res = await fetch(`${apiBase}/catering/my-orders`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
         const data = await res.json();
         if (!res.ok) {
           throw new Error("Failed to load orders");
         }
-        dispatch(setOrders(data.orders || []));
+        dispatch(setOrders(data.data || []));
       } catch (err) {
         dispatch(setOrders([]));
       } finally {
@@ -71,6 +75,7 @@ export const useOrderFlow = () => {
   );
 
   const handleAddToCart = (food) => {
+    dispatch(setMessage({ message: "", type: "" }));
     dispatch(
       addToCart({
         foodItem: food._id,
@@ -98,7 +103,7 @@ export const useOrderFlow = () => {
       return;
     }
     try {
-      const res = await fetch(`${apiBase}/food/order`, {
+      const res = await fetch(`${apiBase}/catering/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,18 +115,56 @@ export const useOrderFlow = () => {
           notes,
         }),
       });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       if (!res.ok) {
         throw new Error("Failed to place order");
       }
       dispatch(setMessage({ message: "Order placed successfully!", type: "success" }));
       dispatch(resetCart());
       // refresh orders
-      const data = await res.json().catch(() => ({}));
-      if (data.orders) {
-        dispatch(setOrders(data.orders));
+      const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (ordersRes.ok) {
+        const ordersData = await ordersRes.json();
+        dispatch(setOrders(ordersData.data || []));
       }
     } catch (err) {
       dispatch(setMessage({ message: "Order failed. Please try again.", type: "error" }));
+    }
+  };
+
+  const cancelOrder = async (orderId) => {
+    try {
+      const res = await fetch(`${apiBase}/catering/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
+      if (!res.ok) {
+        throw new Error("Failed to cancel order");
+      }
+      dispatch(setMessage({ message: "Order cancelled successfully!", type: "success" }));
+      // refresh orders
+      const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (ordersRes.ok) {
+        const ordersData = await ordersRes.json();
+        dispatch(setOrders(ordersData.data || []));
+      }
+    } catch (err) {
+      dispatch(setMessage({ message: "Failed to cancel order. Please try again.", type: "error" }));
     }
   };
 
@@ -135,6 +178,7 @@ export const useOrderFlow = () => {
       updateAddress,
       updateNotes,
       placeOrder,
+      cancelOrder,
     },
   };
 };

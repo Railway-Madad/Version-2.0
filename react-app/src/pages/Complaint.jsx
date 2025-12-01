@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import PageHeader from "../components/common/PageHeader";
 import MessageBanner from "../components/common/MessageBanner";
-import { clearToken } from "../store/slices/authSlice";
+import { clearPassengerToken } from "../store/slices/authSlice";
 import useComplaintForm from "../hooks/useComplaintForm";
 
 const Complaint = () => {
@@ -12,7 +12,7 @@ const Complaint = () => {
     useComplaintForm();
 
   const logout = () => {
-    dispatch(clearToken());
+    dispatch(clearPassengerToken());
     navigate("/login");
   };
 
@@ -131,6 +131,9 @@ const Complaint = () => {
             </div>
             <div className="actions-inline">
               <button type="submit" className="btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '0.5rem' }}>
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
                 Submit Complaint
               </button>
               <button
@@ -139,6 +142,9 @@ const Complaint = () => {
                 className="btn btn-ghost"
                 onClick={() => navigate("/view-complaints")}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '0.5rem' }}>
+                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                </svg>
                 View My Complaints
               </button>
             </div>

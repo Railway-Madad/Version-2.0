@@ -6,7 +6,7 @@ import { useApi } from "../context/ApiContext";
 const LostFoundView = () => {
   const { apiBase } = useApi();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
   const [filter, setFilter] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +21,10 @@ const LostFoundView = () => {
       const res = await fetch(`${apiBase}/lostnfound`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.status === 401) {
+        navigate("/login");
+        return;
+      }
       const result = await res.json();
       let dataItems = res.ok && result.items ? result.items : [];
       if (filter) {
@@ -36,7 +40,8 @@ const LostFoundView = () => {
 
   useEffect(() => {
     loadItems();
-  }, [filter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, token, apiBase]);
 
   return (
     <main className="page-shell fade-in">

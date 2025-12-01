@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearToken } from "../store/slices/authSlice";
+import { clearPassengerToken } from "../store/slices/authSlice";
 import { resetForm, setField, setMessages, setUsername } from "../store/slices/complaintSlice";
 import { useApi } from "../context/ApiContext";
 
@@ -9,25 +9,34 @@ export const useComplaintForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
   const complaint = useSelector((state) => state.complaint);
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!token) return;
+      if (!token) {
+        dispatch(clearPassengerToken());
+        navigate("/login");
+        return;
+      }
       try {
         const res = await fetch(`${apiBase}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) {
+          dispatch(clearPassengerToken());
+          navigate("/login");
+          return;
+        }
         if (!res.ok) {
           throw new Error("Failed to fetch profile");
         }
         const data = await res.json();
         dispatch(setUsername(data.user?.username || ""));
       } catch (err) {
-        dispatch(clearToken());
+        dispatch(clearPassengerToken());
         navigate("/login");
       }
     };
@@ -59,6 +68,12 @@ export const useComplaintForm = () => {
         },
         body: formData,
       });
+
+      if (response.status === 401) {
+        dispatch(clearPassengerToken());
+        navigate("/login");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to submit complaint");

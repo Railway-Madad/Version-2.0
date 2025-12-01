@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setToken } from "../store/slices/authSlice";
+import { setStaffToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 
 const CateringLogin = () => {
@@ -23,7 +23,7 @@ const CateringLogin = () => {
       });
       const data = res.data;
       if (res.status === 200 && data.token) {
-        dispatch(setToken({ token: data.token, role: "staff" }));
+        dispatch(setStaffToken(data.token));
         navigate("/foodstaff");
       } else {
         setMessage(data.message || "Invalid email or password.");

@@ -9,7 +9,6 @@ import ProfileForm from "../components/dashboard/ProfileForm";
 import SettingsPanel from "../components/dashboard/SettingsPanel";
 import StatusBanner from "../components/dashboard/StatusBanner";
 import { useStockManager } from "../hooks/useStockManager";
-import { setUserProfile } from "../store/slices/authSlice";
 import { toggleSetting } from "../store/slices/settingsSlice";
 import { useTheme } from "../context/ThemeContext";
 
@@ -17,7 +16,6 @@ const ProjectDashboard = () => {
   const dispatch = useDispatch();
   const { theme, toggleTheme } = useTheme();
   const settings = useSelector((state) => state.settings);
-  const userProfile = useSelector((state) => state.auth.userProfile);
 
   const [profileForm, setProfileForm] = useState({
     name: "",
@@ -43,11 +41,11 @@ const ProjectDashboard = () => {
 
   useEffect(() => {
     setProfileForm({
-      name: userProfile?.name || "",
-      email: userProfile?.email || "",
-      department: userProfile?.department || "Operations",
+      name: "",
+      email: "",
+      department: "Operations",
     });
-  }, [userProfile]);
+  }, []);
 
   useEffect(() => {
     if (!statusMessage) return undefined;
@@ -62,8 +60,7 @@ const ProjectDashboard = () => {
 
   const handleProfileSubmit = (e) => {
     e.preventDefault();
-    dispatch(setUserProfile(profileForm));
-    setStatusMessage("Profile updated and stored in global state.");
+    setStatusMessage("Profile updated in local state.");
   };
 
   const handleProfileChange = (key, value) => {

@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children, type = "user" }) => {
   const location = useLocation();
-  const { token, adminToken } = useSelector((state) => state.auth);
+  const { passengerToken, staffToken, adminToken } = useSelector((state) => state.auth);
 
   if (type === "admin") {
     if (!adminToken) {
@@ -13,16 +13,14 @@ const ProtectedRoute = ({ children, type = "user" }) => {
   }
 
   if (type === "staff") {
-    if (!token) {
-      return (
-        <Navigate to="/staff_login" replace state={{ from: location }} />
-      );
+    if (!staffToken) {
+      return <Navigate to="/staff_login" replace state={{ from: location }} />;
     }
     return children;
   }
 
   // default passenger/user
-  if (!token) {
+  if (!passengerToken) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

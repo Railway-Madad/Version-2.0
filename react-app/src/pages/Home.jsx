@@ -1,9 +1,25 @@
 import { Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 const Home = () => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <main className="page-shell fade-in">
       <section className="surface-card hero">
+        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+          <button className="btn btn-ghost" onClick={toggleTheme} title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
+            {theme === "light" ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+            )}
+          </button>
+        </div>
         <span className="badge">Rail Madad Platform</span>
         <h1>Experience a faster, calmer way to handle railway support.</h1>
         <p>
@@ -35,10 +51,6 @@ const Home = () => {
             <Link className="link-tile" to="/register">
               <strong>User Register</strong>
               <span>Sign up for a new passenger account</span>
-            </Link>
-            <Link className="link-tile" to="/dashboard">
-              <strong>React Dashboard</strong>
-              <span>Stateful demo with stock, reports, and settings</span>
             </Link>
           </div>
         </article>

@@ -12,6 +12,10 @@ const EmergencyAdmin = () => {
       setLoading(true);
       try {
         const res = await fetch(`${apiBase}/emergency/getEmg`);
+        if (res.status === 401) {
+          window.location.href = "/adminlogin";
+          return;
+        }
         const data = await res.json();
         setEmergencies(Array.isArray(data) ? data : []);
       } catch (err) {

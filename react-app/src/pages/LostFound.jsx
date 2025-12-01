@@ -5,7 +5,7 @@ import { useApi } from "../context/ApiContext";
 
 const LostFound = () => {
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,6 +20,10 @@ const LostFound = () => {
       const res = await fetch(`${apiBase}/lostnfound/myitems`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       const result = await res.json();
       if (res.ok && result.items) {
         setItems(result.items);
@@ -35,6 +39,7 @@ const LostFound = () => {
     if (token) {
       loadUserSubmissions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const submitItem = async (event) => {
@@ -52,6 +57,10 @@ const LostFound = () => {
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
     const result = await res.json();
     if (res.ok) {
       alert("Item submitted successfully!");
@@ -72,6 +81,10 @@ const LostFound = () => {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
     if (res.ok) {
       alert("Item marked as resolved.");
       loadUserSubmissions();
@@ -85,6 +98,10 @@ const LostFound = () => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
     if (res.ok) {
       alert("Item deleted.");
       loadUserSubmissions();

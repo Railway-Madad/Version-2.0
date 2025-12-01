@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchNews } from "../store/slices/newsSlice";
-import { clearToken } from "../store/slices/authSlice";
+import { clearPassengerToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
+import { useTheme } from "../context/ThemeContext";
 
 const UserDashboard = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const { theme, toggleTheme } = useTheme();
+  const token = useSelector((state) => state.auth.passengerToken);
   const { items: newsItems, status: newsStatus } = useSelector(
     (state) => state.news
   );
@@ -25,7 +27,7 @@ const UserDashboard = () => {
         const data = await res.json();
         setWelcomeText(`Hello, ${data.username}!`);
       } else {
-        dispatch(clearToken());
+        dispatch(clearPassengerToken());
         navigate("/login");
       }
     };
@@ -37,7 +39,7 @@ const UserDashboard = () => {
   }, [dispatch]);
 
   const logout = () => {
-    dispatch(clearToken());
+    dispatch(clearPassengerToken());
     navigate("/login");
   };
 
@@ -85,6 +87,18 @@ const UserDashboard = () => {
               flexWrap: "wrap",
             }}
           >
+            <button className="btn btn-ghost" onClick={toggleTheme} title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
+              {theme === "light" ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="5"/>
+                  <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+              )}
+            </button>
             <Link className="btn btn-ghost" to="/">
               Home
             </Link>
@@ -118,10 +132,6 @@ const UserDashboard = () => {
           <Link className="link-tile" to="/feedback">
             <strong>Share Feedback</strong>
             <span>Help us improve your journey experience</span>
-          </Link>
-          <Link className="link-tile" to="/dashboard">
-            <strong>Operations Dashboard</strong>
-            <span>Track stock, reports, and settings</span>
           </Link>
         </div>
       </section>

@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useApi } from "../context/ApiContext";
-import { clearToken } from "../store/slices/authSlice";
+import { clearPassengerToken } from "../store/slices/authSlice";
 
 const ViewComplaints = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
   const [currentUser, setCurrentUser] = useState(null);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ const ViewComplaints = () => {
         const data = await res.json();
         setCurrentUser(data.user);
       } catch (err) {
-        dispatch(clearToken());
+        dispatch(clearPassengerToken());
         navigate("/login");
       }
     };
@@ -202,7 +202,10 @@ const ViewComplaints = () => {
           <h1 style={{ margin: 0 }}>My Complaints</h1>
         </div>
         <Link to="/" className="btn btn-ghost">
-           Go to Home
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '0.5rem' }}>
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          Go to Home
         </Link>
       </header>
       <section className="surface-card card-highlight" style={{ marginBottom: "2.5rem" }}>

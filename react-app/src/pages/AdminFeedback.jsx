@@ -11,12 +11,20 @@ const AdminFeedback = () => {
   useEffect(() => {
     const loadStats = async () => {
       const res = await fetch(`${apiBase}/feedback/stats`);
+      if (res.status === 401) {
+        window.location.href = "/adminlogin";
+        return;
+      }
       const data = await res.json();
       setStats(data.stats || data);
     };
     const loadFeedbacks = async () => {
       try {
         const res = await fetch(`${apiBase}/feedback`);
+        if (res.status === 401) {
+          window.location.href = "/adminlogin";
+          return;
+        }
         const data = await res.json();
         setFeedbacks(data.data || []);
       } catch (err) {

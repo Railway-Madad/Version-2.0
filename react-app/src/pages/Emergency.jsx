@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../context/ApiContext";
-import { clearToken } from "../store/slices/authSlice";
+import { clearPassengerToken } from "../store/slices/authSlice";
 
 const Emergency = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.passengerToken);
   const [username, setUsername] = useState("");
   const [trainNumber, setTrainNumber] = useState("");
   const [seatNumber, setSeatNumber] = useState("");
@@ -16,10 +16,20 @@ const Emergency = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
+      if (!token) {
+        dispatch(clearPassengerToken());
+        navigate("/login");
+        return;
+      }
       try {
         const res = await fetch(`${apiBase}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) {
+          dispatch(clearToken());
+          navigate("/login");
+          return;
+        }
         if (!res.ok) throw new Error("Failed to fetch profile");
         const data = await res.json();
         setUsername(data.user?.username || "");
@@ -30,6 +40,9 @@ const Emergency = () => {
     };
     if (token) {
       loadProfile();
+    } else {
+      dispatch(clearToken());
+      navigate("/login");
     }
   }, [apiBase, dispatch, navigate, token]);
 
@@ -49,6 +62,11 @@ const Emergency = () => {
           seatNumber,
         }),
       });
+      if (res.status === 401) {
+        dispatch(clearToken());
+        navigate("/login");
+        return;
+      }
       const data = await res.json();
       setResult(data.message || data.error || "");
       setTrainNumber("");
@@ -93,7 +111,7 @@ const Emergency = () => {
               id="trainNumber"
               placeholder="Enter 10-digit train number"
               required
-              pattern="\\d{10}"
+              pattern="\d{10}"
               maxLength={10}
               minLength={10}
               title="Train number must be exactly 10 digits"
@@ -109,7 +127,7 @@ const Emergency = () => {
               id="seatNumber"
               placeholder="e.g. S1-45"
               required
-              pattern="^[A-Z]{1,2}\\d{1,2}-\\d{1,3}$"
+              pattern="^[A-Z]{1,2}\d{1,2}-\d{1,3}$"
               title="Format: CoachSeat-SeatNumber (e.g., S1-45, B12-123)"
               value={seatNumber}
               onChange={(e) => setSeatNumber(e.target.value)}

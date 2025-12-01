@@ -5,7 +5,7 @@ import { useApi } from "../context/ApiContext";
 
 const FoodStaff = () => {
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.staffToken);
   const [role, setRole] = useState("chef");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);

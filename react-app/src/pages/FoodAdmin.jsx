@@ -72,6 +72,10 @@ const FoodAdmin = () => {
     setOrdersLoading(true);
     try {
       const res = await fetch(`${apiBase}/catering/all-orders`);
+      if (res.status === 401) {
+        window.location.href = "/adminlogin";
+        return;
+      }
       const data = await res.json();
       if (!data.success) {
         setOrders([]);

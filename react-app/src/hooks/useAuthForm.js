@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setToken } from "../store/slices/authSlice";
+import { setPassengerToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 
 export const useAuthForm = ({ mode = "login" } = {}) => {
@@ -41,7 +41,7 @@ export const useAuthForm = ({ mode = "login" } = {}) => {
         });
 
         if (res.status === 200 && res.data?.token) {
-          dispatch(setToken({ token: res.data.token, role: "user" }));
+          dispatch(setPassengerToken(res.data.token));
           setMessage("Login successful. Redirecting...");
           navigate("/userDashboard");
         } else {
