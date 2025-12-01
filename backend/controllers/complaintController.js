@@ -113,6 +113,7 @@ exports.resolveComplaint = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
 // GET:
 exports.getComplaintsByDomain = async (req, res) => {
   try {

@@ -59,7 +59,7 @@ async function loadComplaints() {
       const currentTime = Date.now();
       const complaintTime = new Date(c.createdAt).getTime();
       const timeDiff = currentTime - complaintTime;
-      const oneHour = 60 * 60 * 1000;
+      const oneHour = 1000;
 
       let progressPercent = Math.min((timeDiff / oneHour) * 100, 100);
 

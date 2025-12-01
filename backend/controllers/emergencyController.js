@@ -15,7 +15,7 @@ exports.createEmergency = async (req, res) => {
       seatNumber
       
     });
-
+    
     await newEmergency.save();
     res.status(201).json({ message: "Emergency request created successfully" });
   } catch (error) {
