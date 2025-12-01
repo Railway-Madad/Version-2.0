@@ -14,7 +14,7 @@ import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminNews from "./pages/AdminNews";
 import AdminFeedback from "./pages/AdminFeedback";
-import EmergencyAdmin from "./pages/EmergencyAdmin";
+import EmergencyAdmin from "./pages/EmergencyAdmin.jsx";
 import FoodAdmin from "./pages/FoodAdmin";
 import FoodStaff from "./pages/FoodStaff";
 import StaffLogin from "./pages/StaffLogin";
