@@ -1,0 +1,100 @@
+import { Link } from "react-router-dom";
+
+const Home = () => {
+  return (
+    <main className="page-shell fade-in">
+      <section className="surface-card hero">
+        <span className="badge">Rail Madad Platform</span>
+        <h1>Experience a faster, calmer way to handle railway support.</h1>
+        <p>
+          Log in based on your role and keep complaints, food services,
+          emergencies, and feedback flowing smoothly.
+        </p>
+        <div className="actions-inline">
+          <Link className="btn" to="/login">
+            Passenger Login
+          </Link>
+          <Link className="btn btn-ghost" to="/register">
+            Create Passenger Account
+          </Link>
+        </div>
+      </section>
+
+      <section className="content-grid two-column">
+        <article className="surface-card card-highlight">
+          <h2 className="card-section-title">For Passengers</h2>
+          <p>
+            Access booking support, raise complaints, order food onboard, and
+            request emergency assistance.
+          </p>
+          <div className="link-grid">
+            <Link className="link-tile" to="/login">
+              <strong>User Login</strong>
+              <span>Access your personalised dashboard</span>
+            </Link>
+            <Link className="link-tile" to="/register">
+              <strong>User Register</strong>
+              <span>Sign up for a new passenger account</span>
+            </Link>
+            <Link className="link-tile" to="/dashboard">
+              <strong>React Dashboard</strong>
+              <span>Stateful demo with stock, reports, and settings</span>
+            </Link>
+          </div>
+        </article>
+
+        <article className="surface-card">
+          <h2 className="card-section-title">For Administrators</h2>
+          <p>
+            Monitor system performance, manage announcements, and keep service
+            quality aligned.
+          </p>
+          <div className="link-grid">
+            <Link className="link-tile" to="/adminlogin">
+              <strong>Admin Login</strong>
+              <span>Manage operations and insights</span>
+            </Link>
+            <Link className="link-tile" to="/adminregister">
+              <strong>Admin Register</strong>
+              <span>Onboard a new administrator</span>
+            </Link>
+          </div>
+        </article>
+
+        <article className="surface-card">
+          <h2 className="card-section-title">For Rail Staff</h2>
+          <p>
+            Stay updated with assigned tasks, track complaints, and collaborate
+            across teams.
+          </p>
+          <div className="link-grid">
+            <Link className="link-tile" to="/staff_login">
+              <strong>Staff Login</strong>
+              <span>Continue where you left off</span>
+            </Link>
+            <Link className="link-tile" to="/staff_register">
+              <strong>Staff Register</strong>
+              <span>Request a new staff account</span>
+            </Link>
+          </div>
+        </article>
+
+        <article className="surface-card">
+          <h2 className="card-section-title">Catering Operations</h2>
+          <p>
+            Coordinate onboard meals, fulfil orders, and keep passengers
+            informed in real-time.
+          </p>
+          <div className="link-grid">
+            <Link className="link-tile" to="/cateringlogin">
+              <strong>Catering Staff Login</strong>
+              <span>Access catering dashboards &amp; orders</span>
+            </Link>
+          </div>
+        </article>
+      </section>
+    </main>
+  );
+};
+
+export default Home;

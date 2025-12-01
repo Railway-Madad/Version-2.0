@@ -1,0 +1,190 @@
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { useApi } from "../context/ApiContext";
+
+const FoodStaff = () => {
+  const { apiBase } = useApi();
+  const token = useSelector((state) => state.auth.token);
+  const [role, setRole] = useState("chef");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const loadOrders = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${apiBase}/catering/all-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError("Failed to load orders.");
+        setOrders([]);
+        return;
+      }
+      let filtered = data.data || [];
+      if (role === "chef") {
+        filtered = filtered.filter((o) => o.status === "pending");
+      } else if (role === "manager") {
+        filtered = filtered.filter((o) => o.status === "preparing");
+      } else if (role === "distributor") {
+        filtered = filtered.filter((o) => o.status === "out for delivery");
+      }
+      setOrders(filtered);
+    } catch (err) {
+      setError("Failed to load orders.");
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (orderId, status) => {
+    try {
+      const res = await fetch(`${apiBase}/catering/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Success! Order status updated to ${status}.`);
+        loadOrders();
+      } else {
+        alert(`Warning: ${data.message}`);
+      }
+    } catch (err) {
+      alert("Server error");
+    }
+  };
+
+  return (
+    <main className="page-shell fade-in">
+      <section className="surface-card card-highlight">
+        <div className="page-header">
+          <div>
+            <h1>Food Service Crew Dashboard</h1>
+            <p className="muted-text">
+              Filter orders based on your role and keep passengers nourished right on
+              time.
+            </p>
+          </div>
+          <Link className="btn btn-ghost" to="/" style={{ marginLeft: "0.5rem" }}>
+            Logout
+          </Link>
+        </div>
+
+        <div className="actions-inline">
+          <div className="input-group" style={{ flex: 1 }}>
+            <label htmlFor="role">Select Role</label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="chef">Chef</option>
+              <option value="manager">Manager</option>
+              <option value="distributor">Distributor</option>
+              <option value="all">All Orders</option>
+            </select>
+          </div>
+          <button className="btn" id="load-orders-btn" type="button" onClick={loadOrders}>
+            Load Orders
+          </button>
+        </div>
+      </section>
+
+      <section className="surface-card">
+        <div className="page-header">
+          <div>
+            <h2>Orders Overview</h2>
+            <p className="muted-text">Actions appear based on your selection above.</p>
+          </div>
+        </div>
+        <div id="orders-container" className="orders-list">
+          {loading ? (
+            <div className="empty-state">Loading orders...</div>
+          ) : error ? (
+            <div className="empty-state">{error}</div>
+          ) : orders.length === 0 ? (
+            <div className="empty-state">No orders available right now.</div>
+          ) : (
+            orders.map((order) => {
+              const statusClass =
+                order.status === "delivered"
+                  ? "status-pill success"
+                  : order.status === "cancelled"
+                  ? "status-pill danger"
+                  : "status-pill warning";
+              return (
+                <article className="order-card" key={order._id}>
+                  <div className="order-card__header">
+                    <div>
+                      <h4>Order ID: {order._id}</h4>
+                      <p className="muted-text">
+                        {order.createdAt ? new Date(order.createdAt).toLocaleString() : ""}
+                      </p>
+                      <p className="muted-text">
+                        Customer: {order.user?.name || "N/A"} ({order.user?.email || ""})
+                      </p>
+                    </div>
+                    <span className={statusClass}>{order.status}</span>
+                  </div>
+                  <p>
+                    <strong>Delivery address:</strong> {order.deliveryAddress}
+                  </p>
+                  <p>
+                    <strong>Total:</strong> &#8377;{order.totalPrice}
+                  </p>
+                  <p>
+                    <strong>Items:</strong>
+                  </p>
+                  <ul className="past-order-items">
+                    {order.items.map((i, idx) => (
+                      <li key={`${order._id}-${idx}`}>
+                        {i.foodItem?.name || "Item"} x {i.quantity} (&#8377;{i.priceAtOrder})
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="actions-inline">
+                    {role === "chef" && order.status === "pending" ? (
+                      <button
+                        className="btn"
+                        onClick={() => updateStatus(order._id, "preparing")}
+                      >
+                        Accept Order (Preparing)
+                      </button>
+                    ) : null}
+                    {role === "manager" && order.status === "preparing" ? (
+                      <button
+                        className="btn"
+                        onClick={() => updateStatus(order._id, "out for delivery")}
+                      >
+                        Mark Out for Delivery
+                      </button>
+                    ) : null}
+                    {role === "distributor" && order.status === "out for delivery" ? (
+                      <button
+                        className="btn"
+                        onClick={() => updateStatus(order._id, "delivered")}
+                      >
+                        Mark Delivered
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })
+          )}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default FoodStaff;
