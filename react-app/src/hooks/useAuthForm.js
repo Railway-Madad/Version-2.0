@@ -1,0 +1,74 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { setToken } from "../store/slices/authSlice";
+import { useApi } from "../context/ApiContext";
+
+export const useAuthForm = ({ mode = "login" } = {}) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { apiBase } = useApi();
+
+  const [values, setValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  const updateField = (key, value) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    setIsError(false);
+
+    if (!values.username || !values.password || (mode === "register" && !values.email)) {
+      setMessage("Please fill in all fields.");
+      setIsError(true);
+      return;
+    }
+
+    try {
+      if (mode === "login") {
+        const res = await axios.post(`${apiBase}/user/login`, {
+          username: values.username,
+          password: values.password,
+        });
+
+        if (res.status === 200 && res.data?.token) {
+          dispatch(setToken({ token: res.data.token, role: "user" }));
+          setMessage("Login successful. Redirecting...");
+          navigate("/userDashboard");
+        } else {
+          setIsError(true);
+          setMessage(res.data?.message || "Invalid username or password.");
+        }
+      } else {
+        const res = await axios.post(`${apiBase}/user/register`, {
+          username: values.username,
+          email: values.email,
+          password: values.password,
+        });
+        setIsError(false);
+        setMessage(res.data?.message || "Registration successful! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 1500);
+      }
+    } catch (error) {
+      setIsError(true);
+      if (error.response) {
+        setMessage(error.response.data?.message || "Request failed.");
+      } else {
+        setMessage("Unable to connect to server. Please try again later.");
+      }
+    }
+  };
+
+  return { values, updateField, submit, message, isError };
+};
+
+export default useAuthForm;
