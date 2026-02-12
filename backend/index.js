@@ -15,8 +15,22 @@ const newsRouter = require("./routes/newsRouter");
 const feedbackRouter = require("./routes/feedbackRouter");
 const lostnfoundRouter = require("./routes/lostnfoundRoutes");
 
+// Logger middleware
+const {
+  requestLogger,
+  consoleLogger,
+  errorLogger,
+  errorCapture,
+  errorHandler,
+} = require("./config/logger");
+
 const app = express();
 app.use(cors());
+
+// Request logging middleware
+app.use(requestLogger); // Logs all requests to access.log
+app.use(consoleLogger); // Logs requests to console (development)
+app.use(errorLogger); // Logs errors to error.log
 //purval and bapya 5500 var chalva he
 // app.use(
 //   cors({
@@ -43,6 +57,10 @@ app.use("/lostnfound", lostnfoundRouter);
 app.get("/", (req, res) => {
   res.send("Server is working");
 });
+
+// Error handling middleware (must be after all routes)
+app.use(errorCapture);
+app.use(errorHandler);
 
 async function connect() {
   try {
