@@ -9,21 +9,21 @@ export const useComplaintForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const complaint = useSelector((state) => state.complaint);
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!token) {
+      if (!isAuthenticated) {
         dispatch(clearPassengerToken());
         navigate("/login");
         return;
       }
       try {
         const res = await fetch(`${apiBase}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         if (res.status === 401) {
           dispatch(clearPassengerToken());
@@ -41,7 +41,7 @@ export const useComplaintForm = () => {
       }
     };
     fetchProfile();
-  }, [apiBase, dispatch, navigate, token]);
+  }, [apiBase, dispatch, navigate, isAuthenticated]);
 
   const setFieldValue = (key, value) => dispatch(setField({ key, value }));
 
@@ -63,9 +63,7 @@ export const useComplaintForm = () => {
     try {
       const response = await fetch(`${apiBase}/complaint/submit-complaint`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
         body: formData,
       });
 

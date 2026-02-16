@@ -9,6 +9,7 @@ const adminRouter = Router();
 
 adminRouter.post('/register', adminController.register);
 adminRouter.post('/login', adminController.login);
+adminRouter.post('/logout', adminController.logout);
 adminRouter.get('/test', adminAuthentication, (req, res) => {
     res.send("Admin route is working");
 });

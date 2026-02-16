@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { fetchNews } from "../store/slices/newsSlice";
 import { clearPassengerToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
@@ -11,7 +12,7 @@ const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const { items: newsItems, status: newsStatus } = useSelector(
     (state) => state.news
   );
@@ -19,26 +20,31 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const loadDashboard = async () => {
-      if (!token) return;
+      if (!isAuthenticated) return;
       const res = await fetch(`${apiBase}/`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
-        setWelcomeText(`Hello, ${data.username}!`);
+        setWelcomeText(`Hello, ${data.username || 'User'}!`);
       } else {
         dispatch(clearPassengerToken());
         navigate("/login");
       }
     };
     loadDashboard();
-  }, [apiBase, dispatch, navigate, token]);
+  }, [apiBase, dispatch, navigate, isAuthenticated]);
 
   useEffect(() => {
     dispatch(fetchNews());
   }, [dispatch]);
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await axios.post(`${apiBase}/user/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     dispatch(clearPassengerToken());
     navigate("/login");
   };

@@ -3,24 +3,24 @@ import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children, type = "user" }) => {
   const location = useLocation();
-  const { passengerToken, staffToken, adminToken } = useSelector((state) => state.auth);
+  const { isPassengerAuthenticated, isStaffAuthenticated, isAdminAuthenticated } = useSelector((state) => state.auth);
 
   if (type === "admin") {
-    if (!adminToken) {
+    if (!isAdminAuthenticated) {
       return <Navigate to="/adminlogin" replace state={{ from: location }} />;
     }
     return children;
   }
 
   if (type === "staff") {
-    if (!staffToken) {
+    if (!isStaffAuthenticated) {
       return <Navigate to="/staff_login" replace state={{ from: location }} />;
     }
     return children;
   }
 
   // default passenger/user
-  if (!passengerToken) {
+  if (!isPassengerAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

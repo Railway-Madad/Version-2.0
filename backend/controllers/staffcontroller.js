@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { z, email } = require('zod');
 const Complaint = require('../models/complaintModel');
 const complaintModel = require('../models/complaintModel');
+const { setAuthCookie, clearAuthCookie } = require('../utils/cookieHelper');
 
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -62,8 +63,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        const token = jwt.sign({ staffId: staff._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ message: "Login successful", token });
+        const token = jwt.sign({ staffId: staff._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        setAuthCookie(res, 'staffToken', token);
+        res.status(200).json({ message: "Login successful", staff: { staffId: staff._id, email: staff.email, role: staff.role } });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });
@@ -155,9 +157,19 @@ const resolveComplaint = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    try {
+        clearAuthCookie(res, 'staffToken');
+        res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
+    logout,
     getProfile,
     getComplaints,
     resolveComplaint,

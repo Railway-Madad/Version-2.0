@@ -8,7 +8,7 @@ const Emergency = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const [username, setUsername] = useState("");
   const [trainNumber, setTrainNumber] = useState("");
   const [seatNumber, setSeatNumber] = useState("");
@@ -16,17 +16,17 @@ const Emergency = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!token) {
+      if (!isAuthenticated) {
         dispatch(clearPassengerToken());
         navigate("/login");
         return;
       }
       try {
         const res = await fetch(`${apiBase}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include'
         });
         if (res.status === 401) {
-          dispatch(clearToken());
+          dispatch(clearPassengerToken());
           navigate("/login");
           return;
         }
@@ -34,17 +34,17 @@ const Emergency = () => {
         const data = await res.json();
         setUsername(data.user?.username || "");
       } catch (err) {
-        dispatch(clearToken());
+        dispatch(clearPassengerToken());
         navigate("/login");
       }
     };
-    if (token) {
+    if (isAuthenticated) {
       loadProfile();
     } else {
-      dispatch(clearToken());
+      dispatch(clearPassengerToken());
       navigate("/login");
     }
-  }, [apiBase, dispatch, navigate, token]);
+  }, [apiBase, dispatch, navigate, isAuthenticated]);
 
   const submitEmergency = async (e) => {
     e.preventDefault();
@@ -52,8 +52,8 @@ const Emergency = () => {
     try {
       const res = await fetch(`${apiBase}/emergency/postEmg`, {
         method: "POST",
+        credentials: 'include',
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -63,7 +63,7 @@ const Emergency = () => {
         }),
       });
       if (res.status === 401) {
-        dispatch(clearToken());
+        dispatch(clearPassengerToken());
         navigate("/login");
         return;
       }

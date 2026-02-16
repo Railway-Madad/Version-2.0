@@ -1,13 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const storedPassengerToken = typeof localStorage !== "undefined" ? localStorage.getItem("passengerToken") : "";
-const storedStaffToken = typeof localStorage !== "undefined" ? localStorage.getItem("staffToken") : "";
-const storedAdminToken = typeof localStorage !== "undefined" ? localStorage.getItem("adminToken") : "";
+// Cookie-based auth - no need for localStorage
+// Clear any old tokens that might exist
+if (typeof localStorage !== "undefined") {
+  localStorage.removeItem("passengerToken");
+  localStorage.removeItem("staffToken");
+  localStorage.removeItem("adminToken");
+}
 
+// Cookies are automatically sent with requests
 const initialState = {
-  passengerToken: storedPassengerToken || "",
-  staffToken: storedStaffToken || "",
-  adminToken: storedAdminToken || "",
+  isPassengerAuthenticated: false,
+  isStaffAuthenticated: false,
+  isAdminAuthenticated: false,
 };
 
 const authSlice = createSlice({
@@ -15,28 +20,22 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setPassengerToken(state, action) {
-      state.passengerToken = action.payload || "";
-      localStorage.setItem("passengerToken", action.payload || "");
+      state.isPassengerAuthenticated = !!action.payload;
     },
     clearPassengerToken(state) {
-      state.passengerToken = "";
-      localStorage.removeItem("passengerToken");
+      state.isPassengerAuthenticated = false;
     },
     setStaffToken(state, action) {
-      state.staffToken = action.payload || "";
-      localStorage.setItem("staffToken", action.payload || "");
+      state.isStaffAuthenticated = !!action.payload;
     },
     clearStaffToken(state) {
-      state.staffToken = "";
-      localStorage.removeItem("staffToken");
+      state.isStaffAuthenticated = false;
     },
     setAdminToken(state, action) {
-      state.adminToken = action.payload || "";
-      localStorage.setItem("adminToken", action.payload || "");
+      state.isAdminAuthenticated = !!action.payload;
     },
     clearAdminToken(state) {
-      state.adminToken = "";
-      localStorage.removeItem("adminToken");
+      state.isAdminAuthenticated = false;
     },
   },
 });

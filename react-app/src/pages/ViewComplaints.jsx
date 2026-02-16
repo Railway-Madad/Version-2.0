@@ -8,7 +8,7 @@ const ViewComplaints = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const [currentUser, setCurrentUser] = useState(null);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const ViewComplaints = () => {
     const fetchProfile = async () => {
       try {
         const res = await fetch(`${apiBase}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include'
         });
         if (!res.ok) throw new Error("Failed to fetch profile");
         const data = await res.json();
@@ -27,10 +27,10 @@ const ViewComplaints = () => {
         navigate("/login");
       }
     };
-    if (token) {
+    if (isAuthenticated) {
       fetchProfile();
     }
-  }, [apiBase, dispatch, navigate, token]);
+  }, [apiBase, dispatch, navigate, isAuthenticated]);
 
   useEffect(() => {
     let intervalId;
@@ -39,7 +39,7 @@ const ViewComplaints = () => {
         try {
           const response = await fetch(
             `${apiBase}/complaint/api/complaints/user/${currentUser.username}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { credentials: 'include' }
           );
           if (!response.ok) throw new Error("Failed to fetch complaints");
           const data = await response.json();
@@ -57,7 +57,7 @@ const ViewComplaints = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [apiBase, currentUser, token]);
+  }, [apiBase, currentUser]);
 
   const handleDelete = async (id, status) => {
     if (status === "Resolved") return;
@@ -66,7 +66,7 @@ const ViewComplaints = () => {
     try {
       const res = await fetch(`${apiBase}/complaint/api/complaints/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (!res.ok) {
         const text = await res.text();

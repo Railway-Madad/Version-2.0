@@ -15,7 +15,7 @@ import { useApi } from "../context/ApiContext";
 export const useOrderFlow = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const { cart, address, notes, message, messageType, orders } = useSelector(
     (state) => state.orders
   );
@@ -44,12 +44,12 @@ export const useOrderFlow = () => {
   }, [apiBase]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!isAuthenticated) return;
     const loadOrders = async () => {
       setOrdersLoading(true);
       try {
         const res = await fetch(`${apiBase}/catering/my-orders`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         if (res.status === 401) {
           window.location.href = "/login";
@@ -67,7 +67,7 @@ export const useOrderFlow = () => {
       }
     };
     loadOrders();
-  }, [apiBase, dispatch, token]);
+  }, [apiBase, dispatch, isAuthenticated]);
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -107,8 +107,8 @@ export const useOrderFlow = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           items: cart,
           deliveryAddress: address,
@@ -126,7 +126,7 @@ export const useOrderFlow = () => {
       dispatch(resetCart());
       // refresh orders
       const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (ordersRes.ok) {
         const ordersData = await ordersRes.json();
@@ -143,8 +143,8 @@ export const useOrderFlow = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ status: "cancelled" }),
       });
       if (res.status === 401) {
@@ -157,7 +157,7 @@ export const useOrderFlow = () => {
       dispatch(setMessage({ message: "Order cancelled successfully!", type: "success" }));
       // refresh orders
       const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (ordersRes.ok) {
         const ordersData = await ordersRes.json();

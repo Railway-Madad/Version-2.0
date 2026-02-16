@@ -9,6 +9,7 @@ const userRouter = Router();
 
 userRouter.post("/register", usercontroller.register);
 userRouter.post("/login", usercontroller.login);
+userRouter.post("/logout", usercontroller.logout);
 userRouter.get("/profile", userAuthentication, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select("-password");

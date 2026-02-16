@@ -20,10 +20,12 @@ const AdminLogin = () => {
       const res = await axios.post(`${apiBase}/admin/login`, {
         username,
         password,
+      }, {
+        withCredentials: true
       });
       const data = res.data;
-      if (res.status === 200 && data.token) {
-        dispatch(setAdminToken(data.token));
+      if (res.status === 200) {
+        dispatch(setAdminToken("authenticated"));
         navigate("/admindashboard");
       } else {
         setMessage(data.message || "Invalid username or password.");

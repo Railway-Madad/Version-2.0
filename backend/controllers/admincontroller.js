@@ -2,6 +2,7 @@ const adminModel = require('../models/adminModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
+const { setAuthCookie, clearAuthCookie } = require('../utils/cookieHelper');
 
 const registerSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -52,8 +53,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid username or password" });
         }
 
-        const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ message: "Login successful", token });
+        const token = jwt.sign({ adminId: admin._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        setAuthCookie(res, 'adminToken', token);
+        res.status(200).json({ message: "Login successful", admin: { adminId: admin._id, username: admin.username } });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });
@@ -62,7 +64,17 @@ const login = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    try {
+        clearAuthCookie(res, 'adminToken');
+        res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    logout
 };

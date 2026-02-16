@@ -6,20 +6,20 @@ import { useApi } from "../context/ApiContext";
 const LostFoundView = () => {
   const { apiBase } = useApi();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
   const [filter, setFilter] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadItems = async () => {
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
     setLoading(true);
     try {
       const res = await fetch(`${apiBase}/lostnfound`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       });
       if (res.status === 401) {
         navigate("/login");

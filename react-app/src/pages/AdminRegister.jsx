@@ -30,6 +30,8 @@ const AdminRegister = () => {
         username,
         email,
         password,
+      }, {
+        withCredentials: true
       });
       const data = res.data;
       if (data.success) {

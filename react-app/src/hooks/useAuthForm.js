@@ -38,10 +38,12 @@ export const useAuthForm = ({ mode = "login" } = {}) => {
         const res = await axios.post(`${apiBase}/user/login`, {
           username: values.username,
           password: values.password,
+        }, {
+          withCredentials: true
         });
 
-        if (res.status === 200 && res.data?.token) {
-          dispatch(setPassengerToken(res.data.token));
+        if (res.status === 200) {
+          dispatch(setPassengerToken("authenticated"));
           setMessage("Login successful. Redirecting...");
           navigate("/userDashboard");
         } else {
@@ -53,6 +55,8 @@ export const useAuthForm = ({ mode = "login" } = {}) => {
           username: values.username,
           email: values.email,
           password: values.password,
+        }, {
+          withCredentials: true
         });
         setIsError(false);
         setMessage(res.data?.message || "Registration successful! Redirecting to login...");

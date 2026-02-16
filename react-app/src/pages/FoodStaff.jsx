@@ -5,7 +5,7 @@ import { useApi } from "../context/ApiContext";
 
 const FoodStaff = () => {
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.staffToken);
+  const isAuthenticated = useSelector((state) => state.auth.isStaffAuthenticated);
   const [role, setRole] = useState("chef");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const FoodStaff = () => {
     setError("");
     try {
       const res = await fetch(`${apiBase}/catering/all-orders`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       });
       const data = await res.json();
       if (!data.success) {
@@ -45,9 +45,9 @@ const FoodStaff = () => {
     try {
       const res = await fetch(`${apiBase}/catering/${orderId}/status`, {
         method: "PUT",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });

@@ -10,6 +10,7 @@ const staffRouter = Router();
 
 staffRouter.post('/register', staffController.register);
 staffRouter.post('/login', staffController.login);
+staffRouter.post('/logout', staffController.logout);
 //get complaints of respective staff
 staffRouter.get('/complaints', staffAuthentication, staffController.getComplaints);
 //resolve complaint

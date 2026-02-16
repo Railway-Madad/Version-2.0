@@ -5,7 +5,7 @@ import { useApi } from "../context/ApiContext";
 
 const LostFound = () => {
   const { apiBase } = useApi();
-  const token = useSelector((state) => state.auth.passengerToken);
+  const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -18,7 +18,7 @@ const LostFound = () => {
   const loadUserSubmissions = async () => {
     try {
       const res = await fetch(`${apiBase}/lostnfound/myitems`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       });
       if (res.status === 401) {
         window.location.href = "/login";
@@ -36,11 +36,11 @@ const LostFound = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       loadUserSubmissions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [isAuthenticated]);
 
   const submitItem = async (event) => {
     event.preventDefault();
@@ -54,7 +54,7 @@ const LostFound = () => {
 
     const res = await fetch(`${apiBase}/lostnfound`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
       body: formData,
     });
     if (res.status === 401) {
@@ -79,7 +79,7 @@ const LostFound = () => {
   const markAsResolved = async (id) => {
     const res = await fetch(`${apiBase}/lostnfound/${id}/resolve`, {
       method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     });
     if (res.status === 401) {
       window.location.href = "/login";
@@ -96,7 +96,7 @@ const LostFound = () => {
   const deleteItem = async (id) => {
     const res = await fetch(`${apiBase}/lostnfound/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     });
     if (res.status === 401) {
       window.location.href = "/login";

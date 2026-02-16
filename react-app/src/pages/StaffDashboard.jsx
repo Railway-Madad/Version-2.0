@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { clearStaffToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 import { useTheme } from "../context/ThemeContext";
@@ -10,7 +11,7 @@ const StaffDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const token = useSelector((state) => state.auth.staffToken);
+  const isAuthenticated = useSelector((state) => state.auth.isStaffAuthenticated);
   const [staff, setStaff] = useState(null);
   const [pendingComplaints, setPendingComplaints] = useState([]);
   const [resolvedComplaints, setResolvedComplaints] = useState([]);
@@ -19,7 +20,7 @@ const StaffDashboard = () => {
   const fetchComplaints = useCallback(async () => {
     try {
       const res = await fetch(`${apiBase}/staff/complaints`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       });
       if (!res.ok) throw new Error("Failed to fetch complaints");
       const data = await res.json();
@@ -33,7 +34,7 @@ const StaffDashboard = () => {
               try {
                 const staffRes = await fetch(
                   `${apiBase}/staff/getname/${complaint.resolvedBy}`,
-                  { headers: { Authorization: `Bearer ${token}` } }
+                  { credentials: 'include' }
                 );
                 if (staffRes.ok) {
                   const staffData = await staffRes.json();
@@ -58,13 +59,13 @@ const StaffDashboard = () => {
       setPendingComplaints([]);
       setResolvedComplaints([]);
     }
-  }, [apiBase, token]);
+  }, [apiBase, isAuthenticated]);
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const res = await fetch(`${apiBase}/staff/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include'
         });
         if (!res.ok) throw new Error("Auth failed");
         const data = await res.json();
@@ -75,11 +76,11 @@ const StaffDashboard = () => {
       }
     };
 
-    if (token) {
+    if (isAuthenticated) {
       loadProfile();
       fetchComplaints();
     }
-  }, [apiBase, dispatch, fetchComplaints, navigate, token]);
+  }, [apiBase, dispatch, fetchComplaints, navigate, isAuthenticated]);
 
   const filteredPending = useMemo(() => {
     const term = searchTerm.toLowerCase();
@@ -112,8 +113,8 @@ const StaffDashboard = () => {
     }
     const res = await fetch(`${apiBase}/staff/complaints/${complaintId}/resolve`, {
       method: "PUT",
+      credentials: 'include',
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ resolutionDetails }),
@@ -126,7 +127,12 @@ const StaffDashboard = () => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await axios.post(`${apiBase}/staff/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     dispatch(clearStaffToken());
     navigate("/staff_login");
   };

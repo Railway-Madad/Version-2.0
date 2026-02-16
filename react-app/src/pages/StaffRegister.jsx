@@ -32,6 +32,8 @@ const StaffRegister = () => {
         email,
         password,
         phone,
+      }, {
+        withCredentials: true
       });
       const data = res.data;
       setMessage(data.message || "Registration successful! Redirecting to login...");

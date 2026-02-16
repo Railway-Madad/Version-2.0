@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { clearAdminToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 import { useTheme } from "../context/ThemeContext";
@@ -114,7 +115,7 @@ const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const adminToken = useSelector((state) => state.auth.adminToken);
+  const isAuthenticated = useSelector((state) => state.auth.isAdminAuthenticated);
 
   const [orders, setOrders] = useState([]);
   const [complaints, setComplaints] = useState([]);
@@ -133,15 +134,15 @@ const AdminDashboard = () => {
       ]);
       setLoading(false);
     };
-    if (adminToken) {
+    if (isAuthenticated) {
       loadData();
     }
-  }, [adminToken, apiBase]);
+  }, [isAuthenticated, apiBase]);
 
   const loadOrders = async () => {
     try {
       const res = await fetch(`${apiBase}/catering/all-orders`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
+        credentials: 'include'
       });
       const data = await res.json();
       const result = data.data || data || [];
@@ -154,7 +155,7 @@ const AdminDashboard = () => {
   const loadComplaints = async () => {
     try {
       const res = await fetch(`${apiBase}/complaint/api/complaintsRES`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
+        credentials: 'include'
       });
       const data = await res.json();
       setComplaints(Array.isArray(data) ? data : []);
@@ -166,7 +167,7 @@ const AdminDashboard = () => {
   const loadImportantComplaints = async () => {
     try {
       const res = await fetch(`${apiBase}/complaint/api/complaintsIMP`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
+        credentials: 'include'
       });
       const data = await res.json();
       setImportantComplaints(Array.isArray(data) ? data : []);
@@ -178,7 +179,7 @@ const AdminDashboard = () => {
   const loadFeedbackStats = async () => {
     try {
       const res = await fetch(`${apiBase}/feedback/stats`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
+        credentials: 'include'
       });
       const data = await res.json();
       setFeedbackStats(data.stats || data);
@@ -193,8 +194,8 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(`${apiBase}/complaint/api/complaints/resolve/${id}`, {
         method: "PUT",
+        credentials: 'include',
         headers: {
-          Authorization: `Bearer ${adminToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -210,7 +211,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await axios.post(`${apiBase}/admin/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     dispatch(clearAdminToken());
     navigate("/adminlogin");
   };

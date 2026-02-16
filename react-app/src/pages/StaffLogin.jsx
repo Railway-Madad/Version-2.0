@@ -20,10 +20,12 @@ const StaffLogin = () => {
       const res = await axios.post(`${apiBase}/staff/login`, {
         email,
         password,
+      }, {
+        withCredentials: true
       });
       const data = res.data;
-      if (res.status === 200 && data.token) {
-        dispatch(setStaffToken(data.token));
+      if (res.status === 200) {
+        dispatch(setStaffToken("authenticated"));
         navigate("/staffDashboard");
       } else {
         setMessage(data.message || "Invalid email or password.");

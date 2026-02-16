@@ -2,6 +2,7 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const multer = require("multer");
+const cookieParser = require("cookie-parser");
 
 const mongoose = require("mongoose");
 const userRouter = require("./routes/userRoutes");
@@ -25,21 +26,26 @@ const {
 } = require("./config/logger");
 
 const app = express();
-app.use(cors());
+
+// CORS configuration for cookies support
+app.use(
+  cors({
+    origin: ["http://localhost:5173"], // Frontend URLs
+    credentials: true, // Allow cookies to be sent with requests
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })  
+);
+
+// Cookie parser middleware - Parse cookies from requests
+app.use(cookieParser());
 
 // Request logging middleware
 app.use(requestLogger); // Logs all requests to access.log
 app.use(consoleLogger); // Logs requests to console (development)
 app.use(errorLogger); // Logs errors to error.log
-//purval and bapya 5500 var chalva he
-// app.use(
-//   cors({
-//     origin: "http://localhost:5500",
 
-//     credentials: true,
-//   })
-// );
-
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
@@ -54,6 +60,15 @@ app.use('/emergency', emergencyRoutes);
 app.use("/news", newsRouter);
 app.use("/feedback", feedbackRouter);
 app.use("/lostnfound", lostnfoundRouter);
+
+//For the cookie testing putpose i have added 
+app.get("/test-cookie", (req, res) => {
+    res.cookie("testCookie", "working", { httpOnly: true });
+    res.json({ 
+        message: "Cookie set!", 
+        cookies: req.cookies 
+    });
+});
 app.get("/", (req, res) => {
   res.send("Server is working");
 });
