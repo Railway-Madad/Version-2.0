@@ -162,3 +162,37 @@ exports.getPendingComplaints = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+// PUT: Handle user satisfaction feedback
+exports.handleSatisfaction = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { satisfied } = req.body;
+
+    const complaint = await Complaint.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ error: "Complaint not found" });
+    }
+
+    if (complaint.status !== 'AwaitingConfirmation') {
+      return res.status(400).json({ error: "Complaint is not awaiting confirmation" });
+    }
+
+    if (satisfied) {
+      // User is satisfied - mark as resolved
+      complaint.status = 'Resolved';
+    } else {
+      // User is not satisfied - rollback to pending
+      complaint.status = 'Pending';
+      complaint.resolvedAt = null;
+      complaint.resolutionDetails = '';
+      complaint.resolvedBy = null;
+    }
+
+    await complaint.save();
+    res.json({ success: true, message: satisfied ? "Complaint confirmed as resolved" : "Complaint rolled back to pending", complaint });
+  } catch (error) {
+    console.error("Error handling satisfaction:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};

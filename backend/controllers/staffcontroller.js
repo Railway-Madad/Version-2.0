@@ -144,7 +144,7 @@ const resolveComplaint = async (req, res) => {
             return res.status(403).json({ message: "You are not authorized to resolve this complaint" });
         }
 
-        complaint.status = 'Resolved';
+        complaint.status = 'AwaitingConfirmation';
         complaint.resolvedAt = new Date();
         complaint.resolutionDetails = resolutionDetails || '';
         complaint.resolvedBy = staff._id;

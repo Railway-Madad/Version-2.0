@@ -19,6 +19,6 @@ router.get('/complaints/all',userAuthentication, complaintController.getAllCompl
 router.get('/api/images/user/:username',userAuthentication, complaintController.getImagesByUser);
 router.get('/api/complaintsIMP',adminAuthentication, complaintController.getComplaintByStatus);
 router.get('/api/complaintsRES',userAuthentication, complaintController.getPendingComplaints);
-//reslove complaint
+router.put('/api/complaints/:id/satisfaction',userAuthentication, complaintController.handleSatisfaction);
 
 module.exports = router;
