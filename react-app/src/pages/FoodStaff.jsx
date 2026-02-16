@@ -130,7 +130,7 @@ const FoodStaff = () => {
                         {order.createdAt ? new Date(order.createdAt).toLocaleString() : ""}
                       </p>
                       <p className="muted-text">
-                        Customer: {order.user?.name || "N/A"} ({order.user?.email || ""})
+                        Customer email: ({order.user?.email || ""})
                       </p>
                     </div>
                     <span className={statusClass}>{order.status}</span>
@@ -169,12 +169,29 @@ const FoodStaff = () => {
                       </button>
                     ) : null}
                     {role === "distributor" && order.status === "out for delivery" ? (
+                      // <button
+                      //   className="btn"
+                      //   onClick={() => updateStatus(order._id, "delivered")}
+                      // >
+                      //   Mark Delivered
+                      // </button>
                       <button
-                        className="btn"
-                        onClick={() => updateStatus(order._id, "delivered")}
-                      >
-                        Mark Delivered
-                      </button>
+  className="btn"
+  onClick={() => {
+    const enteredOtp = prompt("Enter OTP from customer:");
+
+    if (!enteredOtp) return;
+
+    if (enteredOtp === order.otp) {
+      updateStatus(order._id, "delivered");
+    } else {
+      alert("Invalid OTP!");
+    }
+  }}
+>
+  Mark Delivered
+</button>
+
                     ) : null}
                   </div>
                 </article>
@@ -188,3 +205,4 @@ const FoodStaff = () => {
 };
 
 export default FoodStaff;
+ 

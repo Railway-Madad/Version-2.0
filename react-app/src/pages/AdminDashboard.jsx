@@ -372,7 +372,7 @@ const AdminDashboard = () => {
           </div>
           <div className="link-tile">
             <strong>Users</strong>
-            <p id="ad-users">N/A</p>
+            <p id="ad-users"></p>
           </div>
           <div className="link-tile">
             <strong>Complaints</strong>

@@ -11,4 +11,4 @@ cateringRouter.get("/my-orders",userAuthentication, cateringController.getMyCate
 cateringRouter.get("/all-orders", cateringController.getAllCateringOrders);
 cateringRouter.put("/:id/status", cateringController.updateOrderStatus);
 
-module.exports = cateringRouter;
+module.exports = cateringRouter

@@ -1,6 +1,59 @@
 const Catering = require("../models/cateringModel");
 const Food = require("../models/foodModel"); 
 
+// const placeOrder = async (req, res) => {
+//   try {
+//     const { items, deliveryAddress, notes } = req.body;
+
+//     if (!items || items.length === 0 || !deliveryAddress) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Please provide items and a delivery address.",
+//       });
+//     }
+
+//     if (!req.userId) {
+//       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
+//     }
+
+//     let totalPrice = 0;
+//     const orderItems = [];
+
+//     for (const item of items) {
+//       const food = await Food.findById(item.foodItem);
+//       if (!food) {
+//         return res
+//           .status(404)
+//           .json({ success: false, message: `Food item with ID ${item.foodItem} not found.` });
+//       }
+//       if (item.quantity <= 0) {
+//         return res
+//           .status(400)
+//           .json({ success: false, message: `Quantity for ${food.name} must be at least 1.` });
+//       }
+//       orderItems.push({
+//         foodItem: food._id,
+//         quantity: item.quantity,
+//         priceAtOrder: food.price, 
+//       });
+//       totalPrice += food.price * item.quantity;
+//     }
+
+//     const newOrder = await Catering.create({
+//       user: req.userId,
+//       items: orderItems,
+//       totalPrice,
+//       deliveryAddress,
+//       notes,
+//     });
+
+//     res.status(201).json({ success: true, data: newOrder });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, message: "Server Error" });
+//   }
+// };
+
 const placeOrder = async (req, res) => {
   try {
     const { items, deliveryAddress, notes } = req.body;
@@ -13,29 +66,37 @@ const placeOrder = async (req, res) => {
     }
 
     if (!req.userId) {
-      return res.status(401).json({ success: false, message: "Not authorized, user not found" });
+      return res.status(401).json({ success: false, message: "Not authorized" });
     }
 
     let totalPrice = 0;
     const orderItems = [];
 
+    // ✅ Generate OTP ONCE
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
     for (const item of items) {
       const food = await Food.findById(item.foodItem);
       if (!food) {
-        return res
-          .status(404)
-          .json({ success: false, message: `Food item with ID ${item.foodItem} not found.` });
+        return res.status(404).json({
+          success: false,
+          message: `Food item not found.`,
+        });
       }
+
       if (item.quantity <= 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: `Quantity for ${food.name} must be at least 1.` });
+        return res.status(400).json({
+          success: false,
+          message: `Quantity must be at least 1.`,
+        });
       }
+
       orderItems.push({
         foodItem: food._id,
         quantity: item.quantity,
-        priceAtOrder: food.price, 
+        priceAtOrder: food.price,
       });
+
       totalPrice += food.price * item.quantity;
     }
 
@@ -45,18 +106,22 @@ const placeOrder = async (req, res) => {
       totalPrice,
       deliveryAddress,
       notes,
+      otp,
     });
 
     res.status(201).json({ success: true, data: newOrder });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
+
 const getAllCateringOrders = async (req, res) => {
   try {
     const orders = await Catering.find({})
+    .sort({ createdAt: -1 })
       .populate("user", "name email") 
       .populate("items.foodItem", "name price"); 
     res.status(200).json({
@@ -77,6 +142,7 @@ const getMyCateringOrders = async (req, res) => {
     }
 
     const orders = await Catering.find({ user: req.userId })
+    .sort({ createdAt: -1 })
       .populate("items.foodItem", "name price");
 
     res.status(200).json({

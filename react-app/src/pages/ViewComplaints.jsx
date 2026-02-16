@@ -118,8 +118,8 @@ const ViewComplaints = () => {
               1
             )}% (${Math.max(
               0,
-              Math.ceil((oneHour - timeDiff) / 60000)
-            )} min remaining)`;
+              Math.ceil((oneHour - timeDiff) / 6000)
+            )} seconds remaining)`;
 
       return (
         <tbody key={c._id}>

@@ -44,6 +44,10 @@ const cateringSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    otp: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

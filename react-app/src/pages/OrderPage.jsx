@@ -109,7 +109,10 @@ const OrderPage = () => {
                 <div className="divider"></div>
                 <div className="summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <span className="muted-text">Total Amount</span>
+                                   
+
                   <strong style={{ fontSize: '1.2rem', color: 'var(--color-primary)' }}>₹{total}</strong>
+                  
                 </div>
                 <form className="form-grid" onSubmit={placeOrder}>
                   <div className="input-group">
@@ -132,6 +135,10 @@ const OrderPage = () => {
                       value={notes}
                       onChange={(e) => updateNotes(e.target.value)}
                     />
+                  </div>
+                  <div>
+                                       <span className="muted-text">We only accept cash on delivery</span>
+
                   </div>
                   <button className="btn" type="submit" style={{ width: '100%' }}>
                     Place Order
@@ -160,6 +167,12 @@ const OrderPage = () => {
                       <div>
                         <h4>Order #{order._id}</h4>
                         <p className="muted-text">{new Date(order.createdAt).toLocaleString()}</p>
+                        {order.status === "out for delivery" && (
+  <p style={{ color: "green", fontWeight: "bold" }}>
+    Delivery OTP: {order.otp}
+  </p>
+)}
+
                       </div>
                       <span className={statusClass}>{order.status}</span>
                     </div>

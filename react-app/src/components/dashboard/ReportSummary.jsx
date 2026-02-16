@@ -21,11 +21,7 @@ const ReportSummary = ({ reportStats, latestUpdatedAt }) => {
       </div>
 
       <div className="report-card">
-        <h3>Real-time Report</h3>
-        <p>
-          Filters, table data, and stats derive from the same Redux slice to keep the
-          UI synchronized. Persistence ensures the report survives reloads.
-        </p>
+       
         <ul className="report-list">
           <li>
             Most recent update:
@@ -36,8 +32,7 @@ const ReportSummary = ({ reportStats, latestUpdatedAt }) => {
                 : "No records yet"}
             </strong>
           </li>
-          <li>Search &amp; filter driven by controlled inputs + memoized selectors.</li>
-          <li>Data persisted via redux-persist for offline resilience.</li>
+
         </ul>
       </div>
     </>

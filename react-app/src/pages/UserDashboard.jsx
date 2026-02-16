@@ -74,8 +74,33 @@ const UserDashboard = () => {
     ));
   };
 
+
+  useEffect(() => {
+    // 1. Load the main Botpress script
+    const script1 = document.createElement("script");
+    script1.src = "https://cdn.botpress.cloud/webchat/v3.6/inject.js";
+    script1.async = true;
+    document.body.appendChild(script1);
+
+    // 2. Load your specific bot configuration
+    const script2 = document.createElement("script");
+    script2.src = "https://files.bpcontent.cloud/2026/02/15/17/20260215171709-IBMUNH6D.js";
+    script2.defer = true;
+    document.body.appendChild(script2);
+
+    // 3. CLEANUP: Remove the bot when leaving this page
+    return () => {
+      document.body.removeChild(script1);
+      document.body.removeChild(script2);
+      // Optional: Clean up the bot container if it remains
+      const botContainer = document.getElementById('bp-web-widget'); 
+      if (botContainer) botContainer.remove();
+    };
+  }, []);
+
   return (
     <main className="page-shell fade-in">
+      
       <section className="surface-card card-highlight">
         <div className="page-header">
           <div>
@@ -153,6 +178,8 @@ const UserDashboard = () => {
         </div>
         <div id="news-section">{renderNews()}</div>
       </section>
+
+    
     </main>
   );
 };
