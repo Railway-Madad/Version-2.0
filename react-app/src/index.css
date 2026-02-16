@@ -189,6 +189,7 @@ main {
 /* Auth & small forms --------------------------------- */
 .auth-layout {
     width: min(420px, 100%);
+    margin: 0 auto;
 }
 
 .auth-card {

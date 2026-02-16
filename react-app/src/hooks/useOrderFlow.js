@@ -24,6 +24,11 @@ export const useOrderFlow = () => {
   const [menuLoading, setMenuLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
+  // Clear messages on component mount
+  useEffect(() => {
+    dispatch(setMessage({ message: "", type: "" }));
+  }, [dispatch]);
+
   useEffect(() => {
     const loadMenu = async () => {
       setMenuLoading(true);

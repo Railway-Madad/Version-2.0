@@ -41,7 +41,7 @@ const LostFoundView = () => {
   useEffect(() => {
     loadItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, token, apiBase]);
+  }, [filter, isAuthenticated, apiBase]);
 
   return (
     <main className="page-shell fade-in">

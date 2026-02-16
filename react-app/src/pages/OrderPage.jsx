@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 import PageHeader from "../components/common/PageHeader";
 import MessageBanner from "../components/common/MessageBanner";
 import useOrderFlow from "../hooks/useOrderFlow";
 
 const OrderPage = () => {
+  const cartRef = useRef(null);
   const {
     state: { cart, address, notes, message, messageType, orders, menuItems },
     status: { menuLoading, ordersLoading, total },
@@ -18,7 +20,12 @@ const OrderPage = () => {
     },
   } = useOrderFlow();
 
+  const scrollToCart = () => {
+    cartRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
+    <>
     <main className="page-shell fade-in">
       <section className="surface-card card-highlight">
         <PageHeader
@@ -27,127 +34,126 @@ const OrderPage = () => {
           actions={<Link className="btn btn-ghost" to="/userDashboard">Back to Dashboard</Link>}
         />
         <div className="divider"></div>
-        <div className="content-grid two-column">
-          <article className="surface-card compact">
-            <h3>Menu</h3>
-            {menuLoading ? (
-              <p className="muted-text">Loading menu...</p>
-            ) : menuItems.length === 0 ? (
-              <p className="muted-text">No menu items available right now.</p>
-            ) : (
-              <ul className="menu-grid" style={{ listStyle: 'none', padding: 0 }}>
-                {menuItems.map((food) => (
-                  <li key={food._id} className="menu-card">
-                    <img className="menu-card__image" src={food.imageUrl} alt={food.name} />
-                    <div className="menu-card__body">
-                      <div className="stack" style={{ gap: '0.5rem' }}>
-                        <h4>{food.name}</h4>
-                        <p className="muted-text text-sm">{food.description}</p>
-                      </div>
-                      <div className="actions-inline" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                        <span className="menu-card__price">₹{food.price}</span>
-                        <button className="btn btn-sm" onClick={() => handleAddToCart(food)}>
-                          Add
-                        </button>
-                      </div>
+        
+        {/* Menu Section */}
+        <article className="surface-card compact">
+          <h3>Menu</h3>
+          {menuLoading ? (
+            <p className="muted-text">Loading menu...</p>
+          ) : menuItems.length === 0 ? (
+            <p className="muted-text">No menu items available right now.</p>
+          ) : (
+            <ul className="menu-grid" style={{ listStyle: 'none', padding: 0 }}>
+              {menuItems.map((food) => (
+                <li key={food._id} className="menu-card">
+                  <img className="menu-card__image" src={food.imageUrl} alt={food.name} />
+                  <div className="menu-card__body">
+                    <div className="stack" style={{ gap: '0.5rem' }}>
+                      <h4>{food.name}</h4>
+                      <p className="muted-text text-sm">{food.description}</p>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
+                    <div className="actions-inline" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                      <span className="menu-card__price">₹{food.price}</span>
+                      <button className="btn btn-sm" onClick={() => handleAddToCart(food)}>
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
 
-          <article className="surface-card compact">
-            <h3>Cart</h3>
-            <MessageBanner message={message} type={messageType || "info"} />
-            {cart.length === 0 ? (
-              <p className="muted-text">No items yet. Add from the menu.</p>
-            ) : (
-              <ul className="cart-list" style={{ listStyle: 'none', padding: 0 }}>
-                {cart.map((item, idx) => (
-                  <li key={`${item.foodItem}-${idx}`} className="cart-item">
-                    <div className="cart-item__header">
-                      <h4>{item.name}</h4>
-                      <strong>₹{item.price * item.quantity}</strong>
-                    </div>
-                    <div className="cart-item__meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="muted-text text-sm">₹{item.price} x {item.quantity}</span>
-                      <div className="cart-item__actions">
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          style={{ padding: '0.2rem 0.6rem' }}
-                          onClick={() => handleChangeQty(idx, -1)}
-                        >
-                          -
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          style={{ padding: '0.2rem 0.6rem' }}
-                          onClick={() => handleChangeQty(idx, 1)}
-                        >
-                          +
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm text-danger"
-                          style={{ marginLeft: '0.5rem', color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
-                          onClick={() => handleRemoveItem(idx)}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {cart.length > 0 && (
-              <>
-                <div className="divider"></div>
-                <div className="summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span className="muted-text">Total Amount</span>
-                                   
+        <div className="divider"></div>
 
-                  <strong style={{ fontSize: '1.2rem', color: 'var(--color-primary)' }}>₹{total}</strong>
-                  
+        {/* Cart Section */}
+        <article className="surface-card compact" ref={cartRef}>
+          <h3>Cart</h3>
+          <MessageBanner message={message} type={messageType || "info"} />
+          {cart.length === 0 ? (
+            <p className="muted-text">No items yet. Add from the menu.</p>
+          ) : (
+            <ul className="cart-list" style={{ listStyle: 'none', padding: 0 }}>
+              {cart.map((item, idx) => (
+                <li key={`${item.foodItem}-${idx}`} className="cart-item">
+                  <div className="cart-item__header">
+                    <h4>{item.name}</h4>
+                    <strong>₹{item.price * item.quantity}</strong>
+                  </div>
+                  <div className="cart-item__meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="muted-text text-sm">₹{item.price} x {item.quantity}</span>
+                    <div className="cart-item__actions">
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: '0.2rem 0.6rem' }}
+                        onClick={() => handleChangeQty(idx, -1)}
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: '0.2rem 0.6rem' }}
+                        onClick={() => handleChangeQty(idx, 1)}
+                      >
+                        +
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm text-danger"
+                        style={{ marginLeft: '0.5rem', color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                        onClick={() => handleRemoveItem(idx)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+          {cart.length > 0 && (
+            <>
+              <div className="divider"></div>
+              <div className="summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <span className="muted-text">Total Amount</span>
+                <strong style={{ fontSize: '1.2rem', color: 'var(--color-primary)' }}>₹{total}</strong>
+              </div>
+              <form className="form-grid" onSubmit={placeOrder}>
+                <div className="input-group">
+                  <label htmlFor="address">Delivery Address</label>
+                  <textarea
+                    id="address"
+                    required
+                    rows="2"
+                    placeholder="Enter your full address..."
+                    value={address}
+                    onChange={(e) => updateAddress(e.target.value)}
+                  />
                 </div>
-                <form className="form-grid" onSubmit={placeOrder}>
-                  <div className="input-group">
-                    <label htmlFor="address">Delivery Address</label>
-                    <textarea
-                      id="address"
-                      required
-                      rows="2"
-                      placeholder="Enter your full address..."
-                      value={address}
-                      onChange={(e) => updateAddress(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <label htmlFor="notes">Notes (Optional)</label>
-                    <textarea
-                      id="notes"
-                      rows="1"
-                      placeholder="Any special instructions?"
-                      value={notes}
-                      onChange={(e) => updateNotes(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                                       <span className="muted-text">We only accept cash on delivery</span>
-
-                  </div>
-                  <button className="btn" type="submit" style={{ width: '100%' }}>
-                    Place Order
-                  </button>
-                </form>
-              </>
-            )}
-          </article>
-        </div>
+                <div className="input-group">
+                  <label htmlFor="notes">Notes (Optional)</label>
+                  <textarea
+                    id="notes"
+                    rows="1"
+                    placeholder="Any special instructions?"
+                    value={notes}
+                    onChange={(e) => updateNotes(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <span className="muted-text">We only accept cash on delivery</span>
+                </div>
+                <button className="btn" type="submit" style={{ width: '100%' }}>
+                  Place Order
+                </button>
+              </form>
+            </>
+          )}
+        </article>
 
         <div className="divider"></div>
         <section className="surface-card compact">
@@ -198,6 +204,37 @@ const OrderPage = () => {
         </section>
       </section>
     </main>
+
+    {/* Floating Cart Button - Outside main for proper fixed positioning */}
+    {cart.length > 0 && (
+      <button
+        onClick={scrollToCart}
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          zIndex: 9999,
+          borderRadius: '50px',
+          padding: '1rem 1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          backgroundColor: 'var(--color-primary)',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          fontWeight: '600',
+          fontSize: '1rem',
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        Cart ({cart.length}) - ₹{total}
+      </button>
+    )}
+    </>
   );
 };
 

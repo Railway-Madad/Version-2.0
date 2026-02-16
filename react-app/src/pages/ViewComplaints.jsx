@@ -79,6 +79,35 @@ const ViewComplaints = () => {
     }
   };
 
+  const handleSatisfaction = async (id, satisfied) => {
+    try {
+      const res = await fetch(`${apiBase}/complaint/api/complaints/${id}/satisfaction`, {
+        method: "PUT",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ satisfied }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Failed to submit feedback");
+      }
+      const data = await res.json();
+      alert(data.message);
+      // Refresh complaints list
+      setComplaints((prev) =>
+        prev.map((c) =>
+          c._id === id
+            ? { ...c, status: satisfied ? "Resolved" : "Pending" }
+            : c
+        )
+      );
+    } catch (err) {
+      alert(`Feedback failed: ${err.message}`);
+    }
+  };
+
   const tableRows = useMemo(() => {
     if (!complaints.length) return null;
     return complaints.map((c) => {
@@ -99,6 +128,10 @@ const ViewComplaints = () => {
         buttonColor = "#13b013ff";
         progressBarColor = "#13b013ff";
         progressWidth = 100;
+      } else if (displayStatus === "AwaitingConfirmation") {
+        buttonColor = "#f59e0b";
+        progressBarColor = "#f59e0b";
+        progressWidth = 90;
       } else if (displayStatus === "Important") {
         buttonColor = "#f8f8a4ff";
         progressBarColor = "#f8f8a4ff";
@@ -112,6 +145,8 @@ const ViewComplaints = () => {
       const progressCopy =
         displayStatus === "Resolved"
           ? "Complaint resolved - 100% complete"
+          : displayStatus === "AwaitingConfirmation"
+          ? "Staff has resolved - Please confirm your satisfaction"
           : displayStatus === "Important"
           ? "Marked as Important - Requires Immediate Attention"
           : `Progress to Important: ${progressPercent.toFixed(
@@ -130,6 +165,42 @@ const ViewComplaints = () => {
             <td>{c.issueDomain}</td>
             <td>{displayStatus}</td>
             <td>{createdAt ? createdAt.toLocaleString() : ""}</td>
+            <td>
+              {displayStatus === "AwaitingConfirmation" ? (
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    style={{
+                      backgroundColor: "#22c55e",
+                      color: "#fff",
+                      border: "none",
+                      padding: "8px 16px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                    onClick={() => handleSatisfaction(c._id, true)}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    style={{
+                      backgroundColor: "#ef4444",
+                      color: "#fff",
+                      border: "none",
+                      padding: "8px 16px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                    onClick={() => handleSatisfaction(c._id, false)}
+                  >
+                    No
+                  </button>
+                </div>
+              ) : (
+                <span style={{ color: "#888" }}>—</span>
+              )}
+            </td>
             <td>
               <button
                 className="delete-btn"
@@ -157,7 +228,7 @@ const ViewComplaints = () => {
             </td>
           </tr>
           <tr>
-            <td colSpan="7" style={{ padding: "0 8px 12px 8px" }}>
+            <td colSpan="8" style={{ padding: "0 8px 12px 8px" }}>
               <div
                 style={{
                   background: "#e0e0e0",
@@ -225,19 +296,20 @@ const ViewComplaints = () => {
                   <th>Issue Domain</th>
                   <th>Status</th>
                   <th>Created At</th>
+                  <th>Satisfaction</th>
                   <th>Action</th>
                 </tr>
               </thead>
               {loading ? (
                 <tbody>
                   <tr>
-                    <td colSpan="7">Loading complaints...</td>
+                    <td colSpan="8">Loading complaints...</td>
                   </tr>
                 </tbody>
               ) : complaints.length === 0 ? (
                 <tbody>
                   <tr>
-                    <td colSpan="7">No complaints found.</td>
+                    <td colSpan="8">No complaints found.</td>
                   </tr>
                 </tbody>
               ) : (

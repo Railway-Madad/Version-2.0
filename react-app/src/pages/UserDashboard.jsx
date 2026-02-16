@@ -16,17 +16,17 @@ const UserDashboard = () => {
   const { items: newsItems, status: newsStatus } = useSelector(
     (state) => state.news
   );
-  const [welcomeText, setWelcomeText] = useState("Verifying your session...");
+  const [welcomeText, setWelcomeText] = useState("Hello!");
 
   useEffect(() => {
     const loadDashboard = async () => {
       if (!isAuthenticated) return;
-      const res = await fetch(`${apiBase}/`, {
+      const res = await fetch(`${apiBase}/user/profile`, {
         credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
-        setWelcomeText(`Hello, ${data.username || 'User'}!`);
+        setWelcomeText(`Hello, ${data.user?.username || 'User'}!`);
       } else {
         dispatch(clearPassengerToken());
         navigate("/login");

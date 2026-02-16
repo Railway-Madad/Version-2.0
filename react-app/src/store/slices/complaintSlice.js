@@ -32,8 +32,6 @@ const complaintSlice = createSlice({
       state.seatNumber = "";
       state.description = "";
       state.issueDomain = "Cleaning";
-      state.successMessage = "";
-      state.errorMessage = "";
     },
     setUsername(state, action) {
       state.username = action.payload || "";

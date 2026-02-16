@@ -28,7 +28,7 @@ const StaffDashboard = () => {
 
       const resolvedList = await Promise.all(
         complaints
-          .filter((c) => c.status === "Resolved")
+          .filter((c) => c.status === "Resolved" || c.status === "AwaitingConfirmation")
           .map(async (complaint) => {
             if (complaint.resolvedBy) {
               try {
@@ -52,7 +52,7 @@ const StaffDashboard = () => {
       );
 
       setPendingComplaints(
-        complaints.filter((complaint) => complaint.status !== "Resolved")
+        complaints.filter((complaint) => complaint.status !== "Resolved" && complaint.status !== "AwaitingConfirmation")
       );
       setResolvedComplaints(resolvedList);
     } catch (err) {

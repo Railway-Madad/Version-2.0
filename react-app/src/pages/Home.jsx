@@ -20,8 +20,8 @@ const Home = () => {
             )}
           </button>
         </div>
-        <span className="badge">Rail Madad Platform</span>
-        <h1>Experience a faster, calmer way to handle railway support.</h1>
+        <h1>Rail Madad Platform</h1>
+        <h2 className="pl-8">Experience a faster, calmer way to handle railway support.</h2>
         <p>
           Log in based on your role and keep complaints, food services,
           emergencies, and feedback flowing smoothly.

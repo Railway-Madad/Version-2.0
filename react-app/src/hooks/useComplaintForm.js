@@ -15,6 +15,9 @@ export const useComplaintForm = () => {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    // Clear messages on component mount
+    dispatch(setMessages({ successMessage: "", errorMessage: "" }));
+    
     const fetchProfile = async () => {
       if (!isAuthenticated) {
         dispatch(clearPassengerToken());
