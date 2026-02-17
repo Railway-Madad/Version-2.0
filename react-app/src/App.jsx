@@ -24,6 +24,7 @@ import CateringLogin from "./pages/CateringLogin";
 import LostFound from "./pages/LostFound";
 import LostFoundView from "./pages/LostFoundView";
 import ProjectDashboard from "./pages/ProjectDashboard";
+import AdminAnalytics from "./pages/AdminAnalytics";
 
 function App() {
   return (
@@ -159,6 +160,23 @@ function App() {
         element={
           <ProtectedRoute type="admin">
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin-analytics"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-analytics.html"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminAnalytics />
           </ProtectedRoute>
         }
       />
