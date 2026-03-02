@@ -40,7 +40,6 @@ const staffSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    trainNumber: { type: String, required: true },
 });
 
 module.exports = mongoose.model('Staff', staffSchema);
