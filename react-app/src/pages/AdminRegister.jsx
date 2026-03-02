@@ -6,7 +6,6 @@ import { useApi } from "../context/ApiContext";
 const AdminRegister = () => {
   const { apiBase } = useApi();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +18,7 @@ const AdminRegister = () => {
     setMessage("");
     setIsError(false);
 
-    if (!name || !username || !email || !password || !trainNo) {
+    if (!username || !email || !password || !trainNo) {
       setMessage("All fields including train number are required.");
       setIsError(true);
       return;
@@ -27,7 +26,6 @@ const AdminRegister = () => {
 
     try {
       const res = await axios.post(`${apiBase}/admin/register`, {
-        name,
         username,
         email,
         password,
@@ -36,10 +34,10 @@ const AdminRegister = () => {
         withCredentials: true
       });
       const data = res.data;
-      if (data.success) {
+      if (res.status === 201) {
         setMessage(data.message || "Admin registered successfully!");
         setIsError(false);
-        setTimeout(() => navigate("/adminlogin"), 500);
+        setTimeout(() => navigate("/adminlogin"), 1500);
       } else {
         setMessage(data.message || "Registration failed.");
         setIsError(true);
@@ -68,18 +66,6 @@ const AdminRegister = () => {
         </div>
 
         <form className="form-grid" onSubmit={register}>
-          <div className="input-group">
-            <label htmlFor="name">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Admin name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
           <div className="input-group">
             <label htmlFor="username">Username</label>
             <input

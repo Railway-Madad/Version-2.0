@@ -49,8 +49,8 @@ const login = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        if (!username || !password || !trainNo) {
-            return res.status(400).json({ message: "Username, password, and train number are required" });
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required" });
         }
 
         const parsedBody = loginSchema.parse({ username, password });

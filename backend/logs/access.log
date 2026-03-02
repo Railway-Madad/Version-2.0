@@ -669,3 +669,10 @@
 ::ffff:127.0.0.1 - - [02/Mar/2026:17:15:45 +0000] "GET /catering/all-orders HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 385.005 ms
 ::ffff:127.0.0.1 - - [02/Mar/2026:17:15:47 +0000] "GET /admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 50.031 ms
 ::ffff:127.0.0.1 - - [02/Mar/2026:17:15:48 +0000] "GET /admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 330.962 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:46:21 +0000] "GET /admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 94.148 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:46:21 +0000] "GET /admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 43.356 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:46:48 +0000] "POST /admin/login HTTP/1.1" 200 96 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 356.798 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:46:49 +0000] "GET /admin/dashboard-stats HTTP/1.1" 200 120 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 66.933 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:46:49 +0000] "GET /admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 91.717 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:47:00 +0000] "GET /api/trains HTTP/1.1" 200 310 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 43.879 ms
+::ffff:127.0.0.1 - - [02/Mar/2026:17:47:00 +0000] "GET /api/trains HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" - 67.945 ms
