@@ -13,6 +13,7 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const { items: newsItems, status: newsStatus } = useSelector(
     (state) => state.news
   );
@@ -107,6 +108,18 @@ const UserDashboard = () => {
             <h1>Passenger Dashboard</h1>
             <p id="welcome" className="muted-text">
               {welcomeText}
+            </p>
+            <p style={{
+              display: "inline-block",
+              backgroundColor: "#E3F2FD",
+              color: "#1565C0",
+              padding: "4px 10px",
+              borderRadius: "4px",
+              fontSize: "13px",
+              fontWeight: "500",
+              marginTop: "8px"
+            }}>
+              🚆 Train: {passengerTrainNo || "N/A"}
             </p>
           </div>
           <div

@@ -7,6 +7,7 @@ const LostFoundView = () => {
   const { apiBase } = useApi();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const [filter, setFilter] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +93,18 @@ const LostFoundView = () => {
                   {item.title}{" "}
                   <span className="badge-neutral" style={{ fontSize: "13px" }}>
                     {item.category}
+                  </span>
+                  <span style={{
+                    display: "inline-block",
+                    backgroundColor: item.trainNumber === passengerTrainNo ? "#E8F5E9" : "#F3E5F5",
+                    color: item.trainNumber === passengerTrainNo ? "#2E7D32" : "#6A1B9A",
+                    padding: "2px 6px",
+                    borderRadius: "3px",
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                    marginLeft: "8px"
+                  }}>
+                    🚆 {item.trainNumber || "N/A"}
                   </span>
                 </h3>
                 <p className="muted-text">{item.description}</p>

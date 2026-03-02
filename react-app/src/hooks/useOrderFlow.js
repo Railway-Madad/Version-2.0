@@ -53,7 +53,7 @@ export const useOrderFlow = () => {
     const loadOrders = async () => {
       setOrdersLoading(true);
       try {
-        const res = await fetch(`${apiBase}/catering/my-orders`, {
+        const res = await fetch(`${apiBase}/catering/my-orders-history`, {
           credentials: 'include',
         });
         if (res.status === 401) {

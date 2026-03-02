@@ -9,6 +9,7 @@ const ViewComplaints = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const [currentUser, setCurrentUser] = useState(null);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ const ViewComplaints = () => {
       const loadComplaints = async () => {
         try {
           const response = await fetch(
-            `${apiBase}/complaint/api/complaints/user/${currentUser.username}`,
+            `${apiBase}/complaint/my-complaints-history`,
             { credentials: 'include' }
           );
           if (!response.ok) throw new Error("Failed to fetch complaints");
@@ -163,6 +164,18 @@ const ViewComplaints = () => {
             <td>{c.pnr}</td>
             <td>{c.description}</td>
             <td>{c.issueDomain}</td>
+            <td>
+              <span style={{
+                backgroundColor: c.trainNumber === passengerTrainNo ? "#E8F5E9" : "#F3E5F5",
+                color: c.trainNumber === passengerTrainNo ? "#2E7D32" : "#6A1B9A",
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontWeight: 500,
+                fontSize: "12px"
+              }}>
+                🚆 {c.trainNumber || "N/A"}
+              </span>
+            </td>
             <td>{displayStatus}</td>
             <td>{createdAt ? createdAt.toLocaleString() : ""}</td>
             <td>
@@ -264,7 +277,7 @@ const ViewComplaints = () => {
         </tbody>
       );
     });
-  }, [complaints]);
+  }, [complaints, passengerTrainNo]);
 
   return (
     <main className="page-shell fade-in">
@@ -294,6 +307,7 @@ const ViewComplaints = () => {
                   <th>PNR</th>
                   <th>Description</th>
                   <th>Issue Domain</th>
+                  <th>Train Number</th>
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Satisfaction</th>
@@ -303,13 +317,13 @@ const ViewComplaints = () => {
               {loading ? (
                 <tbody>
                   <tr>
-                    <td colSpan="8">Loading complaints...</td>
+                    <td colSpan="9">Loading complaints...</td>
                   </tr>
                 </tbody>
               ) : complaints.length === 0 ? (
                 <tbody>
                   <tr>
-                    <td colSpan="8">No complaints found.</td>
+                    <td colSpan="9">No complaints found.</td>
                   </tr>
                 </tbody>
               ) : (

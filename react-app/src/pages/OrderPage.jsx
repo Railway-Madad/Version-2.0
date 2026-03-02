@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
 import PageHeader from "../components/common/PageHeader";
 import MessageBanner from "../components/common/MessageBanner";
 import useOrderFlow from "../hooks/useOrderFlow";
 
 const OrderPage = () => {
   const cartRef = useRef(null);
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const {
     state: { cart, address, notes, message, messageType, orders, menuItems },
     status: { menuLoading, ordersLoading, total },
@@ -35,7 +37,25 @@ const OrderPage = () => {
         />
         <div className="divider"></div>
         
-        {/* Menu Section */}
+        {/* Train Information Banner for Order Placement */}
+        <div style={{
+          backgroundColor: "#E3F2FD",
+          border: "2px solid #2196F3",
+          borderRadius: "8px",
+          padding: "12px 16px",
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px"
+        }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#2196F3" style={{ flexShrink: 0 }}>
+            <path d="M18 8h-1V4c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v4H6c-2.76 0-5 2.24-5 5v9c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-9c0-2.76-2.24-5-5-5zm-11 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6-8h4v4h-4V7zm6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+          </svg>
+          <div>
+            <strong style={{ color: "#1565C0", fontSize: "16px" }}>Ordering for Train: {passengerTrainNo || "N/A"}</strong>
+            <p style={{ margin: "4px 0 0 0", color: "#555", fontSize: "14px" }}>Your food order will be delivered to this train</p>
+          </div>
+        </div>
         <article className="surface-card compact">
           <h3>Menu</h3>
           {menuLoading ? (
@@ -173,6 +193,18 @@ const OrderPage = () => {
                       <div>
                         <h4>Order #{order._id}</h4>
                         <p className="muted-text">{new Date(order.createdAt).toLocaleString()}</p>
+                        <span style={{
+                          display: "inline-block",
+                          backgroundColor: order.trainNumber === passengerTrainNo ? "#E8F5E9" : "#F3E5F5",
+                          color: order.trainNumber === passengerTrainNo ? "#2E7D32" : "#6A1B9A",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          marginTop: "4px"
+                        }}>
+                          🚆 Train: {order.trainNumber || "N/A"}
+                        </span>
                         {order.status === "out for delivery" && (
   <p style={{ color: "green", fontWeight: "bold" }}>
     Delivery OTP: {order.otp}
