@@ -25,6 +25,10 @@ import LostFound from "./pages/LostFound";
 import LostFoundView from "./pages/LostFoundView";
 import ProjectDashboard from "./pages/ProjectDashboard";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminStaff from "./pages/AdminStaff";
+import AdminComplaints from "./pages/AdminComplaints";
+import AdminOrders from "./pages/AdminOrders";
+import AdminTrains from "./pages/AdminTrains";
 
 function App() {
   return (
@@ -177,6 +181,39 @@ function App() {
         element={
           <ProtectedRoute type="admin">
             <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin-staff"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminStaff />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-complaints"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminComplaints />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-orders"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminOrders />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-trains"
+        element={
+          <ProtectedRoute type="admin">
+            <AdminTrains />
           </ProtectedRoute>
         }
       />

@@ -35,3 +35,6 @@
 ::ffff:127.0.0.1 - [02/Mar/2026:14:03:59 +0000] "GET /complaint/api/complaintsRES" 401 "-" - 1.461 ms
 ::ffff:127.0.0.1 - [02/Mar/2026:14:11:02 +0000] "GET /complaint/api/complaintsRES" 401 "-" - 0.303 ms
 ::ffff:127.0.0.1 - [02/Mar/2026:14:11:02 +0000] "GET /complaint/api/complaintsRES" 401 "-" - 0.243 ms
+::ffff:127.0.0.1 - [02/Mar/2026:14:41:14 +0000] "GET /complaint/api/complaintsRES" 401 "-" - 0.221 ms
+::ffff:127.0.0.1 - [02/Mar/2026:14:41:14 +0000] "GET /complaint/api/complaintsRES" 401 "-" - 0.121 ms
+::ffff:127.0.0.1 - [02/Mar/2026:15:41:41 +0000] "GET /admin/dashboard-stats" 404 "-" - 6.022 ms

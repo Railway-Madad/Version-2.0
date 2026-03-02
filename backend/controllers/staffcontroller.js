@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { z, email } = require('zod');
 const Complaint = require('../models/complaintModel');
 const complaintModel = require('../models/complaintModel');
+const commandModel = require('../models/commandModel');
 const { setAuthCookie, clearAuthCookie } = require('../utils/cookieHelper');
 
 const registerSchema = z.object({
@@ -18,8 +19,8 @@ const registerSchema = z.object({
     }),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
-    phone: z.string().min(10, "Phone number must be at least 10 digits long")
-
+    phone: z.string().min(10, "Phone number must be at least 10 digits long"),
+    trainNumber: z.string().min(1, "Train number is required")
 });
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -32,14 +33,14 @@ const register = async (req, res) => {
         return res.status(400).json({ errors: parsedBody.error.errors });
     }
     try {
-        const { name, role, email, password, phone } = parsedBody.data;
+        const { name, role, email, password, phone, trainNumber } = parsedBody.data;
         const existingStaff = await staffModel.findOne({ email });
         if (existingStaff) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newStaff = await staffModel.create({ name, role, email, password: hashedPassword, phone });
+        const newStaff = await staffModel.create({ name, role, email, password: hashedPassword, phone, trainNumber });
         res.status(201).json({ message: "Staff registered successfully", staffId: newStaff._id });
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -173,6 +174,36 @@ const logout = async (req, res) => {
     }
 };
 
+// ── GET commands/notices for the logged-in staff ──
+const getMyCommands = async (req, res) => {
+    try {
+        const staffId = req.staffId;
+        const commands = await commandModel.find({ staffId })
+            .sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: commands });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// ── Mark a command as read ──
+const markCommandRead = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const command = await commandModel.findOneAndUpdate(
+            { _id: id, staffId: req.staffId },
+            { isRead: true },
+            { new: true }
+        );
+        if (!command) {
+            return res.status(404).json({ success: false, message: "Command not found" });
+        }
+        res.status(200).json({ success: true, data: command });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -180,5 +211,7 @@ module.exports = {
     getProfile,
     getComplaints,
     resolveComplaint,
-    getStaffById
+    getStaffById,
+    getMyCommands,
+    markCommandRead
 };

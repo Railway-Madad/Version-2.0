@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useApi } from "../context/ApiContext";
@@ -11,15 +11,29 @@ const StaffRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [trainNumber, setTrainNumber] = useState("");
+  const [trains, setTrains] = useState([]);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    const fetchTrains = async () => {
+      try {
+        const res = await axios.get(`${apiBase}/api/trains`);
+        if (res.data.success) setTrains(res.data.data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchTrains();
+  }, [apiBase]);
 
   const register = async (e) => {
     e.preventDefault();
     setMessage("");
     setIsError(false);
 
-    if (!name || !role || !email || !password || !phone) {
+    if (!name || !role || !email || !password || !phone || !trainNumber) {
       setMessage("Please fill in all fields.");
       setIsError(true);
       return;
@@ -32,6 +46,7 @@ const StaffRegister = () => {
         email,
         password,
         phone,
+        trainNumber,
       }, {
         withCredentials: true
       });
@@ -132,6 +147,20 @@ const StaffRegister = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
+          </div>
+          <div className="input-group">
+            <label htmlFor="trainNumber">Train Number</label>
+            <select
+              id="trainNumber"
+              required
+              value={trainNumber}
+              onChange={(e) => setTrainNumber(e.target.value)}
+            >
+              <option value="" disabled>Select Train</option>
+              {trains.map((t) => (
+                <option key={t.id} value={t.trainNumber}>{t.trainNumber}</option>
+              ))}
+            </select>
           </div>
           <button className="btn" type="submit">
             Register Staff Account

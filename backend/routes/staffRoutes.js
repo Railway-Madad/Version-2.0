@@ -18,6 +18,9 @@ staffRouter.put('/complaints/:id/resolve', staffAuthentication, staffController.
 staffRouter.get('/profile', staffAuthentication, staffController.getProfile);
 //get staff name by id
 staffRouter.get('/getname/:id', staffAuthentication, staffController.getStaffById);
+// Commands / notices from admin
+staffRouter.get('/commands', staffAuthentication, staffController.getMyCommands);
+staffRouter.put('/commands/:id/read', staffAuthentication, staffController.markCommandRead);
 staffRouter.get('/test', (req, res) => {
     res.send("Staff route is working in backend");
 });

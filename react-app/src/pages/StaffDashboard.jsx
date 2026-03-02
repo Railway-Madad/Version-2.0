@@ -16,6 +16,8 @@ const StaffDashboard = () => {
   const [pendingComplaints, setPendingComplaints] = useState([]);
   const [resolvedComplaints, setResolvedComplaints] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [commands, setCommands] = useState([]);
+  const [showCommands, setShowCommands] = useState(false);
 
   const fetchComplaints = useCallback(async () => {
     try {
@@ -61,6 +63,17 @@ const StaffDashboard = () => {
     }
   }, [apiBase, isAuthenticated]);
 
+  const fetchCommands = useCallback(async () => {
+    try {
+      const res = await fetch(`${apiBase}/staff/commands`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success) setCommands(data.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [apiBase]);
+
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -79,8 +92,9 @@ const StaffDashboard = () => {
     if (isAuthenticated) {
       loadProfile();
       fetchComplaints();
+      fetchCommands();
     }
-  }, [apiBase, dispatch, fetchComplaints, navigate, isAuthenticated]);
+  }, [apiBase, dispatch, fetchComplaints, fetchCommands, navigate, isAuthenticated]);
 
   const filteredPending = useMemo(() => {
     const term = searchTerm.toLowerCase();
@@ -137,6 +151,18 @@ const StaffDashboard = () => {
     navigate("/staff_login");
   };
 
+  const markCommandRead = async (id) => {
+    try {
+      await fetch(`${apiBase}/staff/commands/${id}/read`, { method: "PUT", credentials: "include" });
+      fetchCommands();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const unreadCount = commands.filter((c) => !c.isRead).length;
+  const priorityColor = { low: "#4caf50", medium: "#ff9800", high: "#f44336", urgent: "#9c27b0" };
+
   return (
     <main className="page-shell fade-in">
       <section className="surface-card card-highlight">
@@ -168,6 +194,9 @@ const StaffDashboard = () => {
             <Link className="btn btn-ghost" to="/">
               Home
             </Link>
+            <button className="btn btn-tonal" onClick={() => setShowCommands(!showCommands)}>
+              Notices {unreadCount > 0 ? `(${unreadCount} new)` : ""}
+            </button>
             <button className="btn btn-tonal" onClick={logout}>
               Logout
             </button>
@@ -175,6 +204,46 @@ const StaffDashboard = () => {
         </div>
 
         <div className="divider"></div>
+
+        {/* Commands/Notices from Admin */}
+        {showCommands && (
+          <section className="surface-card" style={{ marginBottom: "1.5rem" }}>
+            <h2>Admin Notices &amp; Commands</h2>
+            {commands.length === 0 ? (
+              <p className="muted-text">No notices yet.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {commands.map((cmd) => (
+                  <div
+                    key={cmd._id}
+                    style={{
+                      padding: "1rem",
+                      borderRadius: "8px",
+                      border: cmd.isRead ? "1px solid var(--border)" : "2px solid var(--accent, #2196f3)",
+                      background: cmd.isRead ? "transparent" : "var(--surface-hover, #f5f5f5)",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
+                      <strong>{cmd.title}</strong>
+                      <span style={{ color: priorityColor[cmd.priority] || "#999", fontSize: "0.85rem", fontWeight: 600 }}>
+                        {cmd.priority.toUpperCase()}
+                      </span>
+                    </div>
+                    <p style={{ margin: "0.5rem 0" }}>{cmd.message}</p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <small className="muted-text">{new Date(cmd.createdAt).toLocaleString()}</small>
+                      {!cmd.isRead && (
+                        <button className="btn btn-ghost" style={{ fontSize: "0.8rem" }} onClick={() => markCommandRead(cmd._id)}>
+                          Mark as Read
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <div className="stack">
           <div className="input-group">

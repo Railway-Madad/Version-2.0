@@ -12,69 +12,27 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const isAuthenticated = useSelector((state) => state.auth.isAdminAuthenticated);
+  const adminTrainNo = useSelector((state) => state.auth.adminTrainNo);
 
-  const [complaints, setComplaints] = useState([]);
-  const [importantComplaints, setImportantComplaints] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([
-        loadComplaints(),
-        loadImportantComplaints(),
-      ]);
-      setLoading(false);
-    };
     if (isAuthenticated) {
-      loadData();
+      loadStats();
     }
   }, [isAuthenticated, apiBase]);
 
-  const loadComplaints = async () => {
+  const loadStats = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/complaint/api/complaintsRES`, {
-        credentials: 'include'
-      });
+      const res = await fetch(`${apiBase}/admin/dashboard-stats`, { credentials: 'include' });
       const data = await res.json();
-      setComplaints(Array.isArray(data) ? data : []);
+      if (data.success) setStats(data.data);
     } catch (err) {
-      setComplaints([]);
-    }
-  };
-
-  const loadImportantComplaints = async () => {
-    try {
-      const res = await fetch(`${apiBase}/complaint/api/complaintsIMP`, {
-        credentials: 'include'
-      });
-      const data = await res.json();
-      setImportantComplaints(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setImportantComplaints([]);
-    }
-  };
-
-  const resolveComplaint = async (id) => {
-    const confirmed = window.confirm("Mark this complaint as resolved?");
-    if (!confirmed) return;
-    try {
-      const res = await fetch(`${apiBase}/complaint/api/complaints/resolve/${id}`, {
-        method: "PUT",
-        credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to resolve complaint");
-      }
-      await loadImportantComplaints();
-      await loadComplaints();
-      alert("Complaint resolved successfully");
-    } catch (err) {
-      alert(`Resolve failed: ${err.message}`);
+      console.error("Failed to load stats", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,49 +52,74 @@ const AdminDashboard = () => {
         <div className="page-header">
           <div>
             <h1>Administrator Dashboard</h1>
-            <p id="welcome" className="muted-text">
-              Welcome back, Admin!
+            <p className="muted-text">
+              Train: <strong>{adminTrainNo || stats?.trainNo || "—"}</strong>
             </p>
           </div>
-          <div
-            className="dashboard-actions"
-            style={{
-              display: "flex",
-              gap: "1rem",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="dashboard-actions" style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
             <button className="btn btn-ghost" onClick={toggleTheme} title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
               {theme === "light" ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
               )}
             </button>
-            <Link className="btn btn-ghost" to="/">
-              Home
-            </Link>
-            <Link className="btn btn-tonal" to="/staff_register">
-              Register Staff
-            </Link>
-            <button className="btn btn-tonal" onClick={logout}>
-              Logout
-            </button>
+            <Link className="btn btn-ghost" to="/">Home</Link>
+            <Link className="btn btn-tonal" to="/staff_register">Register Staff</Link>
+            <button className="btn btn-tonal" onClick={logout}>Logout</button>
           </div>
         </div>
 
         <div className="divider"></div>
 
+        {/* Stats Cards */}
+        {loading ? (
+          <p className="muted-text">Loading dashboard…</p>
+        ) : stats ? (
+          <div className="link-grid" style={{ marginBottom: "2rem" }}>
+            <div className="link-tile" style={{ cursor: "default" }}>
+              <strong style={{ fontSize: "2rem" }}>{stats.staffCount}</strong>
+              <span>Staff on Train</span>
+            </div>
+            <div className="link-tile" style={{ cursor: "default" }}>
+              <strong style={{ fontSize: "2rem" }}>{stats.pendingComplaints}</strong>
+              <span>Pending Complaints</span>
+            </div>
+            <div className="link-tile" style={{ cursor: "default" }}>
+              <strong style={{ fontSize: "2rem" }}>{stats.totalComplaints}</strong>
+              <span>Total Complaints</span>
+            </div>
+            <div className="link-tile" style={{ cursor: "default" }}>
+              <strong style={{ fontSize: "2rem" }}>{stats.pendingOrders}</strong>
+              <span>Active Orders</span>
+            </div>
+            <div className="link-tile" style={{ cursor: "default" }}>
+              <strong style={{ fontSize: "2rem" }}>{stats.totalOrders}</strong>
+              <span>Total Orders</span>
+            </div>
+          </div>
+        ) : null}
+
         <h2 className="card-section-title">Control Centre</h2>
-        <p>Manage railway operations and keep every passenger interaction on track.</p>
+        <p>Manage all operations for your train from one place.</p>
 
         <div className="link-grid">
+          <Link className="link-tile" to="/admin-staff">
+            <strong>Staff Management</strong>
+            <span>View, edit & send commands to staff on your train</span>
+          </Link>
+          <Link className="link-tile" to="/admin-complaints">
+            <strong>Train Complaints</strong>
+            <span>View and resolve complaints for your train</span>
+          </Link>
+          <Link className="link-tile" to="/admin-orders">
+            <strong>Catering Orders</strong>
+            <span>Track all food orders on your train</span>
+          </Link>
+          <Link className="link-tile" to="/admin-trains">
+            <strong>Train Management</strong>
+            <span>Add new train numbers to the system</span>
+          </Link>
           <Link className="link-tile" to="/foodadmin">
             <strong>Food Menu Management</strong>
             <span>Update offerings, track orders, and analyse performance</span>
@@ -151,7 +134,7 @@ const AdminDashboard = () => {
           </Link>
           <Link className="link-tile" to="/emergency-admin">
             <strong>Emergency Management</strong>
-            <span>see all emergencies</span>
+            <span>See all emergencies</span>
           </Link>
           <Link className="link-tile" to="/dashboard">
             <strong>Operations Dashboard</strong>
