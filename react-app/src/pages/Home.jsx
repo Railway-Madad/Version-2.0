@@ -66,10 +66,10 @@ const Home = () => {
               <strong>Admin Login</strong>
               <span>Manage operations and insights</span>
             </Link>
-            <Link className="link-tile" to="/adminregister">
+            {/* <Link className="link-tile" to="/adminregister">
               <strong>Admin Register</strong>
               <span>Onboard a new administrator</span>
-            </Link>
+            </Link> */}
           </div>
         </article>
 
@@ -84,10 +84,10 @@ const Home = () => {
               <strong>Staff Login</strong>
               <span>Continue where you left off</span>
             </Link>
-            <Link className="link-tile" to="/staff_register">
+            {/* <Link className="link-tile" to="/staff_register">
               <strong>Staff Register</strong>
               <span>Request a new staff account</span>
-            </Link>
+            </Link> */}
           </div>
         </article>
 
