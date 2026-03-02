@@ -98,14 +98,17 @@ const getProfile = async (req, res) => {
 const getComplaints = async (req, res) => {
     try {
         const staffId = req.staffId;
+        const trainNo = req.trainNo;
         const staff = await staffModel.findById(staffId);
         if (!staff) {
             return res.status(404).json({ message: "Staff not found" });
         }
 
-        // Fetch complaints assigned to the staff's role from complaintModel using issueDomain fields ie 
-
-        const complaints = await Complaint.find({ issueDomain: staff.role}).sort({ createdAt: -1 });
+        // Fetch complaints assigned to the staff's role AND train number
+        const complaints = await Complaint.find({ 
+            issueDomain: staff.role,
+            trainNumber: trainNo 
+        }).sort({ createdAt: -1 });
         
         res.status(200).json({ complaints });
     } catch (error) {
