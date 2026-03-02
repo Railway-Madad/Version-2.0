@@ -107,6 +107,7 @@ const placeOrder = async (req, res) => {
       deliveryAddress,
       notes,
       otp,
+      trainNumber: req.trainNo, // Store trainNumber for filtering
     });
 
     res.status(201).json({ success: true, data: newOrder });
@@ -120,7 +121,7 @@ const placeOrder = async (req, res) => {
 
 const getAllCateringOrders = async (req, res) => {
   try {
-    const orders = await Catering.find({})
+    const orders = await Catering.find({ trainNumber: req.trainNo })
     .sort({ createdAt: -1 })
       .populate("user", "name email") 
       .populate("items.foodItem", "name price"); 
@@ -141,7 +142,7 @@ const getMyCateringOrders = async (req, res) => {
       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
     }
 
-    const orders = await Catering.find({ user: req.userId })
+    const orders = await Catering.find({ user: req.userId, trainNumber: req.trainNo })
     .sort({ createdAt: -1 })
       .populate("items.foodItem", "name price");
 
@@ -184,9 +185,32 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// Get all user's catering orders across all trains (for historical view)
+const getMyAllCateringOrders = async (req, res) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ success: false, message: "Not authorized, user not found" });
+    }
+
+    const orders = await Catering.find({ user: req.userId })
+    .sort({ createdAt: -1 })
+      .populate("items.foodItem", "name price");
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 module.exports = {
   placeOrder,
   getAllCateringOrders,
   getMyCateringOrders,
+  getMyAllCateringOrders,
   updateOrderStatus,
 };

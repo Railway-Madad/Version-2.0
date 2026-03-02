@@ -51,7 +51,14 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = loginSchema.parse(req.body);
+        const { email, password, trainNo } = req.body;
+        
+        // Validate required fields
+        if (!email || !password || !trainNo) {
+            return res.status(400).json({ message: "Email, password, and train number are required" });
+        }
+
+        const parsedBody = loginSchema.parse({ email, password });
 
         const staff = await staffModel.findOne({ email });
         if (!staff) {
@@ -63,9 +70,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        const token = jwt.sign({ staffId: staff._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ staffId: staff._id, trainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
         setAuthCookie(res, 'staffToken', token);
-        res.status(200).json({ message: "Login successful", staff: { staffId: staff._id, email: staff.email, role: staff.role } });
+        res.status(200).json({ message: "Login successful", staff: { staffId: staff._id, email: staff.email, role: staff.role, trainNo } });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });

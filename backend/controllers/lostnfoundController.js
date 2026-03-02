@@ -50,6 +50,7 @@ const addItem = async (req, res) => {
             location,
             contactInfo: user.email,
             imageUrl,
+            trainNumber: req.trainNo, // Store trainNumber for filtering
         });
 
         res.status(201).json({ success: true, data: newItem });
@@ -61,7 +62,7 @@ const addItem = async (req, res) => {
 
 const getAllItems = async (req, res) => {
   try {
-    const items = await LostFound.find({}).sort({ createdAt: -1 });
+    const items = await LostFound.find({ trainNumber: req.trainNo }).sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: items.length, items });
   } catch (err) {
     console.error(err);
@@ -122,7 +123,7 @@ const markAsResolved = async (req, res) => {
 const getUserItems = async (req, res) => {
     const userId = req.userId;
     try {
-        const items = await LostFound.find({ userId }).sort({ createdAt: -1 });
+        const items = await LostFound.find({ userId, trainNumber: req.trainNo }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: items.length, items });
     } catch (err) {
         console.error(err);

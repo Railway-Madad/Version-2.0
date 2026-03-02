@@ -38,6 +38,7 @@ const lostFoundSchema = new Schema(
         imageUrl: {
             type: String, // optional: store image URL or file path
         },
+        trainNumber: { type: String, required: true },
         status: {
             type: String,
             enum: ["Open", "Resolved"],
