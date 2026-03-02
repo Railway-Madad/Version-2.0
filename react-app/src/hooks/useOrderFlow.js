@@ -130,7 +130,7 @@ export const useOrderFlow = () => {
       dispatch(setMessage({ message: "Order placed successfully!", type: "success" }));
       dispatch(resetCart());
       // refresh orders
-      const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
+      const ordersRes = await fetch(`${apiBase}/catering/my-orders-history`, {
         credentials: 'include',
       });
       if (ordersRes.ok) {
@@ -161,7 +161,7 @@ export const useOrderFlow = () => {
       }
       dispatch(setMessage({ message: "Order cancelled successfully!", type: "success" }));
       // refresh orders
-      const ordersRes = await fetch(`${apiBase}/catering/my-orders`, {
+      const ordersRes = await fetch(`${apiBase}/catering/my-orders-history`, {
         credentials: 'include',
       });
       if (ordersRes.ok) {

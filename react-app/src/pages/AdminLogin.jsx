@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,48 +11,26 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [trainNo, setTrainNo] = useState("");
   const [message, setMessage] = useState("");
-  const [trains, setTrains] = useState([]);
-  const [loadingTrains, setLoadingTrains] = useState(false);
-
-  useEffect(() => {
-    fetchTrains();
-  }, []);
-
-  const fetchTrains = async () => {
-    try {
-      setLoadingTrains(true);
-      const res = await axios.get(`${apiBase}/api/trains`);
-      if (res.data.success) {
-        setTrains(res.data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching trains:", error);
-    } finally {
-      setLoadingTrains(false);
-    }
-  };
 
   const login = async (e) => {
     e.preventDefault();
     setMessage("");
-    if (!username || !password || !trainNo) {
-      setMessage("Please fill in all fields including train number.");
+    if (!username || !password) {
+      setMessage("Please fill in all fields.");
       return;
     }
     try {
       const res = await axios.post(`${apiBase}/admin/login`, {
         username,
         password,
-        trainNo,
       }, {
         withCredentials: true
       });
       const data = res.data;
       if (res.status === 200) {
         dispatch(setAdminToken("authenticated"));
-        dispatch(setAdminTrainNo(trainNo));
+        dispatch(setAdminTrainNo(data.admin.trainNo));
         navigate("/admindashboard");
       } else {
         setMessage(data.message || "Invalid username or password.");
@@ -103,25 +81,6 @@ const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-          </div>
-          <div className="input-group">
-            <label htmlFor="trainNo">Train Number</label>
-            <select
-              id="trainNo"
-              value={trainNo}
-              onChange={(e) => setTrainNo(e.target.value)}
-              required
-              disabled={loadingTrains}
-            >
-              <option value="">
-                {loadingTrains ? "Loading trains..." : "Select a train"}
-              </option>
-              {trains.map((train) => (
-                <option key={train.id} value={train.trainNumber}>
-                  {train.trainNumber}
-                </option>
-              ))}
-            </select>
           </div>
           <button className="btn" type="submit">
             Sign In

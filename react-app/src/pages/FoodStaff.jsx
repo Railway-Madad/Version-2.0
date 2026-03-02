@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useApi } from "../context/ApiContext";
@@ -6,6 +6,7 @@ import { useApi } from "../context/ApiContext";
 const FoodStaff = () => {
   const { apiBase } = useApi();
   const isAuthenticated = useSelector((state) => state.auth.isStaffAuthenticated);
+  const staffTrainNo = useSelector((state) => state.auth.staffTrainNo);
   const [role, setRole] = useState("chef");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,13 +26,28 @@ const FoodStaff = () => {
         return;
       }
       let filtered = data.data || [];
-      if (role === "chef") {
-        filtered = filtered.filter((o) => o.status === "pending");
-      } else if (role === "manager") {
-        filtered = filtered.filter((o) => o.status === "preparing");
-      } else if (role === "distributor") {
-        filtered = filtered.filter((o) => o.status === "out for delivery");
+      console.log("All orders:", filtered);
+      console.log("Staff Train No:", staffTrainNo);
+      
+      // Filter by staff's assigned train
+      filtered = filtered.filter((o) => {
+        console.log(`Comparing order train ${o.trainNumber} with staff train ${staffTrainNo}`);
+        return String(o.trainNumber) === String(staffTrainNo);
+      });
+      
+      console.log("Filtered by train:", filtered);
+      
+      if (role !== "all") {
+        if (role === "chef") {
+          filtered = filtered.filter((o) => o.status === "pending");
+        } else if (role === "manager") {
+          filtered = filtered.filter((o) => o.status === "preparing");
+        } else if (role === "distributor") {
+          filtered = filtered.filter((o) => o.status === "out for delivery");
+        }
       }
+      
+      console.log("Final filtered orders:", filtered);
       setOrders(filtered);
     } catch (err) {
       setError("Failed to load orders.");
@@ -40,6 +56,12 @@ const FoodStaff = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated && staffTrainNo) {
+      loadOrders();
+    }
+  }, [isAuthenticated, staffTrainNo, role]);
 
   const updateStatus = async (orderId, status) => {
     try {
@@ -72,6 +94,18 @@ const FoodStaff = () => {
             <p className="muted-text">
               Filter orders based on your role and keep passengers nourished right on
               time.
+            </p>
+            <p style={{
+              display: "inline-block",
+              backgroundColor: "#E3F2FD",
+              color: "#1565C0",
+              padding: "4px 10px",
+              borderRadius: "4px",
+              fontSize: "13px",
+              fontWeight: "500",
+              marginTop: "8px"
+            }}>
+              🚆 Train: {staffTrainNo || "N/A"}
             </p>
           </div>
           <Link className="btn btn-ghost" to="/" style={{ marginLeft: "0.5rem" }}>
@@ -132,6 +166,18 @@ const FoodStaff = () => {
                       <p className="muted-text">
                         Customer email: ({order.user?.email || ""})
                       </p>
+                      <span style={{
+                        display: "inline-block",
+                        backgroundColor: "#E8F5E9",
+                        color: "#2E7D32",
+                        padding: "2px 6px",
+                        borderRadius: "3px",
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        marginTop: "4px"
+                      }}>
+                        🚆 Train: {order.trainNumber || "N/A"}
+                      </span>
                     </div>
                     <span className={statusClass}>{order.status}</span>
                   </div>

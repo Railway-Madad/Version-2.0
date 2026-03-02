@@ -10,6 +10,7 @@ const AdminRegister = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [trainNo, setTrainNo] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
@@ -18,8 +19,8 @@ const AdminRegister = () => {
     setMessage("");
     setIsError(false);
 
-    if (!name || !username || !email || !password) {
-      setMessage("All fields are required.");
+    if (!name || !username || !email || !password || !trainNo) {
+      setMessage("All fields including train number are required.");
       setIsError(true);
       return;
     }
@@ -30,6 +31,7 @@ const AdminRegister = () => {
         username,
         email,
         password,
+        trainNo,
       }, {
         withCredentials: true
       });
@@ -112,6 +114,18 @@ const AdminRegister = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="trainNo">Train Number</label>
+            <input
+              type="text"
+              id="trainNo"
+              name="trainNo"
+              placeholder="e.g., 1234567890"
+              required
+              value={trainNo}
+              onChange={(e) => setTrainNo(e.target.value)}
             />
           </div>
           <button className="btn" type="submit">

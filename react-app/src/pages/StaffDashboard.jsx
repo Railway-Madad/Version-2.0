@@ -12,6 +12,7 @@ const StaffDashboard = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const isAuthenticated = useSelector((state) => state.auth.isStaffAuthenticated);
+  const staffTrainNo = useSelector((state) => state.auth.staffTrainNo);
   const [staff, setStaff] = useState(null);
   const [pendingComplaints, setPendingComplaints] = useState([]);
   const [resolvedComplaints, setResolvedComplaints] = useState([]);
@@ -174,6 +175,18 @@ const StaffDashboard = () => {
             <p id="welcome" className="muted-text">
               {staff ? `Hello, ${staff.name}!` : "Authenticating your profile..."}
             </p>
+            <p style={{
+              display: "inline-block",
+              backgroundColor: "#E3F2FD",
+              color: "#1565C0",
+              padding: "4px 10px",
+              borderRadius: "4px",
+              fontSize: "13px",
+              fontWeight: "500",
+              marginTop: "8px"
+            }}>
+              🚆 Train: {staffTrainNo || "N/A"}
+            </p>
           </div>
           <div
             className="dashboard-actions"
@@ -278,6 +291,7 @@ const StaffDashboard = () => {
                 <th>Complaint Image</th>
                 <th>Username</th>
                 <th>PNR</th>
+                <th>Train Number</th>
                 <th>Description</th>
                 <th>Issue Domain</th>
                 <th>Status</th>
@@ -288,7 +302,7 @@ const StaffDashboard = () => {
             <tbody id="complaints-table-body">
               {filteredPending.length === 0 ? (
                 <tr>
-                  <td colSpan="8">No pending complaints</td>
+                  <td colSpan="9">No pending complaints</td>
                 </tr>
               ) : (
                 filteredPending.map((complaint) => (
@@ -302,6 +316,17 @@ const StaffDashboard = () => {
                     </td>
                     <td>{complaint.username}</td>
                     <td>{complaint.pnr}</td>
+                    <td><span style={{
+                      display: "inline-block",
+                      backgroundColor: "#E8F5E9",
+                      color: "#2E7D32",
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      fontSize: "11px",
+                      fontWeight: "bold"
+                    }}>
+                      🚆 {complaint.trainNumber || "N/A"}
+                    </span></td>
                     <td>{complaint.description}</td>
                     <td>{complaint.issueDomain}</td>
                     <td>{complaint.status}</td>
@@ -339,6 +364,7 @@ const StaffDashboard = () => {
                 <th>Complaint Image</th>
                 <th>Username</th>
                 <th>PNR</th>
+                <th>Train Number</th>
                 <th>Description</th>
                 <th>Issue Domain</th>
                 <th>Status</th>
@@ -349,7 +375,7 @@ const StaffDashboard = () => {
             <tbody id="resolved-complaints-table-body">
               {filteredResolved.length === 0 ? (
                 <tr>
-                  <td colSpan="8">No resolved complaints</td>
+                  <td colSpan="9">No resolved complaints</td>
                 </tr>
               ) : (
                 filteredResolved.map((complaint) => (
@@ -363,6 +389,17 @@ const StaffDashboard = () => {
                     </td>
                     <td>{complaint.username}</td>
                     <td>{complaint.pnr}</td>
+                    <td><span style={{
+                      display: "inline-block",
+                      backgroundColor: "#E8F5E9",
+                      color: "#2E7D32",
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      fontSize: "11px",
+                      fontWeight: "bold"
+                    }}>
+                      🚆 {complaint.trainNumber || "N/A"}
+                    </span></td>
                     <td>{complaint.description}</td>
                     <td>{complaint.issueDomain}</td>
                     <td>{complaint.status}</td>
