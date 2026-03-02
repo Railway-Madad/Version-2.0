@@ -86,11 +86,6 @@ const AdminLogin = () => {
             Sign In
           </button>
         </form>
-
-        <p className="form-meta">
-          Need an account?{" "}
-          <Link to="/adminregister">Register a new administrator</Link>
-        </p>
         {message ? <p className="message error">{message}</p> : null}
       </section>
     </main>
