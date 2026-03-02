@@ -122,6 +122,9 @@ const AdminDashboard = () => {
             <Link className="btn btn-ghost" to="/">
               Home
             </Link>
+            <Link className="btn btn-tonal" to="/staff_register">
+              Register Staff
+            </Link>
             <button className="btn btn-tonal" onClick={logout}>
               Logout
             </button>
@@ -159,89 +162,6 @@ const AdminDashboard = () => {
             <span>Charts, graphs, revenue trends &amp; advanced analytics</span>
           </Link>
         </div>
-      </section>
-
-      <section className="surface-card" style={{ marginTop: "2rem" }}>
-        <h2>Important Complaints</h2>
-        <table
-          id="complaintsTable"
-          style={{
-            display: "table",
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "1rem",
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                PNR
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Description
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Bogie
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Seat
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Domain
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Status
-              </th>
-              <th style={{ padding: "0.75rem", textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                Created At
-              </th>
-            </tr>
-          </thead>
-          <tbody id="complaintsBody">
-            {loading ? (
-              <tr>
-                <td colSpan="7" style={{ padding: "1rem", textAlign: "center" }}>
-                  Loading...
-                </td>
-              </tr>
-            ) : importantComplaints.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ padding: "1rem", textAlign: "center" }}>
-                  No important complaints found.
-                </td>
-              </tr>
-            ) : (
-              importantComplaints.map((c) => {
-                const createdAt = c.createdAt ? new Date(c.createdAt).toLocaleString() : "N/A";
-                return (
-                  <tr key={c._id} id={`complaint-${c._id}`}>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.pnr || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.description || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.bogieNumber || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.seatNumber || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.issueDomain || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {c.status || "-"}
-                    </td>
-                    <td style={{ padding: "0.75rem", borderBottom: "1px solid #ddd" }}>
-                      {createdAt}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
       </section>
     </main>
   );
