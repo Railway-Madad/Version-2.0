@@ -9,6 +9,7 @@ const Emergency = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isPassengerAuthenticated);
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const [username, setUsername] = useState("");
   const [trainNumber, setTrainNumber] = useState("");
   const [seatNumber, setSeatNumber] = useState("");
@@ -93,6 +94,22 @@ const Emergency = () => {
         </div>
 
         <form id="emergencyForm" className="form-grid" onSubmit={submitEmergency}>
+          <div style={{
+            backgroundColor: "#E8F5E9",
+            border: "2px solid #4CAF50",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+          }}>
+            <div style={{ fontSize: "20px" }}>🚆</div>
+            <div>
+              <strong style={{ color: "#2E7D32", fontSize: "15px" }}>Current Train: {passengerTrainNo || "N/A"}</strong>
+              <p style={{ margin: "4px 0 0 0", color: "#555", fontSize: "13px" }}>Confirm you're on this train before submitting emergency request</p>
+            </div>
+          </div>
           <div className="input-group">
             <label htmlFor="username">Passenger Username</label>
             <input

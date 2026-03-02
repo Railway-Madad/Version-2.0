@@ -11,6 +11,7 @@ const upload = multer({ storage });
 // Routes
 router.get('/',userAuthentication, complaintController.getAllComplaints);
 router.post('/submit-complaint',userAuthentication, upload.single('image'), complaintController.postComplaint);
+router.get('/my-complaints-history',userAuthentication, complaintController.getMyAllComplaints);
 router.get('/api/complaints/user/:username',userAuthentication, complaintController.getComplaintsByUser);
 router.put('/api/complaints/resolve/:id/',adminAuthentication, complaintController.resolveComplaint);
 router.get('/api/complaints/:domain',userAuthentication, complaintController.getComplaintsByDomain);

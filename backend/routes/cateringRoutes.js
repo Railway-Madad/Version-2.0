@@ -7,6 +7,7 @@ const cateringRouter = Router();
 
 cateringRouter.post("/order",userAuthentication, cateringController.placeOrder);
 cateringRouter.get("/my-orders",userAuthentication, cateringController.getMyCateringOrders);
+cateringRouter.get("/my-orders-history",userAuthentication, cateringController.getMyAllCateringOrders);
 
 cateringRouter.get("/all-orders", cateringController.getAllCateringOrders);
 cateringRouter.put("/:id/status", cateringController.updateOrderStatus);

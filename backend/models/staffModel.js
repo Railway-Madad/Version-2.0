@@ -31,6 +31,7 @@ const staffSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+     trainNumber: { type: String, required: true },
     createdAt: {
         type: Date,
         default: Date.now
@@ -38,7 +39,8 @@ const staffSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    trainNumber: { type: String, required: true },
 });
 
 module.exports = mongoose.model('Staff', staffSchema);

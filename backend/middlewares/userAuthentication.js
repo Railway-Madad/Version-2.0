@@ -13,6 +13,7 @@ const userAuthentication = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.userId;
+        req.trainNo = decoded.trainNo;
         next();
     } catch (error) {
         return res.status(401).json({ 

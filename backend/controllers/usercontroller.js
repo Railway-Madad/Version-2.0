@@ -41,8 +41,15 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { username, password } = loginSchema.parse(req.body);
+        const { username, password, trainNo } = req.body;
+        
+        // Validate required fields
+        if (!username || !password || !trainNo) {
+            return res.status(400).json({ message: "Username, password, and train number are required" });
+        }
 
+        const parsedBody = loginSchema.parse({ username, password });
+        
         const user = await userModel.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: "Invalid username or password" });
@@ -53,9 +60,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid username or password" });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ userId: user._id, trainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
         setAuthCookie(res, 'userToken', token);
-        res.status(200).json({ message: "Login successful", user: { userId: user._id, username: user.username } });
+        res.status(200).json({ message: "Login successful", user: { userId: user._id, username: user.username, trainNo } });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });

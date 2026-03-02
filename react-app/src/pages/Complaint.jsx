@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PageHeader from "../components/common/PageHeader";
 import MessageBanner from "../components/common/MessageBanner";
 import { clearPassengerToken } from "../store/slices/authSlice";
@@ -8,6 +8,7 @@ import useComplaintForm from "../hooks/useComplaintForm";
 const Complaint = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const passengerTrainNo = useSelector((state) => state.auth.passengerTrainNo);
   const { complaint, setFieldValue, submitComplaint, imageFile, setImageFile, fileInputRef } =
     useComplaintForm();
 
@@ -38,6 +39,27 @@ const Complaint = () => {
           }
         />
         <div className="divider"></div>
+        
+        {/* Train Information Banner */}
+        <div style={{
+          backgroundColor: "#E8F5E9",
+          border: "2px solid #4CAF50",
+          borderRadius: "8px",
+          padding: "12px 16px",
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px"
+        }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#4CAF50" style={{ flexShrink: 0 }}>
+            <path d="M18 8h-1V4c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v4H6c-2.76 0-5 2.24-5 5v9c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-9c0-2.76-2.24-5-5-5zm-11 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6-8h4v4h-4V7zm6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+          </svg>
+          <div>
+            <strong style={{ color: "#2E7D32", fontSize: "16px" }}>Current Train: {passengerTrainNo || "N/A"}</strong>
+            <p style={{ margin: "4px 0 0 0", color: "#555", fontSize: "14px" }}>Your complaint will be registered for this train</p>
+          </div>
+        </div>
+
         <section>
           <h2 className="card-section-title">Submit New Complaint</h2>
           <MessageBanner message={complaint.successMessage} type="success" className="success" />

@@ -49,6 +49,7 @@ const complaintSchema = new mongoose.Schema({
         type: String,
         default: null // Cloudinary image URL, null if no image
     },
+    trainNumber: { type: String, required: true },
     status: {
         type: String,
         enum: ['Pending', 'Resolved', 'Important', 'AwaitingConfirmation'],

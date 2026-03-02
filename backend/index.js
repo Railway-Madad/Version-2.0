@@ -15,6 +15,7 @@ const emergencyRoutes = require("./routes/emergencyRoutes");
 const newsRouter = require("./routes/newsRouter");
 const feedbackRouter = require("./routes/feedbackRouter");
 const lostnfoundRouter = require("./routes/lostnfoundRoutes");
+const Train = require("./models/trainModel");
 
 // Logger middleware
 const {
@@ -69,6 +70,37 @@ app.get("/test-cookie", (req, res) => {
         cookies: req.cookies 
     });
 });
+
+// Get available trains
+app.get("/api/trains", async (req, res) => {
+  try {
+    const trains = await Train.find({});
+    res.status(200).json({
+      success: true,
+      data: trains.map(train => ({
+        id: train._id,
+        trainNumber: train.trainNumber
+      }))
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+app.post("/api/trains", async (req, res) => {
+  try {
+    const { trainNumber } = req.body;
+    const newTrain = new Train({ trainNumber });
+    await newTrain.save();
+    res.status(201).json({ success: true, data: newTrain });
+  } catch (error) { 
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+
 app.get("/", (req, res) => {
   res.send("Server is working");
 });

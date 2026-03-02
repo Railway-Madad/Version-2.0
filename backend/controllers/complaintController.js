@@ -42,6 +42,7 @@ exports.postComplaint = async (req, res) => {
       issueDomain,
       linkurl,
       status: "Pending",
+      trainNumber: req.trainNo, // Use trainNo from authentication middleware
     });
 
     await complaint.save();
@@ -145,7 +146,7 @@ exports.getImagesByUser = async (req, res) => {
 // GET: All complaints (for admin)
 exports.getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 });
+    const complaints = await Complaint.find({ trainNumber: req.trainNo }).sort({ createdAt: -1 });
     res.json(complaints);
   } catch (error) {
     console.error("Error fetching all complaints:", error);
@@ -155,7 +156,7 @@ exports.getAllComplaints = async (req, res) => {
 //Get all complaints but not resolved
 exports.getPendingComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ status: { $ne: 'Resolved' } }).sort({ createdAt: -1 });
+    const complaints = await Complaint.find({ status: { $ne: 'Resolved' }, trainNumber: req.trainNo }).sort({ createdAt: -1 });
     res.json(complaints);
   } catch (error) {
     console.error("Error fetching pending complaints:", error);
@@ -193,6 +194,17 @@ exports.handleSatisfaction = async (req, res) => {
     res.json({ success: true, message: satisfied ? "Complaint confirmed as resolved" : "Complaint rolled back to pending", complaint });
   } catch (error) {
     console.error("Error handling satisfaction:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// GET: Get all user's complaints across all trains (for historical view)
+exports.getMyAllComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ userId: req.userId }).sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching all user complaints:", error);
     res.status(500).json({ error: "Server error" });
   }
 };

@@ -1,10 +1,15 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthField from "../components/auth/AuthField";
 import { useAuthForm } from "../hooks/useAuthForm";
 
 const Login = () => {
-  const { values, updateField, submit, message, isError } = useAuthForm({ mode: "login" });
+  const { values, updateField, submit, message, isError, trains, loadingTrains, fetchTrains } = useAuthForm({ mode: "login" });
+
+  useEffect(() => {
+    fetchTrains();
+  }, []);
 
   return (
     <AuthLayout
@@ -36,6 +41,25 @@ const Login = () => {
           value={values.password}
           onChange={(val) => updateField("password", val)}
         />
+        <div className="input-group">
+          <label htmlFor="trainNo">Train Number</label>
+          <select
+            id="trainNo"
+            value={values.trainNo}
+            onChange={(e) => updateField("trainNo", e.target.value)}
+            required
+            disabled={loadingTrains}
+          >
+            <option value="">
+              {loadingTrains ? "Loading trains..." : "Select a train"}
+            </option>
+            {trains.map((train) => (
+              <option key={train.id} value={train.trainNumber}>
+                {train.trainNumber}
+              </option>
+            ))}
+          </select>
+        </div>
         <button className="btn" type="submit">
           Login
         </button>
