@@ -71,6 +71,12 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
+        // Update train number in database if it changed
+        if (staff.trainNumber !== trainNo) {
+            staff.trainNumber = trainNo;
+            await staff.save();
+        }
+
         const token = jwt.sign({ staffId: staff._id, trainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
         setAuthCookie(res, 'staffToken', token);
         res.status(200).json({ message: "Login successful", staff: { staffId: staff._id, email: staff.email, role: staff.role, trainNo } });

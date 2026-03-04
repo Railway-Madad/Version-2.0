@@ -36,6 +36,7 @@ adminRouter.post('/trains', adminAuthentication, adminController.addTrain);
 adminRouter.get('/all-orders', adminController.getAllOrdersAll);
 adminRouter.get('/all-complaints', adminController.getAllComplaintsAll);
 adminRouter.get('/all-lostnfound', adminController.getAllLostFoundAll);
+adminRouter.put('/lostnfound/:id/status', adminAuthentication, adminController.updateLostFoundStatus);
 adminRouter.get('/all-staff', adminController.getAllStaffAll);
 
 adminRouter.get('/test', adminAuthentication, (req, res) => {

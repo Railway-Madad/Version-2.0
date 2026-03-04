@@ -357,6 +357,24 @@ const getAllLostFoundAll = async (req, res) => {
     }
 };
 
+// ── UPDATE lost and found status (admin) ──
+const updateLostFoundStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const LostFound = require("../models/lostnfoundModel");
+        const item = await LostFound.findById(id);
+        if (!item) {
+            return res.status(404).json({ success: false, message: "Item not found" });
+        }
+        item.status = status || "Resolved";
+        await item.save();
+        res.status(200).json({ success: true, data: item });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
 // ── GET all staff across all trains ──
 const getAllStaffAll = async (req, res) => {
     try {
@@ -385,5 +403,6 @@ module.exports = {
     getAllOrdersAll,
     getAllComplaintsAll,
     getAllLostFoundAll,
+    updateLostFoundStatus,
     getAllStaffAll
 };
