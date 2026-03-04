@@ -126,12 +126,15 @@ const getUserDetails = async (req, res) => {
         const user = await User.findById(userId).select("-password");
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         
+        // Emergency model stores userId as string, so search by both ObjectId and string
+        const userIdStr = userId.toString();
+        
         const userStats = {
             user,
             complaints: await Complaint.find({ userId }).sort({ createdAt: -1 }),
             orders: await Catering.find({ user: userId }).sort({ createdAt: -1 }),
-            emergencies: await Emergency.find({ userId }).sort({ createdAt: -1 }),
-            lostNFound: await LostNFound.find({ reportedBy: userId }).sort({ createdAt: -1 })
+            emergencies: await Emergency.find({ $or: [{ userId }, { userId: userIdStr }] }).sort({ createdAt: -1 }),
+            lostNFound: await LostNFound.find({ userId }).sort({ createdAt: -1 })
         };
         
         res.status(200).json({ success: true, data: userStats });
@@ -244,8 +247,8 @@ const getComplaintAnalysis = async (req, res) => {
                 return {
                     domain,
                     total: await Complaint.countDocuments({ trainNumber: train.trainNumber, issueDomain: domain }),
-                    resolved: await Complaint.countDocuments({ trainNumber: train.trainNumber, issueDomain: domain, status: 'resolved' }),
-                    pending: await Complaint.countDocuments({ trainNumber: train.trainNumber, issueDomain: domain, status: 'pending' })
+                    resolved: await Complaint.countDocuments({ trainNumber: train.trainNumber, issueDomain: domain, status: { $in: ['Resolved', 'AwaitingConfirmation'] } }),
+                    pending: await Complaint.countDocuments({ trainNumber: train.trainNumber, issueDomain: domain, status: { $in: ['Pending', 'Important'] } })
                 };
             }));
             
@@ -253,6 +256,67 @@ const getComplaintAnalysis = async (req, res) => {
         }));
 
         res.status(200).json({ success: true, data: analysis });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// Get all admins
+const getAllAdmins = async (req, res) => {
+    try {
+        const { page = 1, limit = 50, role } = req.query;
+        
+        const query = {};
+        if (role) query.role = role;
+        
+        const skip = (page - 1) * limit;
+        
+        const admins = await Admin.find(query)
+            .select("-password")
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort({ createdAt: -1 });
+        
+        const total = await Admin.countDocuments(query);
+        
+        res.status(200).json({ 
+            success: true, 
+            data: admins,
+            pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / limit) }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// Get admin details with their management stats
+const getAdminDetails = async (req, res) => {
+    try {
+        const { adminId } = req.params;
+        
+        const admin = await Admin.findById(adminId).select("-password");
+        if (!admin) return res.status(404).json({ success: false, message: "Admin not found" });
+        
+        // Get stats for the trains this admin manages
+        const trainFilter = admin.trainNo ? { trainNumber: admin.trainNo } : {};
+        
+        const adminStats = {
+            admin,
+            complaintsManaged: await Complaint.countDocuments(trainFilter),
+            ordersManaged: await Catering.countDocuments(trainFilter),
+            emergenciesHandled: await Emergency.countDocuments(trainFilter),
+            staffSupervised: admin.trainNo ? await Staff.countDocuments({ trainNumber: admin.trainNo }) : await Staff.countDocuments(),
+            usersServed: admin.trainNo ? await User.countDocuments() : await User.countDocuments(),
+            recentComplaints: await Complaint.find(trainFilter).sort({ createdAt: -1 }).limit(5),
+            complaintStats: {
+                total: await Complaint.countDocuments(trainFilter),
+                pending: await Complaint.countDocuments({ ...trainFilter, status: 'Pending' }),
+                inProcess: await Complaint.countDocuments({ ...trainFilter, status: 'InProcess' }),
+                resolved: await Complaint.countDocuments({ ...trainFilter, status: 'Resolved' })
+            }
+        };
+        
+        res.status(200).json({ success: true, data: adminStats });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -266,5 +330,7 @@ module.exports = {
     getAllStaff,
     getStaffDetails,
     getTrainPerformanceMetrics,
-    getComplaintAnalysis
+    getComplaintAnalysis,
+    getAllAdmins,
+    getAdminDetails
 };
