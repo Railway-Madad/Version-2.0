@@ -18,7 +18,16 @@ const adminSchema = new mongoose.Schema({
     },
     trainNo: {
         type: String,
-        required: true
+        default: null
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'superadmin'],
+        default: 'admin'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 

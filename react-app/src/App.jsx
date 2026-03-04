@@ -29,6 +29,8 @@ import AdminStaff from "./pages/AdminStaff";
 import AdminComplaints from "./pages/AdminComplaints";
 import AdminOrders from "./pages/AdminOrders";
 import AdminTrains from "./pages/AdminTrains";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
 function App() {
   return (
@@ -148,6 +150,7 @@ function App() {
 
       <Route path="/adminlogin" element={<AdminLogin />} />
       <Route path="/adminlogin.html" element={<AdminLogin />} />
+      <Route path="/superadmin-login" element={<SuperAdminLogin />} />
       <Route path="/adminregister" element={<AdminRegister />} />
       <Route path="/adminregister.html" element={<AdminRegister />} />
 
@@ -164,6 +167,15 @@ function App() {
         element={
           <ProtectedRoute type="admin">
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/superadmin-dashboard"
+        element={
+          <ProtectedRoute type="admin">
+            <SuperAdminDashboard />
           </ProtectedRoute>
         }
       />

@@ -11,6 +11,7 @@ adminRouter.post('/logout', adminController.logout);
 
 // Dashboard stats
 adminRouter.get('/dashboard-stats', adminAuthentication, adminController.getDashboardStats);
+adminRouter.get('/train-statistics', adminAuthentication, adminController.getTrainStatistics);
 
 // Staff management
 adminRouter.get('/train-staff', adminAuthentication, adminController.getTrainStaff);

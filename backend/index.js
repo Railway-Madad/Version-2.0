@@ -15,6 +15,7 @@ const emergencyRoutes = require("./routes/emergencyRoutes");
 const newsRouter = require("./routes/newsRouter");
 const feedbackRouter = require("./routes/feedbackRouter");
 const lostnfoundRouter = require("./routes/lostnfoundRoutes");
+const superadminRouter = require("./routes/superadminRoutes");
 const Train = require("./models/trainModel");
 
 // Logger middleware
@@ -61,6 +62,7 @@ app.use('/emergency', emergencyRoutes);
 app.use("/news", newsRouter);
 app.use("/feedback", feedbackRouter);
 app.use("/lostnfound", lostnfoundRouter);
+app.use('/superadmin', superadminRouter);
 
 //For the cookie testing putpose i have added 
 app.get("/test-cookie", (req, res) => {

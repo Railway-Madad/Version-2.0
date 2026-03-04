@@ -10,6 +10,7 @@ const AdminRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [trainNo, setTrainNo] = useState("");
+  const [role, setRole] = useState("admin");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
@@ -30,6 +31,7 @@ const AdminRegister = () => {
         email,
         password,
         trainNo,
+        role,
       }, {
         withCredentials: true
       });
@@ -109,10 +111,30 @@ const AdminRegister = () => {
               id="trainNo"
               name="trainNo"
               placeholder="e.g., 1234567890"
-              required
               value={trainNo}
               onChange={(e) => setTrainNo(e.target.value)}
             />
+          </div>
+          <div className="input-group">
+            <label htmlFor="role">Role</label>
+            <select
+              id="role"
+              name="role"
+              required
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              style={{
+                padding: "0.75rem",
+                borderRadius: "0.5rem",
+                border: "1px solid var(--border-color)",
+                fontSize: "1rem",
+                fontFamily: "inherit",
+                cursor: "pointer"
+              }}
+            >
+              <option value="admin">Admin</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
           </div>
           <button className="btn" type="submit">
             Create Admin Account

@@ -16,6 +16,7 @@ const initialState = {
   passengerTrainNo: null,
   staffTrainNo: null,
   adminTrainNo: null,
+  adminRole: null,
 };
 
 const authSlice = createSlice({
@@ -48,9 +49,13 @@ const authSlice = createSlice({
     setAdminTrainNo(state, action) {
       state.adminTrainNo = action.payload;
     },
+    setAdminRole(state, action) {
+      state.adminRole = action.payload;
+    },
     clearAdminToken(state) {
       state.isAdminAuthenticated = false;
       state.adminTrainNo = null;
+      state.adminRole = null;
     },
   },
 });
@@ -64,6 +69,7 @@ export const {
   clearStaffToken,
   setAdminToken,
   setAdminTrainNo,
+  setAdminRole,
   clearAdminToken,
 } = authSlice.actions;
 

@@ -13,7 +13,8 @@ const registerSchema = z.object({
     email: z.string().email("Invalid email address"),
     username: z.string().min(3, "Username must be at least 3 characters long"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
-    trainNo: z.string().min(1, "Train number is required")
+    trainNo: z.string().min(1, "Train number is required"),
+    role: z.enum(['admin', 'superadmin']).default('admin')
 });
 
 const loginSchema = z.object({
@@ -28,14 +29,14 @@ const register = async (req, res) => {
         return res.status(400).json({ errors: parsedBody.error.errors });
     }
     try {
-        const { email, username, password, trainNo } = parsedBody.data;
+        const { email, username, password, trainNo, role } = parsedBody.data;
         const existingAdmin = await adminModel.findOne({ $or: [{ email }, { username }] });
         if (existingAdmin) {
             return res.status(400).json({ message: "Email or Username already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newAdmin = await adminModel.create({ email, username, password: hashedPassword, trainNo });
+        const newAdmin = await adminModel.create({ email, username, password: hashedPassword, trainNo, role });
         res.status(201).json({ message: "Admin registered successfully", adminId: newAdmin._id });
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -65,9 +66,21 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid username or password" });
         }
 
-        const token = jwt.sign({ adminId: admin._id, trainNo: admin.trainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ 
+            adminId: admin._id, 
+            trainNo: admin.trainNo,
+            role: admin.role || 'admin'
+        }, process.env.JWT_SECRET, { expiresIn: '24h' });
         setAuthCookie(res, 'adminToken', token);
-        res.status(200).json({ message: "Login successful", admin: { adminId: admin._id, username: admin.username, trainNo: admin.trainNo } });
+        res.status(200).json({ 
+            message: "Login successful", 
+            admin: { 
+                adminId: admin._id, 
+                username: admin.username, 
+                trainNo: admin.trainNo,
+                role: admin.role || 'admin'
+            } 
+        });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });
@@ -257,6 +270,51 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+// ── GET detailed train statistics ──
+const getTrainStatistics = async (req, res) => {
+    try {
+        const trainNo = req.trainNo;
+        const complaintModel = require("../models/complaintModel");
+        const cateringModel = require("../models/cateringModel");
+        const emergencyModel = require("../models/emergencyModel");
+        const lostnfoundModel = require("../models/lostnfoundModel");
+        const feedbackModel = require("../models/feedbackModel");
+        
+        const stats = {
+            trainNumber: trainNo,
+            users: await require("../models/userModel").countDocuments({ trainNumber: trainNo }),
+            staff: await staffModel.countDocuments({ trainNumber: trainNo }),
+            complaints: {
+                total: await complaintModel.countDocuments({ trainNumber: trainNo }),
+                pending: await complaintModel.countDocuments({ trainNumber: trainNo, status: 'pending' }),
+                resolved: await complaintModel.countDocuments({ trainNumber: trainNo, status: 'resolved' })
+            },
+            orders: {
+                total: await cateringModel.countDocuments({ trainNumber: trainNo }),
+                pending: await cateringModel.countDocuments({ trainNumber: trainNo, status: 'pending' }),
+                delivered: await cateringModel.countDocuments({ trainNumber: trainNo, status: 'delivered' }),
+                cancelled: await cateringModel.countDocuments({ trainNumber: trainNo, status: 'cancelled' })
+            },
+            emergencies: {
+                total: await emergencyModel.countDocuments({ trainNumber: trainNo }),
+                pending: await emergencyModel.countDocuments({ trainNumber: trainNo, status: 'pending' }),
+                responded: await emergencyModel.countDocuments({ trainNumber: trainNo, status: 'responded' })
+            },
+            lostNFound: {
+                total: await lostnfoundModel.countDocuments({ trainNumber: trainNo }),
+                lost: await lostnfoundModel.countDocuments({ trainNumber: trainNo, type: 'lost' }),
+                found: await lostnfoundModel.countDocuments({ trainNumber: trainNo, type: 'found' }),
+                claimed: await lostnfoundModel.countDocuments({ trainNumber: trainNo, claimed: true })
+            },
+            feedback: await feedbackModel.countDocuments({ trainNumber: trainNo })
+        };
+
+        res.status(200).json({ success: true, data: stats });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -270,5 +328,6 @@ module.exports = {
     getTrainCommands,
     deleteCommand,
     addTrain,
-    getDashboardStats
+    getDashboardStats,
+    getTrainStatistics
 };

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const adminAuthentication = (req, res, next) => {
+const superadminAuthentication = (req, res, next) => {
     const token = req.cookies.adminToken;
 
     if (!token) {
@@ -12,9 +12,16 @@ const adminAuthentication = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        if (decoded.role !== 'superadmin') {
+            return res.status(403).json({ 
+                success: false,
+                message: "Access forbidden. Superadmin only." 
+            });
+        }
+        
         req.adminId = decoded.adminId;
-        req.trainNo = decoded.trainNo;
-        req.adminRole = decoded.role || 'admin';
+        req.adminRole = decoded.role;
         next();
     } catch (error) {
         return res.status(401).json({ 
@@ -24,4 +31,4 @@ const adminAuthentication = (req, res, next) => {
     }
 };
 
-module.exports = adminAuthentication;
+module.exports = superadminAuthentication;

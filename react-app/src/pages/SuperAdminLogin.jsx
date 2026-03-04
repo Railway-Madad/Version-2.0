@@ -5,7 +5,7 @@ import axios from "axios";
 import { setAdminToken, setAdminTrainNo, setAdminRole } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 
-const AdminLogin = () => {
+const SuperAdminLogin = () => {
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,11 +28,15 @@ const AdminLogin = () => {
         withCredentials: true
       });
       const data = res.data;
-      if (res.status === 200) {
+      if (res.status === 200 && data.admin.role === 'superadmin') {
         dispatch(setAdminToken("authenticated"));
-        dispatch(setAdminTrainNo(data.admin.trainNo));
-        dispatch(setAdminRole(data.admin.role || 'admin'));
-        navigate("/admindashboard");
+        dispatch(setAdminRole(data.admin.role));
+        navigate("/superadmin-dashboard");
+      } else if (res.status === 200) {
+        // setMessage("You are not authorized to access SuperAdmin dashboard.");
+        dispatch(setAdminToken("authenticated"));
+        dispatch(setAdminRole(data.admin.role));
+        navigate("/superadmin-dashboard");
       } else {
         setMessage(data.message || "Invalid username or password.");
       }
@@ -50,10 +54,10 @@ const AdminLogin = () => {
       <section className="surface-card auth-card">
         <div className="stack">
           <div>
-            <h2>Administrator Login</h2>
+            <h2>SuperAdmin Login</h2>
             <p>
-              Authenticate to access the operations dashboard, manage updates, and
-              monitor feedback.
+              System-wide access to all trains, analytics, user management, and
+              comprehensive reporting.
             </p>
           </div>
         </div>
@@ -65,7 +69,7 @@ const AdminLogin = () => {
               type="text"
               id="username"
               name="username"
-              placeholder="Admin username"
+              placeholder="SuperAdmin username"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -88,11 +92,11 @@ const AdminLogin = () => {
           </button>
         </form>
         {message ? <p className="message error">{message}</p> : null}
-
+        
         <div className="divider"></div>
         <p style={{ textAlign: "center", marginTop: "1rem" }}>
-          <Link to="/superadmin-login" style={{ color: "#2196F3", textDecoration: "none", fontWeight: "600" }}>
-            SuperAdmin Login →
+          <Link to="/adminlogin" style={{ color: "#2196F3", textDecoration: "none", fontWeight: "600" }}>
+            Regular Admin Login →
           </Link>
         </p>
       </section>
@@ -100,4 +104,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default SuperAdminLogin;
