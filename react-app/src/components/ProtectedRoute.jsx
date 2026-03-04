@@ -3,7 +3,14 @@ import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children, type = "user" }) => {
   const location = useLocation();
-  const { isPassengerAuthenticated, isStaffAuthenticated, isAdminAuthenticated } = useSelector((state) => state.auth);
+  const { isPassengerAuthenticated, isStaffAuthenticated, isAdminAuthenticated, isSuperAdminAuthenticated } = useSelector((state) => state.auth);
+
+  if (type === "superadmin") {
+    if (!isSuperAdminAuthenticated) {
+      return <Navigate to="/superadmin-login" replace state={{ from: location }} />;
+    }
+    return children;
+  }
 
   if (type === "admin") {
     if (!isAdminAuthenticated) {

@@ -236,15 +236,15 @@ const AdminAnalytics = () => {
       setError(null);
       try {
         const [ordersRes, complaintsRes, fbStatsRes, fbAllRes, foodRes] = await Promise.all([
-          fetch(`${apiBase}/catering/all-orders`, { credentials: "include" }).then((r) => r.json()),
-          fetch(`${apiBase}/complaint/api/complaintsRES`, { credentials: "include" }).then((r) => r.json()),
+          fetch(`${apiBase}/admin/train-orders`, { credentials: "include" }).then((r) => r.json()),
+          fetch(`${apiBase}/admin/train-complaints`, { credentials: "include" }).then((r) => r.json()),
           fetch(`${apiBase}/feedback/stats`, { credentials: "include" }).then((r) => r.json()),
           fetch(`${apiBase}/feedback`, { credentials: "include" }).then((r) => r.json()),
           fetch(`${apiBase}/food`, { credentials: "include" }).then((r) => r.json()),
         ]);
         if (cancel) return;
-        setOrders(Array.isArray(ordersRes.data || ordersRes) ? ordersRes.data || ordersRes : []);
-        setComplaints(Array.isArray(complaintsRes) ? complaintsRes : []);
+        setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : Array.isArray(ordersRes) ? ordersRes : []);
+        setComplaints(Array.isArray(complaintsRes.data) ? complaintsRes.data : Array.isArray(complaintsRes) ? complaintsRes : []);
         setFeedbackStats(fbStatsRes.stats || fbStatsRes || null);
         setAllFeedbacks(Array.isArray(fbAllRes.data || fbAllRes) ? fbAllRes.data || fbAllRes : []);
         setMenuItems(Array.isArray(foodRes.data || foodRes) ? foodRes.data || foodRes : []);

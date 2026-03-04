@@ -32,7 +32,7 @@ const app = express();
 // CORS configuration for cookies support
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // Frontend URLs
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"], // Frontend URLs
     credentials: true, // Allow cookies to be sent with requests
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -111,10 +111,41 @@ app.get("/", (req, res) => {
 app.use(errorCapture);
 app.use(errorHandler);
 
+// ── Seed default super-admin credentials on startup ──
+const Admin = require("./models/adminModel");
+const bcryptSeed = require("bcryptjs");
+
+async function seedAdmin() {
+  try {
+    const USERNAME = "superadmin";
+    const PASSWORD = "password123";
+    const existing = await Admin.findOne({ username: USERNAME });
+    const hashed = await bcryptSeed.hash(PASSWORD, 10);
+    if (existing) {
+      // Update password in case it was changed manually
+      existing.password = hashed;
+      existing.trainNo = existing.trainNo || "ALL";
+      await existing.save();
+      console.log(`[seed] Admin "${USERNAME}" credentials refreshed.`);
+    } else {
+      await Admin.create({
+        username: USERNAME,
+        email: "superadmin@railway.com",
+        password: hashed,
+        trainNo: "ALL",
+      });
+      console.log(`[seed] Admin "${USERNAME}" created (password: ${PASSWORD}).`);
+    }
+  } catch (err) {
+    console.error("[seed] Could not seed admin:", err.message);
+  }
+}
+
 async function connect() {
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to MongoDB");
+    await seedAdmin(); // ensure default credentials exist
     app.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);
     });

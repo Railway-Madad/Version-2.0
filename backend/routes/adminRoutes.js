@@ -32,6 +32,15 @@ adminRouter.delete('/commands/:id', adminAuthentication, adminController.deleteC
 // Train management
 adminRouter.post('/trains', adminAuthentication, adminController.addTrain);
 
+// Lost & Found for admin's train
+adminRouter.get('/train-lostnfound', adminAuthentication, adminController.getTrainLostFound);
+
+// Super admin — all data across all trains
+adminRouter.get('/all-orders', adminAuthentication, adminController.getAllOrdersAll);
+adminRouter.get('/all-complaints', adminAuthentication, adminController.getAllComplaintsAll);
+adminRouter.get('/all-lostnfound', adminAuthentication, adminController.getAllLostFoundAll);
+adminRouter.get('/all-staff', adminAuthentication, adminController.getAllStaffAll);
+
 adminRouter.get('/test', adminAuthentication, (req, res) => {
     res.send("Admin route is working");
 });
