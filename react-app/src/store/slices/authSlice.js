@@ -13,6 +13,7 @@ const initialState = {
   isPassengerAuthenticated: false,
   isStaffAuthenticated: false,
   isAdminAuthenticated: false,
+  isSuperAdminAuthenticated: false,
   passengerTrainNo: null,
   staffTrainNo: null,
   adminTrainNo: null,
@@ -52,6 +53,12 @@ const authSlice = createSlice({
       state.isAdminAuthenticated = false;
       state.adminTrainNo = null;
     },
+    setSuperAdminToken(state, action) {
+      state.isSuperAdminAuthenticated = !!action.payload;
+    },
+    clearSuperAdminToken(state) {
+      state.isSuperAdminAuthenticated = false;
+    },
   },
 });
 
@@ -65,6 +72,8 @@ export const {
   setAdminToken,
   setAdminTrainNo,
   clearAdminToken,
+  setSuperAdminToken,
+  clearSuperAdminToken,
 } = authSlice.actions;
 
 export default authSlice.reducer;

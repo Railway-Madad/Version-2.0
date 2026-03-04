@@ -24,7 +24,8 @@ exports.createEmergency = async (req, res) => {
 
 exports.getallEmergencies = async (req, res) => {
   try {
-    const emergencies = await Emergency.find({ trainNumber: req.trainNo });
+    const query = req.trainNo ? { trainNumber: req.trainNo } : {};
+    const emergencies = await Emergency.find(query);
     res.status(200).json(emergencies);
   } catch (error) {
     res.status(500).json({ error: "Server error" });

@@ -140,9 +140,9 @@ const AdminDashboard = () => {
             <strong>Operations Dashboard</strong>
             <span>Track stock, reports, and advanced analytics</span>
           </Link>
-          <Link className="link-tile" to="/admin-analytics">
+          <Link className="link-tile" to="/train-admin-analytics">
             <strong>Analytics Dashboard</strong>
-            <span>Charts, graphs, revenue trends &amp; advanced analytics</span>
+            <span>60+ real-time analytics — orders, complaints, food, users, emergencies &amp; more</span>
           </Link>
         </div>
       </section>

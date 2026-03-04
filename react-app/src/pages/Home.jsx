@@ -62,9 +62,9 @@ const Home = () => {
             quality aligned.
           </p>
           <div className="link-grid">
-            <Link className="link-tile" to="/adminlogin">
+            <Link className="link-tile" to="/admin-select">
               <strong>Admin Login</strong>
-              <span>Manage operations and insights</span>
+              <span>Train Admin or Super Admin access</span>
             </Link>
             {/* <Link className="link-tile" to="/adminregister">
               <strong>Admin Register</strong>

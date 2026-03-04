@@ -29,6 +29,13 @@ import AdminStaff from "./pages/AdminStaff";
 import AdminComplaints from "./pages/AdminComplaints";
 import AdminOrders from "./pages/AdminOrders";
 import AdminTrains from "./pages/AdminTrains";
+import AdminLoginSelector from "./pages/AdminLoginSelector";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import SuperAdminAnalytics from "./pages/SuperAdminAnalytics";
+import TrainAdminAnalytics from "./pages/TrainAdminAnalytics";
+import TrainAdminUsers from "./pages/TrainAdminUsers";
+import TrainAdminUserDetail from "./pages/TrainAdminUserDetail";
 
 function App() {
   return (
@@ -148,6 +155,8 @@ function App() {
 
       <Route path="/adminlogin" element={<AdminLogin />} />
       <Route path="/adminlogin.html" element={<AdminLogin />} />
+      <Route path="/admin-select" element={<AdminLoginSelector />} />
+      <Route path="/superadmin-login" element={<SuperAdminLogin />} />
       <Route path="/adminregister" element={<AdminRegister />} />
       <Route path="/adminregister.html" element={<AdminRegister />} />
 
@@ -357,6 +366,50 @@ function App() {
         element={
           <ProtectedRoute>
             <LostFoundView />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Super Admin Routes */}
+      <Route
+        path="/superadmin-dashboard"
+        element={
+          <ProtectedRoute type="superadmin">
+            <SuperAdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/superadmin-analytics"
+        element={
+          <ProtectedRoute type="superadmin">
+            <SuperAdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Train Admin Analytics & Users */}
+      <Route
+        path="/train-admin-analytics"
+        element={
+          <ProtectedRoute type="admin">
+            <TrainAdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-users"
+        element={
+          <ProtectedRoute type="admin">
+            <TrainAdminUsers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-user/:userId"
+        element={
+          <ProtectedRoute type="admin">
+            <TrainAdminUserDetail />
           </ProtectedRoute>
         }
       />

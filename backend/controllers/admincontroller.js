@@ -4,6 +4,7 @@ const complaintModel = require('../models/complaintModel');
 const cateringModel = require('../models/cateringModel');
 const commandModel = require('../models/commandModel');
 const trainModel = require('../models/trainModel');
+const lostnfoundModel = require('../models/lostnfoundModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
@@ -47,7 +48,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, trainNo } = req.body;
         
         if (!username || !password) {
             return res.status(400).json({ message: "Username and password are required" });
@@ -65,9 +66,12 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid username or password" });
         }
 
-        const token = jwt.sign({ adminId: admin._id, trainNo: admin.trainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // Use the selected trainNo from the frontend (or fall back to DB value)
+        const effectiveTrainNo = trainNo || admin.trainNo;
+
+        const token = jwt.sign({ adminId: admin._id, trainNo: effectiveTrainNo }, process.env.JWT_SECRET, { expiresIn: '24h' });
         setAuthCookie(res, 'adminToken', token);
-        res.status(200).json({ message: "Login successful", admin: { adminId: admin._id, username: admin.username, trainNo: admin.trainNo } });
+        res.status(200).json({ message: "Login successful", admin: { adminId: admin._id, username: admin.username, trainNo: effectiveTrainNo } });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ errors: error.errors });
@@ -257,6 +261,58 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+// ── GET lost & found for admin's train ──
+const getTrainLostFound = async (req, res) => {
+    try {
+        const trainNo = req.trainNo;
+        const items = await lostnfoundModel.find({ trainNumber: trainNo }).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: items });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// ══════ SUPER ADMIN — all data across all trains ══════
+
+const getAllOrdersAll = async (req, res) => {
+    try {
+        const orders = await cateringModel.find({})
+            .sort({ createdAt: -1 })
+            .populate("user", "name email")
+            .populate("items.foodItem", "name price");
+        res.status(200).json({ success: true, count: orders.length, data: orders });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+const getAllComplaintsAll = async (req, res) => {
+    try {
+        const complaints = await complaintModel.find({}).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, count: complaints.length, data: complaints });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+const getAllLostFoundAll = async (req, res) => {
+    try {
+        const items = await lostnfoundModel.find({}).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, count: items.length, data: items });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+const getAllStaffAll = async (req, res) => {
+    try {
+        const staff = await staffModel.find({}).select('-password');
+        res.status(200).json({ success: true, count: staff.length, data: staff });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -266,9 +322,14 @@ module.exports = {
     deleteStaff,
     getTrainComplaints,
     getTrainOrders,
+    getTrainLostFound,
     sendCommand,
     getTrainCommands,
     deleteCommand,
     addTrain,
-    getDashboardStats
+    getDashboardStats,
+    getAllOrdersAll,
+    getAllComplaintsAll,
+    getAllLostFoundAll,
+    getAllStaffAll
 };
