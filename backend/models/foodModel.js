@@ -19,9 +19,15 @@ const foodSchema = new mongoose.Schema(
     category: {
       type: String,
       trim: true,
+      enum: ["Breakfast", "Lunch", "Dinner", "Snacks", "Beverages"],
+      default: "Snacks",
     },
     imageUrl: {
       type: String,
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true,
     },
   },
   {

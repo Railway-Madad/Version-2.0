@@ -11,6 +11,8 @@ foodRouter.post("/", upload.single("image"), foodcontroller.addFood);
 
 foodRouter.get("/:id", foodcontroller.getFoodById);
 
+foodRouter.put("/:id", foodcontroller.updateFood);
+
 foodRouter.delete("/:id",foodcontroller.deleteFood);
 
 module.exports = foodRouter;

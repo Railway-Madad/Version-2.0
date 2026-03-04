@@ -36,7 +36,7 @@ const getFoodById = async (req, res) => {
 
 const addFood = async (req, res) => {
   try {
-    const { name, price, description, category } = req.body;
+    const { name, price, description, category, isAvailable } = req.body;
     const file = req.file;
     let linkurl = null;
 
@@ -72,8 +72,9 @@ const addFood = async (req, res) => {
       name,
       price,
       description,
-      category,
+      category: category || "Snacks",
       imageUrl: linkurl,
+      isAvailable: isAvailable !== undefined ? isAvailable : true,
     });
 
     res.status(201).json({ success: true, data: newFood });
@@ -101,9 +102,38 @@ const deleteFood = async (req, res) => {
   }
 };
 
+const updateFood = async (req, res) => {
+  try {
+    const { isAvailable, name, price, description, category } = req.body;
+    
+    const food = await Food.findById(req.params.id);
+    
+    if (!food) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Food item not found" });
+    }
+
+    // Update fields if provided
+    if (isAvailable !== undefined) food.isAvailable = isAvailable;
+    if (name) food.name = name;
+    if (price) food.price = price;
+    if (description !== undefined) food.description = description;
+    if (category) food.category = category;
+
+    await food.save();
+
+    res.status(200).json({ success: true, data: food });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 module.exports = {
   getAllFoods,
   getFoodById,
   addFood,
-  deleteFood
+  deleteFood,
+  updateFood
 };
