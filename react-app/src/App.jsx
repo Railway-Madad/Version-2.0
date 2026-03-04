@@ -10,6 +10,7 @@ import OrderPage from "./pages/OrderPage";
 import Emergency from "./pages/Emergency";
 import Feedback from "./pages/Feedback";
 import AdminLogin from "./pages/AdminLogin";
+import AdminLoginSelector from "./pages/AdminLoginSelector";
 import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminNews from "./pages/AdminNews";
@@ -25,6 +26,7 @@ import LostFound from "./pages/LostFound";
 import LostFoundView from "./pages/LostFoundView";
 import ProjectDashboard from "./pages/ProjectDashboard";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import TrainAdminAnalytics from "./pages/TrainAdminAnalytics";
 import AdminStaff from "./pages/AdminStaff";
 import AdminComplaints from "./pages/AdminComplaints";
 import AdminOrders from "./pages/AdminOrders";
@@ -150,6 +152,7 @@ function App() {
 
       <Route path="/adminlogin" element={<AdminLogin />} />
       <Route path="/adminlogin.html" element={<AdminLogin />} />
+      <Route path="/admin-select" element={<AdminLoginSelector />} />
       <Route path="/superadmin-login" element={<SuperAdminLogin />} />
       <Route path="/adminregister" element={<AdminRegister />} />
       <Route path="/adminregister.html" element={<AdminRegister />} />
@@ -174,7 +177,7 @@ function App() {
       <Route
         path="/superadmin-dashboard"
         element={
-          <ProtectedRoute type="admin">
+          <ProtectedRoute type="superadmin">
             <SuperAdminDashboard />
           </ProtectedRoute>
         }
@@ -193,6 +196,15 @@ function App() {
         element={
           <ProtectedRoute type="admin">
             <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/train-admin-analytics"
+        element={
+          <ProtectedRoute type="admin">
+            <TrainAdminAnalytics />
           </ProtectedRoute>
         }
       />

@@ -9,9 +9,9 @@ adminRouter.post('/register', adminController.register);
 adminRouter.post('/login', adminController.login);
 adminRouter.post('/logout', adminController.logout);
 
-// Dashboard stats
-adminRouter.get('/dashboard-stats', adminAuthentication, adminController.getDashboardStats);
-adminRouter.get('/train-statistics', adminAuthentication, adminController.getTrainStatistics);
+// Dashboard stats (no auth required for now)
+adminRouter.get('/dashboard-stats', adminController.getDashboardStats);
+adminRouter.get('/train-statistics', adminController.getTrainStatistics);
 
 // Staff management
 adminRouter.get('/train-staff', adminAuthentication, adminController.getTrainStaff);
@@ -32,14 +32,11 @@ adminRouter.delete('/commands/:id', adminAuthentication, adminController.deleteC
 // Train management
 adminRouter.post('/trains', adminAuthentication, adminController.addTrain);
 
-// Lost & Found for admin's train
-adminRouter.get('/train-lostnfound', adminAuthentication, adminController.getTrainLostFound);
-
-// Super admin — all data across all trains
-adminRouter.get('/all-orders', adminAuthentication, adminController.getAllOrdersAll);
-adminRouter.get('/all-complaints', adminAuthentication, adminController.getAllComplaintsAll);
-adminRouter.get('/all-lostnfound', adminAuthentication, adminController.getAllLostFoundAll);
-adminRouter.get('/all-staff', adminAuthentication, adminController.getAllStaffAll);
+// All data endpoints (for analytics - no auth required for now)
+adminRouter.get('/all-orders', adminController.getAllOrdersAll);
+adminRouter.get('/all-complaints', adminController.getAllComplaintsAll);
+adminRouter.get('/all-lostnfound', adminController.getAllLostFoundAll);
+adminRouter.get('/all-staff', adminController.getAllStaffAll);
 
 adminRouter.get('/test', adminAuthentication, (req, res) => {
     res.send("Admin route is working");

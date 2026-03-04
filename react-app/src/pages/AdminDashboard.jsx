@@ -18,12 +18,15 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadStats();
-  }, [apiBase]);
+  }, [apiBase, adminTrainNo]);
 
   const loadStats = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/admin/train-statistics`, { credentials: 'include' });
+      const url = adminTrainNo 
+        ? `${apiBase}/admin/train-statistics?trainNo=${adminTrainNo}`
+        : `${apiBase}/admin/train-statistics`;
+      const res = await fetch(url, { credentials: 'include' });
       const data = await res.json();
       if (data.success) setStats(data.data);
     } catch (err) {

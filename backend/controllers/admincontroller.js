@@ -252,7 +252,13 @@ const addTrain = async (req, res) => {
 // ── GET dashboard summary stats ──
 const getDashboardStats = async (req, res) => {
     try {
-        const trainNo = req.trainNo;
+        // Get trainNo from query params or from auth token (if available)
+        const trainNo = req.query.trainNo || req.trainNo;
+        
+        if (!trainNo) {
+            return res.status(400).json({ success: false, message: "Train number is required" });
+        }
+        
         const [staffCount, pendingComplaints, totalComplaints, totalOrders, pendingOrders] = await Promise.all([
             staffModel.countDocuments({ trainNumber: trainNo }),
             complaintModel.countDocuments({ trainNumber: trainNo, status: { $ne: 'Resolved' } }),
@@ -273,7 +279,13 @@ const getDashboardStats = async (req, res) => {
 // ── GET detailed train statistics ──
 const getTrainStatistics = async (req, res) => {
     try {
-        const trainNo = req.trainNo;
+        // Get trainNo from query params or from auth token (if available)
+        const trainNo = req.query.trainNo || req.trainNo;
+        
+        if (!trainNo) {
+            return res.status(400).json({ success: false, message: "Train number is required" });
+        }
+        
         const complaintModel = require("../models/complaintModel");
         const cateringModel = require("../models/cateringModel");
         const emergencyModel = require("../models/emergencyModel");
@@ -315,6 +327,46 @@ const getTrainStatistics = async (req, res) => {
     }
 };
 
+// ── GET all orders across all trains ──
+const getAllOrdersAll = async (req, res) => {
+    try {
+        const orders = await cateringModel.find({}).select('-__v');
+        res.status(200).json({ success: true, data: orders });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// ── GET all complaints across all trains ──
+const getAllComplaintsAll = async (req, res) => {
+    try {
+        const complaints = await complaintModel.find({}).select('-__v');
+        res.status(200).json({ success: true, data: complaints });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// ── GET all lost and found across all trains ──
+const getAllLostFoundAll = async (req, res) => {
+    try {
+        const lostFound = await require("../models/lostnfoundModel").find({}).select('-__v');
+        res.status(200).json({ success: true, data: lostFound });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+// ── GET all staff across all trains ──
+const getAllStaffAll = async (req, res) => {
+    try {
+        const staff = await staffModel.find({}).select('-password -__v');
+        res.status(200).json({ success: true, data: staff });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -329,5 +381,9 @@ module.exports = {
     deleteCommand,
     addTrain,
     getDashboardStats,
-    getTrainStatistics
+    getTrainStatistics,
+    getAllOrdersAll,
+    getAllComplaintsAll,
+    getAllLostFoundAll,
+    getAllStaffAll
 };

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setAdminToken, setAdminTrainNo, setAdminRole } from "../store/slices/authSlice";
+import { setSuperAdminToken } from "../store/slices/authSlice";
 import { useApi } from "../context/ApiContext";
 
 const SuperAdminLogin = () => {
@@ -28,14 +28,9 @@ const SuperAdminLogin = () => {
         withCredentials: true
       });
       const data = res.data;
-      if (res.status === 200 && data.admin.role === 'superadmin') {
-        dispatch(setAdminToken("authenticated"));
-        dispatch(setAdminRole(data.admin.role));
-        navigate("/superadmin-dashboard");
-      } else if (res.status === 200) {
-        // setMessage("You are not authorized to access SuperAdmin dashboard.");
-        dispatch(setAdminToken("authenticated"));
-        dispatch(setAdminRole(data.admin.role));
+      if (res.status === 200) {
+        // Set superadmin token for superadmin dashboard
+        dispatch(setSuperAdminToken("authenticated"));
         navigate("/superadmin-dashboard");
       } else {
         setMessage(data.message || "Invalid username or password.");
