@@ -23,4 +23,8 @@ superadminRouter.get("/users/:userId", superadminController.getUserDetails);
 superadminRouter.get("/staff", superadminController.getAllStaff);
 superadminRouter.get("/staff/:staffId", superadminController.getStaffDetails);
 
+// Admins management
+superadminRouter.get("/admins", superadminController.getAllAdmins);
+superadminRouter.get("/admins/:adminId", superadminController.getAdminDetails);
+
 module.exports = superadminRouter;
