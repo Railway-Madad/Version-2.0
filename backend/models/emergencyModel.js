@@ -4,7 +4,11 @@ const emergencySchema = new mongoose.Schema({
   username: { type: String, required: true },
   trainNumber: { type: String, required: true },
   seatNumber: { type: String, required: true },
-  status: { type: String, default: "Active" },
+  status: { 
+    type: String, 
+    enum: ["Active", "InProcess", "Resolved"],
+    default: "Active" 
+  },
   createdAt: { type: Date, default: Date.now },
 });
 module.exports = mongoose.model("Emergency", emergencySchema);
