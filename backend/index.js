@@ -17,7 +17,8 @@ const feedbackRouter = require("./routes/feedbackRouter");
 const lostnfoundRouter = require("./routes/lostnfoundRoutes");
 const superadminRouter = require("./routes/superadminRoutes");
 const Train = require("./models/trainModel");
-
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 // Logger middleware
 const {
   requestLogger,
@@ -64,6 +65,8 @@ app.use("/feedback", feedbackRouter);
 app.use("/lostnfound", lostnfoundRouter);
 app.use('/superadmin', superadminRouter);
 
+// Swagger API documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //For the cookie testing putpose i have added 
 app.get("/test-cookie", (req, res) => {
     res.cookie("testCookie", "working", { httpOnly: true });
@@ -74,6 +77,16 @@ app.get("/test-cookie", (req, res) => {
 });
 
 // Get available trains
+/**
+ * @swagger
+ * /api/trains:
+ *   get:
+ *     summary: Get available trains
+ *     tags: [Trains]
+ *     responses:
+ *       200:
+ *         description: A list of trains
+ */
 app.get("/api/trains", async (req, res) => {
   try {
     const trains = await Train.find({});
@@ -90,6 +103,25 @@ app.get("/api/trains", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/trains:
+ *   post:
+ *     summary: Add a new train
+ *     tags: [Trains]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               trainNumber:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Train created successfully
+ */
 app.post("/api/trains", async (req, res) => {
   try {
     const { trainNumber } = req.body;
