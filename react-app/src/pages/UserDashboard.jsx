@@ -281,21 +281,31 @@ const UserDashboard = () => {
     loadData();
   }, [isAuthenticated, navigate, fetchUserProfile, fetchComplaints, fetchOrders, fetchFood, fetchNews, fetchEmergencies, fetchLostNFound, fetchAllTrainLnF]);
 
-  // Botpress chatbot
+  // Botpress chatbot (safe async injection)
   useEffect(() => {
+    // Prevent duplicate script injection (React strict mode)
+    if (document.querySelector('script[src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"]')) {
+      return;
+    }
+
     const script1 = document.createElement("script");
     script1.src = "https://cdn.botpress.cloud/webchat/v3.6/inject.js";
     script1.async = true;
     document.body.appendChild(script1);
 
-    const script2 = document.createElement("script");
-    script2.src = "https://files.bpcontent.cloud/2026/02/15/17/20260215171709-IBMUNH6D.js";
-    script2.defer = true;
-    document.body.appendChild(script2);
+    let script2;
+    script1.onload = () => {
+      script2 = document.createElement("script");
+      script2.src = "https://files.bpcontent.cloud/2026/02/15/17/20260215171709-IBMUNH6D.js";
+      script2.defer = true;
+      document.body.appendChild(script2);
+    };
 
     return () => {
-      document.body.removeChild(script1);
-      document.body.removeChild(script2);
+      const s1 = document.querySelector('script[src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"]');
+      const s2 = document.querySelector('script[src="https://files.bpcontent.cloud/2026/02/15/17/20260215171709-IBMUNH6D.js"]');
+      if (s1) document.body.removeChild(s1);
+      if (s2) document.body.removeChild(s2);
       const botContainer = document.getElementById('bp-web-widget');
       if (botContainer) botContainer.remove();
     };
