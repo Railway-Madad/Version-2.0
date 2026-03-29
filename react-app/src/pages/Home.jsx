@@ -167,10 +167,7 @@ const Home = () => {
         <div className="home-hero-bg" />
         <div className="home-hero-pattern" />
         <div className="home-hero-content">
-          <div className="home-hero-badge">
-            <Icons.Sparkles />
-            <span>Streamlined Railway Support</span>
-          </div>
+          
           <h1 className="home-hero-title">
             Experience a Faster Way to{" "}
             <span className="home-hero-title-highlight">Handle Railway Support</span>
@@ -248,7 +245,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section
       <section className="home-stats">
         <div className="home-stats-grid">
           <div className="home-stat">
@@ -268,7 +265,7 @@ const Home = () => {
             <div className="home-stat-label">Satisfaction Rate</div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="home-footer">

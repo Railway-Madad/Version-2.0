@@ -515,8 +515,8 @@
 /* ===== Footer ===== */
 .home-footer {
   padding: 3rem 2rem;
-  background: var(--home-surface);
-  border-top: 1px solid var(--home-border);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #1e40af 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
   text-align: center;
 }
 
@@ -534,7 +534,7 @@
 }
 
 .home-footer-text {
-  color: var(--home-text-secondary);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
 }
@@ -547,14 +547,14 @@
 }
 
 .home-footer-link {
-  color: var(--home-text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   font-size: 0.9rem;
   transition: var(--home-transition);
 }
 
 .home-footer-link:hover {
-  color: var(--home-primary);
+  color: #ffffff;
 }
 
 /* ===== Animations ===== */

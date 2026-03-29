@@ -151,7 +151,7 @@ const UserDashboard = () => {
   // Form states
   const [showComplaintForm, setShowComplaintForm] = useState(false);
   const [complaintForm, setComplaintForm] = useState({
-    pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null
+    pnr: "", trainNumber: passengerTrainNo || "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null
   });
   const [showEmergencyForm, setShowEmergencyForm] = useState(false);
   const [emergencyForm, setEmergencyForm] = useState({ seatNumber: "" });
@@ -328,6 +328,7 @@ const UserDashboard = () => {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("pnr", complaintForm.pnr);
+      formData.append("trainNumber", complaintForm.trainNumber || passengerTrainNo || "");
       formData.append("bogieNumber", complaintForm.bogieNumber);
       formData.append("seatNumber", complaintForm.seatNumber);
       formData.append("description", complaintForm.description);
@@ -342,7 +343,7 @@ const UserDashboard = () => {
       const data = await res.json();
       if (data.success) {
         setShowComplaintForm(false);
-        setComplaintForm({ pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null });
+        setComplaintForm({ pnr: "", trainNumber: passengerTrainNo || "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null });
         fetchComplaints();
       } else {
         alert(data.message || data.error || "Failed to submit complaint");
@@ -1378,17 +1379,32 @@ const UserDashboard = () => {
               </div>
               <div className="ud-form-row">
                 <div className="ud-form-group">
+                  <label>Train Number</label>
+                  <input
+                    value={complaintForm.trainNumber || passengerTrainNo || ""}
+                    onChange={(e) => setComplaintForm({ ...complaintForm, trainNumber: e.target.value })}
+                    placeholder="e.g., 12951"
+                    required
+                  />
+                </div>
+                <div className="ud-form-group">
                   <label>Bogie Number</label>
                   <input
                     value={complaintForm.bogieNumber}
                     onChange={(e) => setComplaintForm({ ...complaintForm, bogieNumber: e.target.value })}
+                    placeholder="e.g., S1"
+                    required
                   />
                 </div>
+              </div>
+              <div className="ud-form-row">
                 <div className="ud-form-group">
                   <label>Seat Number</label>
                   <input
                     value={complaintForm.seatNumber}
                     onChange={(e) => setComplaintForm({ ...complaintForm, seatNumber: e.target.value })}
+                    placeholder="e.g., 45"
+                    required
                   />
                 </div>
               </div>
