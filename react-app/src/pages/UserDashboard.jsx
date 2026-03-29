@@ -151,7 +151,7 @@ const UserDashboard = () => {
   // Form states
   const [showComplaintForm, setShowComplaintForm] = useState(false);
   const [complaintForm, setComplaintForm] = useState({
-    pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleanliness", image: null
+    pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null
   });
   const [showEmergencyForm, setShowEmergencyForm] = useState(false);
   const [emergencyForm, setEmergencyForm] = useState({ seatNumber: "" });
@@ -342,7 +342,7 @@ const UserDashboard = () => {
       const data = await res.json();
       if (data.success) {
         setShowComplaintForm(false);
-        setComplaintForm({ pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleanliness", image: null });
+        setComplaintForm({ pnr: "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null });
         fetchComplaints();
       } else {
         alert(data.message || data.error || "Failed to submit complaint");
@@ -1368,12 +1368,11 @@ const UserDashboard = () => {
                     value={complaintForm.issueDomain}
                     onChange={(e) => setComplaintForm({ ...complaintForm, issueDomain: e.target.value })}
                   >
-                    <option>Cleanliness</option>
-                    <option>Food Quality</option>
-                    <option>Staff Behavior</option>
-                    <option>Technical Issue</option>
-                    <option>Safety</option>
-                    <option>Other</option>
+                    <option>Cleaning</option>
+                    <option>Catering</option>
+                    <option>Security</option>
+                    <option>Maintenance</option>
+                    <option>Medical</option>
                   </select>
                 </div>
               </div>
