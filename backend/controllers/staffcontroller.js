@@ -6,6 +6,7 @@ const Complaint = require('../models/complaintModel');
 const complaintModel = require('../models/complaintModel');
 const commandModel = require('../models/commandModel');
 const { setAuthCookie, clearAuthCookie } = require('../utils/cookieHelper');
+const { paginateModel } = require('../utils/pagination');
 
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -112,12 +113,24 @@ const getComplaints = async (req, res) => {
         }
 
         // Fetch complaints assigned to the staff's role AND train number
-        const complaints = await Complaint.find({ 
+        const filter = {
             issueDomain: staff.role,
-            trainNumber: trainNo 
-        }).sort({ createdAt: -1 });
-        
-        res.status(200).json({ complaints });
+            trainNumber: trainNo
+        };
+
+        const result = await paginateModel({
+            model: Complaint,
+            query: req.query,
+            filter,
+            sort: { createdAt: -1 },
+        });
+
+        res.status(200).json({
+            complaints: result.data,
+            hasMore: result.hasMore,
+            nextPage: result.nextPage || null,
+            nextCursor: result.nextCursor || null,
+        });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -187,9 +200,14 @@ const logout = async (req, res) => {
 const getMyCommands = async (req, res) => {
     try {
         const staffId = req.staffId;
-        const commands = await commandModel.find({ staffId })
-            .sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: commands });
+        const result = await paginateModel({
+            model: commandModel,
+            query: req.query,
+            filter: { staffId },
+            sort: { createdAt: -1 },
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }

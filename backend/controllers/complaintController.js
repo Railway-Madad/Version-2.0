@@ -1,6 +1,7 @@
 const { cloudinary } = require("../config/cloudinary");
 const Complaint = require("../models/complaintModel");
 const streamifier = require("streamifier");
+const { paginateModel } = require("../utils/pagination");
 
 //post
 exports.postComplaint = async (req, res) => {
@@ -56,10 +57,17 @@ exports.postComplaint = async (req, res) => {
 // GET: Get complaints by username
 exports.getComplaintsByUser = async (req, res) => {
   try {
-    const complaints = await Complaint.find({
-      username: req.params.username,
-    }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { username: req.params.username },
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching complaints:", error);
     res.status(500).json({ error: "Server error" });
@@ -70,8 +78,17 @@ exports.getComplaintByStatus = async (req, res) => {
  //by default get Important complaints
   const status = "Important";
   try {
-    const complaints = await Complaint.find({ status }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { status },
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching complaints by status:", error);
     res.status(500).json({ error: "Server error" });
@@ -118,10 +135,17 @@ exports.resolveComplaint = async (req, res) => {
 // GET:
 exports.getComplaintsByDomain = async (req, res) => {
   try {
-    const complaints = await Complaint.find({
-      issueDomain: req.params.domain,
-    }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { issueDomain: req.params.domain },
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching complaints by domain:", error);
     res.status(500).json({ error: "Server error" });
@@ -131,12 +155,20 @@ exports.getComplaintsByDomain = async (req, res) => {
 // GET: All user images
 exports.getImagesByUser = async (req, res) => {
   try {
-    const images = await Complaint.find({
-      username: req.params.username,
-      linkurl: { $ne: null },
-    }).sort({ createdAt: -1 });
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: {
+        username: req.params.username,
+        linkurl: { $ne: null },
+      },
+      sort: { createdAt: -1 },
+    });
 
-    res.json(images);
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching images:", error);
     res.status(500).json({ error: "Server error" });
@@ -146,8 +178,17 @@ exports.getImagesByUser = async (req, res) => {
 // GET: All complaints (for admin)
 exports.getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ trainNumber: req.trainNo }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { trainNumber: req.trainNo },
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching all complaints:", error);
     res.status(500).json({ error: "Server error" });
@@ -156,8 +197,17 @@ exports.getAllComplaints = async (req, res) => {
 //Get all complaints but not resolved
 exports.getPendingComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ status: { $ne: 'Resolved' }, trainNumber: req.trainNo }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { status: { $ne: 'Resolved' }, trainNumber: req.trainNo },
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.json(result.data);
   } catch (error) {
     console.error("Error fetching pending complaints:", error);
     res.status(500).json({ error: "Server error" });
@@ -201,8 +251,19 @@ exports.handleSatisfaction = async (req, res) => {
 // GET: Get all user's complaints across all trains (for historical view)
 exports.getMyAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ userId: req.userId }).sort({ createdAt: -1 });
-    res.json(complaints);
+    const result = await paginateModel({
+      model: Complaint,
+      query: req.query,
+      filter: { userId: req.userId },
+      sort: { createdAt: -1 },
+    });
+
+    res.json({
+      success: true,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
+    });
   } catch (error) {
     console.error("Error fetching all user complaints:", error);
     res.status(500).json({ error: "Server error" });
