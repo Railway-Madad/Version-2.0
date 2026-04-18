@@ -35,4 +35,7 @@ const foodSchema = new mongoose.Schema(
   }
 );
 
+foodSchema.index({ category: 1, isAvailable: 1, createdAt: -1 });
+foodSchema.index({ isAvailable: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Food", foodSchema);

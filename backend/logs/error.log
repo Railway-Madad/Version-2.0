@@ -7,3 +7,6 @@
 ::ffff:127.0.0.1 - [30/Mar/2026:04:34:38 +0000] "POST /emergency/postEmg" 500 "-" - 12.503 ms
 ::ffff:127.0.0.1 - [30/Mar/2026:04:35:47 +0000] "POST /complaint/submit-complaint" 500 "-" - 20.356 ms
 ::ffff:127.0.0.1 - [30/Mar/2026:04:42:17 +0000] "POST /complaint/submit-complaint" 500 "-" - 14.442 ms
+::ffff:127.0.0.1 - [01/Apr/2026:05:09:40 +0000] "GET /complaint" 401 "-" - 2.002 ms
+::ffff:127.0.0.1 - [01/Apr/2026:05:09:48 +0000] "POST /complaint/submit-complaint" 401 "-" - 2.967 ms
+::ffff:127.0.0.1 - [18/Apr/2026:14:10:32 +0000] "POST /user/login" 400 "-" - 300.762 ms

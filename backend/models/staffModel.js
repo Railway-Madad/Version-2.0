@@ -42,5 +42,8 @@ const staffSchema = new mongoose.Schema({
     }
 });
 
+staffSchema.index({ trainNumber: 1, createdAt: -1 });
+staffSchema.index({ role: 1, trainNumber: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Staff', staffSchema);
 

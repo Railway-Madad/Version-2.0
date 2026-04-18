@@ -55,4 +55,10 @@ const cateringSchema = new mongoose.Schema(
   }
 );
 
+cateringSchema.index({ trainNumber: 1, createdAt: -1 });
+cateringSchema.index({ user: 1, trainNumber: 1, createdAt: -1 });
+cateringSchema.index({ user: 1, createdAt: -1 });
+cateringSchema.index({ trainNumber: 1, status: 1, createdAt: -1 });
+cateringSchema.index({ status: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Catering", cateringSchema);

@@ -22,4 +22,6 @@ const newsSchema = new mongoose.Schema(
   }
 );
 
+newsSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("News", newsSchema);

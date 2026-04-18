@@ -40,4 +40,9 @@ const commandSchema = new mongoose.Schema({
     }
 });
 
+commandSchema.index({ trainNumber: 1, createdAt: -1 });
+commandSchema.index({ staffId: 1, createdAt: -1 });
+commandSchema.index({ staffId: 1, isRead: 1, createdAt: -1 });
+commandSchema.index({ adminId: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Command', commandSchema);
