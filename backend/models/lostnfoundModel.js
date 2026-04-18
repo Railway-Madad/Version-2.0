@@ -48,4 +48,8 @@ const lostFoundSchema = new Schema(
     { timestamps: true }
 );
 
+lostFoundSchema.index({ trainNumber: 1, createdAt: -1 });
+lostFoundSchema.index({ userId: 1, trainNumber: 1, createdAt: -1 });
+lostFoundSchema.index({ trainNumber: 1, category: 1, status: 1, createdAt: -1 });
+
 module.exports = mongoose.model("LostFound", lostFoundSchema);

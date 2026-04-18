@@ -31,4 +31,7 @@ const adminSchema = new mongoose.Schema({
     }
 });
 
+adminSchema.index({ role: 1, createdAt: -1 });
+adminSchema.index({ trainNo: 1, role: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Admin', adminSchema);

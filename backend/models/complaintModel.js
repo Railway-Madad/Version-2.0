@@ -71,4 +71,11 @@ const complaintSchema = new mongoose.Schema({
     resolvedAt: Date
 });
 
-module.exports = mongoose.model('Complaint', complaintSchema);
+complaintSchema.index({ trainNumber: 1, createdAt: -1 });
+complaintSchema.index({ userId: 1, createdAt: -1 });
+complaintSchema.index({ status: 1, createdAt: -1 });
+complaintSchema.index({ trainNumber: 1, status: 1, createdAt: -1 });
+complaintSchema.index({ trainNumber: 1, issueDomain: 1, status: 1, createdAt: -1 });
+complaintSchema.index({ resolvedBy: 1, status: 1, createdAt: -1 });
+
+module.exports = mongoose.model('Complaint', complaintSchema);  
