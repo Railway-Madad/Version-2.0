@@ -1,5 +1,6 @@
 const Catering = require("../models/cateringModel");
 const Food = require("../models/foodModel"); 
+const { paginateModel } = require("../utils/pagination");
 
 // const placeOrder = async (req, res) => {
 //   try {
@@ -121,14 +122,22 @@ const placeOrder = async (req, res) => {
 
 const getAllCateringOrders = async (req, res) => {
   try {
-    const orders = await Catering.find({ trainNumber: req.trainNo })
-    .sort({ createdAt: -1 })
-      .populate("user", "name email") 
-      .populate("items.foodItem", "name price"); 
+    const result = await paginateModel({
+      model: Catering,
+      query: req.query,
+      filter: { trainNumber: req.trainNo },
+      sort: { createdAt: -1 },
+      populate: [
+        { path: "user", select: "name email" },
+        { path: "items.foodItem", select: "name price" },
+      ],
+    });
+
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
     });
   } catch (error) {
     console.error(error);
@@ -142,14 +151,19 @@ const getMyCateringOrders = async (req, res) => {
       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
     }
 
-    const orders = await Catering.find({ user: req.userId, trainNumber: req.trainNo })
-    .sort({ createdAt: -1 })
-      .populate("items.foodItem", "name price");
+    const result = await paginateModel({
+      model: Catering,
+      query: req.query,
+      filter: { user: req.userId, trainNumber: req.trainNo },
+      sort: { createdAt: -1 },
+      populate: { path: "items.foodItem", select: "name price" },
+    });
 
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
     });
   } catch (error) {
     console.error(error);
@@ -192,14 +206,21 @@ const getMyAllCateringOrders = async (req, res) => {
       return res.status(401).json({ success: false, message: "Not authorized, user not found" });
     }
 
-    const orders = await Catering.find({ user: req.userId })
-    .sort({ createdAt: -1 })
-      .populate("items.foodItem", "name price");
+    const result = await paginateModel({
+      model: Catering,
+      query: req.query,
+      filter: { user: req.userId },
+      sort: { createdAt: -1 },
+      populate: { path: "items.foodItem", select: "name price" },
+    });
 
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders,
+      count: result.data.length,
+      data: result.data,
+      hasMore: result.hasMore,
+      nextPage: result.nextPage || null,
+      nextCursor: result.nextCursor || null,
     });
   } catch (error) {
     console.error(error);

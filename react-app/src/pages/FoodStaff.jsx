@@ -113,6 +113,7 @@ const ROLES = [
    MAIN FOOD STAFF DASHBOARD COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const FoodStaff = () => {
+  const BATCH_SIZE = 25;
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -134,30 +135,65 @@ const FoodStaff = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [otpInput, setOtpInput] = useState("");
 
+  const fetchAllBatches = useCallback(async (url, options = {}, extractor) => {
+    const getItems = extractor || ((payload) => {
+      if (Array.isArray(payload)) return payload;
+      return payload?.data || payload?.items || payload?.orders || [];
+    });
+
+    let page = 1;
+    let hasMore = true;
+    const seen = new Set();
+    const merged = [];
+
+    while (hasMore && page <= 200) {
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}page=${page}`, options);
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+      const payload = await res.json();
+      const batch = getItems(payload) || [];
+
+      let newCount = 0;
+      for (const item of batch) {
+        const key = item?._id || `${page}-${newCount}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(item);
+          newCount += 1;
+        }
+      }
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+      if (newCount === 0) break;
+      page += 1;
+    }
+
+    return merged;
+  }, [BATCH_SIZE]);
+
   /* ── FETCH FUNCTIONS ── */
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/catering/all-orders`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
-        // Filter by staff's train
-        const filtered = (data.data || []).filter(
-          (o) => String(o.trainNumber) === String(staffTrainNo)
-        );
-        setOrders(filtered);
-      } else {
-        setOrders([]);
-      }
+      const allOrders = await fetchAllBatches(
+        `${apiBase}/catering/all-orders`,
+        { credentials: "include" },
+        (payload) => {
+          if (Array.isArray(payload)) return payload;
+          if (Array.isArray(payload?.data)) return payload.data;
+          return [];
+        }
+      );
+      const filtered = allOrders.filter((o) => String(o.trainNumber) === String(staffTrainNo));
+      setOrders(filtered);
     } catch (err) {
       console.error(err);
       setOrders([]);
     } finally {
       setLoading(false);
     }
-  }, [apiBase, staffTrainNo]);
+  }, [apiBase, staffTrainNo, fetchAllBatches]);
 
   useEffect(() => {
     if (!isAuthenticated) {

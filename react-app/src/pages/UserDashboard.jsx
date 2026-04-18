@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -125,6 +125,7 @@ const NAV_ITEMS = [
    MAIN USER DASHBOARD COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const UserDashboard = () => {
+  const BATCH_SIZE = 25;
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -147,6 +148,14 @@ const UserDashboard = () => {
   const [lostNFound, setLostNFound] = useState([]);
   const [allTrainLnF, setAllTrainLnF] = useState([]);
   const [cart, setCart] = useState([]);
+  const [complaintsCursor, setComplaintsCursor] = useState(null);
+  const [complaintsHasMore, setComplaintsHasMore] = useState(true);
+  const [complaintsLoadingMore, setComplaintsLoadingMore] = useState(false);
+  const complaintsLoadMoreRef = useRef(null);
+  const complaintsLoadingRef = useRef(false);
+  const mainScrollRef = useRef(null);
+  const complaintsCursorRef = useRef(null);
+  const complaintsHasMoreRef = useRef(true);
 
   // Form states
   const [showComplaintForm, setShowComplaintForm] = useState(false);
@@ -183,80 +192,171 @@ const UserDashboard = () => {
     }
   }, [apiBase, dispatch, navigate]);
 
-  const fetchComplaints = useCallback(async () => {
+  const fetchAllBatches = useCallback(async (url, options = {}, extractor) => {
+    const getItems = extractor || ((payload) => {
+      if (Array.isArray(payload)) return payload;
+      return payload?.data || payload?.items || payload?.complaints || [];
+    });
+
+    let page = 1;
+    let hasMore = true;
+    const seen = new Set();
+    const merged = [];
+
+    while (hasMore && page <= 200) {
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}page=${page}`, options);
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+
+      const payload = await res.json();
+      const batch = getItems(payload) || [];
+      let newItemsCount = 0;
+
+      for (const item of batch) {
+        const key = item?._id || `${page}-${newItemsCount}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(item);
+          newItemsCount += 1;
+        }
+      }
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+
+      // Safety break: backend ignored page and returned duplicate window.
+      if (newItemsCount === 0) break;
+
+      page += 1;
+    }
+
+    return merged;
+  }, [BATCH_SIZE]);
+
+  const fetchComplaints = useCallback(async ({ append = false } = {}) => {
+    if (complaintsLoadingRef.current) return;
+    if (append && !complaintsHasMoreRef.current) return;
+
+    complaintsLoadingRef.current = true;
+    setComplaintsLoadingMore(true);
     try {
-      const res = await fetch(`${apiBase}/complaint/my-complaints-history`, { credentials: "include" });
-      const data = await res.json();
-      // Backend returns array directly from getMyAllComplaints
-      setComplaints(Array.isArray(data) ? data : []);
+      const nextPage = append ? (complaintsCursorRef.current || 1) : 1;
+      const sep = `${apiBase}/complaint/my-complaints-history`.includes("?") ? "&" : "?";
+      const res = await fetch(`${apiBase}/complaint/my-complaints-history${sep}page=${nextPage}`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+
+      const payload = await res.json();
+      const batch = Array.isArray(payload)
+        ? payload
+        : payload?.data || payload?.items || payload?.complaints || [];
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      const hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+
+      if (append) {
+        setComplaints((prev) => {
+          const seen = new Set(prev.map((c) => c?._id));
+          const merged = [...prev];
+          for (const item of batch) {
+            if (!seen.has(item?._id)) {
+              seen.add(item?._id);
+              merged.push(item);
+            }
+          }
+          return merged;
+        });
+      } else {
+        setComplaints(batch);
+      }
+
+      setComplaintsHasMore(hasMore);
+      complaintsHasMoreRef.current = hasMore;
+
+      const nextCursor = hasMore ? nextPage + 1 : null;
+      setComplaintsCursor(nextCursor);
+      complaintsCursorRef.current = nextCursor;
     } catch (err) {
       console.error(err);
+      if (!append) setComplaints([]);
+      setComplaintsHasMore(false);
+      setComplaintsCursor(null);
+      complaintsHasMoreRef.current = false;
+      complaintsCursorRef.current = null;
+    } finally {
+      complaintsLoadingRef.current = false;
+      setComplaintsLoadingMore(false);
     }
-  }, [apiBase]);
+  }, [apiBase, BATCH_SIZE]);
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/catering/my-orders-history`, { credentials: "include" });
-      const data = await res.json();
-      setOrders(data.data || []);
+      const allOrders = await fetchAllBatches(
+        `${apiBase}/catering/my-orders-history`,
+        { credentials: "include" }
+      );
+      setOrders(allOrders);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchFood = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/food`);
-      const data = await res.json();
-      if (data.success) setFoodItems(data.data || []);
+      const allFood = await fetchAllBatches(`${apiBase}/food`);
+      setFoodItems(allFood);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchNews = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/news`);
-      const data = await res.json();
-      if (data.success) setNewsItems(data.data || []);
+      const allNews = await fetchAllBatches(`${apiBase}/news`);
+      setNewsItems(allNews);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchEmergencies = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/emergency/my-emergencies`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) {
-        setEmergencies(data.data || []);
-      } else {
-        setEmergencies([]);
-      }
+      const allEmergencies = await fetchAllBatches(
+        `${apiBase}/emergency/my-emergencies`,
+        { credentials: "include" }
+      );
+      setEmergencies(allEmergencies);
     } catch (err) {
       console.error(err);
+      setEmergencies([]);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchLostNFound = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/lostnfound/myitems`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setLostNFound(data.items || []);
+      const allMine = await fetchAllBatches(
+        `${apiBase}/lostnfound/myitems`,
+        { credentials: "include" }
+      );
+      setLostNFound(allMine);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchAllTrainLnF = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/lostnfound`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setAllTrainLnF(data.items || []);
+      const allItems = await fetchAllBatches(
+        `${apiBase}/lostnfound`,
+        { credentials: "include" }
+      );
+      setAllTrainLnF(allItems);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -268,7 +368,7 @@ const UserDashboard = () => {
       setLoading(true);
       await Promise.all([
         fetchUserProfile(),
-        fetchComplaints(),
+        fetchComplaints({ append: false }),
         fetchOrders(),
         fetchFood(),
         fetchNews(),
@@ -279,7 +379,8 @@ const UserDashboard = () => {
       setLoading(false);
     };
     loadData();
-  }, [isAuthenticated, navigate, fetchUserProfile, fetchComplaints, fetchOrders, fetchFood, fetchNews, fetchEmergencies, fetchLostNFound, fetchAllTrainLnF]);
+    // Intentionally avoid re-running full dashboard fetch when pagination state updates.
+  }, [isAuthenticated, navigate, apiBase]);
 
   // Botpress chatbot (safe async injection)
   useEffect(() => {
@@ -344,7 +445,11 @@ const UserDashboard = () => {
       if (data.success) {
         setShowComplaintForm(false);
         setComplaintForm({ pnr: "", trainNumber: passengerTrainNo || "", bogieNumber: "", seatNumber: "", description: "", issueDomain: "Cleaning", image: null });
-        fetchComplaints();
+        setComplaintsCursor(null);
+        complaintsCursorRef.current = null;
+        setComplaintsHasMore(true);
+        complaintsHasMoreRef.current = true;
+        fetchComplaints({ append: false });
       } else {
         alert(data.message || data.error || "Failed to submit complaint");
       }
@@ -468,7 +573,7 @@ const UserDashboard = () => {
       });
       const data = await res.json();
       if (data.success) {
-        fetchComplaints();
+        fetchComplaints({ append: false });
         alert(satisfied ? "Thank you for confirming!" : "Complaint reopened for further review.");
       } else {
         alert(data.error || data.message || "Failed to update");
@@ -549,6 +654,42 @@ const UserDashboard = () => {
     const awaiting = complaints.filter(c => c.status === "AwaitingConfirmation").length;
     return { total: complaints.length, pending, resolved, awaiting };
   }, [complaints]);
+
+  //important beucase of this only pagination working smooth as fk
+  useEffect(() => {
+    if (activeSection !== "complaints") return;
+    if (!complaintsHasMore) return;
+
+    const sentinel = complaintsLoadMoreRef.current;
+    const rootNode = mainScrollRef.current;
+    if (!sentinel || !rootNode) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !complaintsLoadingRef.current) {
+          fetchComplaints({ append: true });
+        }
+      },
+      { root: rootNode, rootMargin: "200px", threshold: 0 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [activeSection, complaintsHasMore, fetchComplaints]);
+
+  useEffect(() => {
+    if (activeSection !== "complaints") return;
+    if (!complaintsHasMore) return;
+    if (complaintsLoadingRef.current) return;
+
+    const rootNode = mainScrollRef.current;
+    if (!rootNode) return;
+
+    const notScrollableYet = rootNode.scrollHeight <= rootNode.clientHeight + 80;
+    if (notScrollableYet) {
+      fetchComplaints({ append: true });
+    }
+  }, [activeSection, complaints.length, complaintsHasMore, fetchComplaints]);
 
   const getRelativeTime = (dateStr) => {
     const date = new Date(dateStr);
@@ -811,6 +952,13 @@ const UserDashboard = () => {
                 ))}
               </tbody>
             </table>
+            <div ref={complaintsLoadMoreRef} className="ud-table-footer" style={{ textAlign: "center" }}>
+              {complaintsLoadingMore
+                ? "Loading complaints..."
+                : complaintsHasMore
+                  ? `Loaded ${complaints.length} complaints. Scroll for more...`
+                  : `All complaints loaded (${complaints.length})`}
+            </div>
           </div>
           <div className="ud-table-footer">
             Showing {complaints.length} complaint{complaints.length !== 1 ? 's' : ''}
@@ -1342,7 +1490,7 @@ const UserDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="ud-main">
+      <main className="ud-main" ref={mainScrollRef}>
         <div className="ud-content-area">
           {renderContent()}
         </div>

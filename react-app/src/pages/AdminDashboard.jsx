@@ -308,6 +308,7 @@ const NAV_ITEMS = [
    MAIN ADMIN DASHBOARD COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const AdminDashboard = () => {
+  const BATCH_SIZE = 25;
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -366,99 +367,127 @@ const AdminDashboard = () => {
     }
   }, [apiBase, adminTrainNo]);
 
+  const fetchAllBatches = useCallback(async (url, options = {}, extractor) => {
+    const getItems = extractor || ((payload) => {
+      if (Array.isArray(payload)) return payload;
+      return payload?.data || payload?.items || payload?.complaints || [];
+    });
+
+    let page = 1;
+    let hasMore = true;
+    const seen = new Set();
+    const merged = [];
+
+    while (hasMore && page <= 200) {
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}page=${page}`, options);
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+      const payload = await res.json();
+      const batch = getItems(payload) || [];
+
+      let newCount = 0;
+      for (const item of batch) {
+        const key = item?._id || `${page}-${newCount}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(item);
+          newCount += 1;
+        }
+      }
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+      if (newCount === 0) break;
+      page += 1;
+    }
+
+    return merged;
+  }, [BATCH_SIZE]);
+
   const fetchStaff = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/admin/train-staff`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setStaffList(data.data || []);
+      const allStaff = await fetchAllBatches(`${apiBase}/admin/train-staff`, { credentials: "include" });
+      setStaffList(allStaff);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchCommands = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/admin/commands`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setCommands(data.data || []);
+      const allCommands = await fetchAllBatches(`${apiBase}/admin/commands`, { credentials: "include" });
+      setCommands(allCommands);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchComplaints = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (complaintStatus) params.append("status", complaintStatus);
-      const res = await fetch(`${apiBase}/admin/train-complaints?${params.toString()}`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setComplaints(data.data || []);
+      const allComplaints = await fetchAllBatches(`${apiBase}/admin/train-complaints?${params.toString()}`, { credentials: "include" });
+      setComplaints(allComplaints);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase, complaintStatus]);
+  }, [apiBase, complaintStatus, fetchAllBatches]);
 
   const fetchOrders = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (orderStatus) params.append("status", orderStatus);
-      const res = await fetch(`${apiBase}/admin/train-orders?${params.toString()}`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setOrders(data.data || []);
+      const allOrders = await fetchAllBatches(`${apiBase}/admin/train-orders?${params.toString()}`, { credentials: "include" });
+      setOrders(allOrders);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase, orderStatus]);
+  }, [apiBase, orderStatus, fetchAllBatches]);
 
   const fetchFood = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/food`);
-      const data = await res.json();
-      if (data.success) setFoodItems(data.data || []);
+      const allFood = await fetchAllBatches(`${apiBase}/food`);
+      setFoodItems(allFood);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchNews = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/news`);
-      const data = await res.json();
-      if (data.success) setNewsItems(data.data || []);
+      const allNews = await fetchAllBatches(`${apiBase}/news`);
+      setNewsItems(allNews);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchEmergencies = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/emergency/admin/getEmg`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setEmergencies(data.data || []);
+      const allEmergencies = await fetchAllBatches(`${apiBase}/emergency/admin/getEmg`, { credentials: "include" });
+      setEmergencies(allEmergencies);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchLostNFound = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/admin/all-lostnfound`, { credentials: "include" });
-      const data = await res.json();
-      if (data.success) setLostNFound(data.data || []);
+      const allItems = await fetchAllBatches(`${apiBase}/admin/all-lostnfound`, { credentials: "include" });
+      setLostNFound(allItems);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchFeedbacks = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/feedback`);
-      const data = await res.json();
-      setFeedbacks(data.data || []);
+      const allFeedbacks = await fetchAllBatches(`${apiBase}/feedback`);
+      setFeedbacks(allFeedbacks);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchTrains = useCallback(async () => {
     try {

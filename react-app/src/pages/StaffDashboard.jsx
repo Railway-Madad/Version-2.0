@@ -88,6 +88,7 @@ const NAV_ITEMS = [
    MAIN STAFF DASHBOARD COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const StaffDashboard = () => {
+  const BATCH_SIZE = 25;
   const { apiBase } = useApi();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -126,12 +127,50 @@ const StaffDashboard = () => {
     }
   }, [apiBase, dispatch, navigate]);
 
+  const fetchAllBatches = useCallback(async (url, options = {}, extractor) => {
+    const getItems = extractor || ((payload) => {
+      if (Array.isArray(payload)) return payload;
+      return payload?.data || payload?.items || payload?.complaints || [];
+    });
+
+    let page = 1;
+    let hasMore = true;
+    const seen = new Set();
+    const merged = [];
+
+    while (hasMore && page <= 200) {
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}page=${page}`, options);
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+      const payload = await res.json();
+      const batch = getItems(payload) || [];
+
+      let newCount = 0;
+      for (const item of batch) {
+        const key = item?._id || `${page}-${newCount}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(item);
+          newCount += 1;
+        }
+      }
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+      if (newCount === 0) break;
+      page += 1;
+    }
+
+    return merged;
+  }, [BATCH_SIZE]);
+
   const fetchComplaints = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/staff/complaints`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch complaints");
-      const data = await res.json();
-      const complaints = data.complaints || [];
+      const complaints = await fetchAllBatches(
+        `${apiBase}/staff/complaints`,
+        { credentials: "include" },
+        (payload) => payload?.complaints || payload?.data || []
+      );
 
       // Process resolved complaints to get resolver names
       const resolvedList = await Promise.all(
@@ -160,18 +199,16 @@ const StaffDashboard = () => {
       setPendingComplaints([]);
       setResolvedComplaints([]);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   const fetchCommands = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/staff/commands`, { credentials: "include" });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data.success) setCommands(data.data || []);
+      const allCommands = await fetchAllBatches(`${apiBase}/staff/commands`, { credentials: "include" });
+      setCommands(allCommands);
     } catch (err) {
       console.error(err);
     }
-  }, [apiBase]);
+  }, [apiBase, fetchAllBatches]);
 
   useEffect(() => {
     if (!isAuthenticated) {

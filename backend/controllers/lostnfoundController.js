@@ -3,6 +3,7 @@ const streamifier = require("streamifier");
 const LostFound = require("../models/lostnfoundModel");
 const User = require("../models/userModel");
 const { mongo } = require("mongoose");
+const { paginateModel } = require("../utils/pagination");
 
 const addItem = async (req, res) => {
     try {
@@ -62,8 +63,19 @@ const addItem = async (req, res) => {
 
 const getAllItems = async (req, res) => {
   try {
-    const items = await LostFound.find({ trainNumber: req.trainNo }).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: items.length, items });
+        const result = await paginateModel({
+            model: LostFound,
+            query: req.query,
+            filter: { trainNumber: req.trainNo },
+            sort: { createdAt: -1 },
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result.data,
+            nextCursor: result.nextCursor || null,
+            hasMore: Boolean(result.hasMore),
+        });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -123,8 +135,19 @@ const markAsResolved = async (req, res) => {
 const getUserItems = async (req, res) => {
     const userId = req.userId;
     try {
-        const items = await LostFound.find({ userId, trainNumber: req.trainNo }).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, count: items.length, items });
+        const result = await paginateModel({
+            model: LostFound,
+            query: req.query,
+            filter: { userId, trainNumber: req.trainNo },
+            sort: { createdAt: -1 },
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result.data,
+            nextCursor: result.nextCursor || null,
+            hasMore: Boolean(result.hasMore),
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: "Server Error" });
