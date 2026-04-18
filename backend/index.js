@@ -184,11 +184,21 @@ async function connect() {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to MongoDB");
     await seedAdmin(); // ensure default credentials exist
-    app.listen(process.env.PORT, () => {
+    return app.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);
     });
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
+    throw error;
   }
 }
-connect();
+
+if (require.main === module && process.env.NODE_ENV !== "test") {
+  connect();
+}
+
+module.exports = {
+  app,
+  connect,
+  seedAdmin,
+};
