@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { API_BASE } from './env';
 
 // Create axios instance with default config for cookie-based auth
 const api = axios.create({
-  baseURL: 'https://version-2-0-ed6g.onrender.com',
+  baseURL: API_BASE,
   withCredentials: true, // Always send cookies with requests
   headers: {
     'Content-Type': 'application/json',

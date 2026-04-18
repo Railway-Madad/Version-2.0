@@ -30,18 +30,39 @@ const {
 
 const app = express();
 
+const isProduction = process.env.NODE_ENV === "production";
+const DEFAULT_FRONTEND_DEV_URL = "http://localhost:5173";
+const DEFAULT_FRONTEND_PROD_URL = "https://version-2-0-delta.vercel.app";
+const configuredFrontendUrl = process.env.FRONTEND_URL;
+
+const allowedOrigins = [
+  ...(isProduction
+    ? [configuredFrontendUrl || DEFAULT_FRONTEND_PROD_URL]
+    : [
+        configuredFrontendUrl || DEFAULT_FRONTEND_DEV_URL,
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+      ]),
+].filter(Boolean);
+
 // CORS configuration for cookies support
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", 
-      "http://localhost:5174", 
-      "http://localhost:5175", 
-      "http://localhost:5176",
-      process.env.FRONTEND_URL // Vercel production URL
-    ], // Frontend URLs
+    origin: (origin, callback) => {
+      // Allow server-to-server calls and tools like Postman with no browser origin.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true, // Allow cookies to be sent with requests
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })  
 );
@@ -181,11 +202,12 @@ async function seedAdmin() {
 
 async function connect() {
   try {
+    const port = process.env.PORT || 4000;
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to MongoDB");
     await seedAdmin(); // ensure default credentials exist
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     });
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
