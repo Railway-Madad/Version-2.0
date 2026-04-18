@@ -45,7 +45,7 @@
             const password = document.getElementById("password").value.trim();
             try {
                 console.log("Attempting login for admin:", username);
-                const res = await axios.post("http://localhost:4000/admin/login", {
+                const res = await axios.post("https://version-2-0-ed6g.onrender.com/admin/login", {
                     username,
                     password
                 });
