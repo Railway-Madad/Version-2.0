@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 
-const API_BASE = "http://localhost:4000";
+// Fallback to localhost if environment variable is missing
+const API_BASE = import.meta.env.VITE_API_BASE || "https://version-2-0-ed6g.onrender.com";
 
 const ApiContext = createContext({ apiBase: API_BASE });
 

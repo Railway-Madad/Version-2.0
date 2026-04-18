@@ -33,7 +33,13 @@ const app = express();
 // CORS configuration for cookies support
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"], // Frontend URLs
+    origin: [
+      "http://localhost:5173", 
+      "http://localhost:5174", 
+      "http://localhost:5175", 
+      "http://localhost:5176",
+      process.env.FRONTEND_URL // Vercel production URL
+    ], // Frontend URLs
     credentials: true, // Allow cookies to be sent with requests
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
