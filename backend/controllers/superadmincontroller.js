@@ -8,6 +8,7 @@ const Emergency = require("../models/emergencyModel");
 const Feedback = require("../models/feedbackModel");
 const News = require("../models/NewsModel");
 const Train = require("../models/trainModel");
+const { paginateModel } = require("../utils/pagination");
 
 // Get all trains stats
 const getAllTrainsStats = async (req, res) => {
@@ -95,24 +96,19 @@ const getSystemStats = async (req, res) => {
 // Get all users with their details
 const getAllUsers = async (req, res) => {
     try {
-        const { trainNumber, page = 1, limit = 10 } = req.query;
+        const { trainNumber } = req.query;
         
         const query = trainNumber ? { trainNumber } : {};
-        const skip = (page - 1) * limit;
-        
-        const users = await User.find(query)
-            .select("-password")
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
-        
-        const total = await User.countDocuments(query);
-        
-        res.status(200).json({ 
-            success: true, 
-            data: users,
-            pagination: { total, page, limit, pages: Math.ceil(total / limit) }
+
+        const result = await paginateModel({
+            model: User,
+            query: req.query,
+            filter: query,
+            sort: { createdAt: -1 },
+            select: "-password",
         });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -146,27 +142,21 @@ const getUserDetails = async (req, res) => {
 // Get all staff with their details
 const getAllStaff = async (req, res) => {
     try {
-        const { trainNumber, page = 1, limit = 10, role } = req.query;
+        const { trainNumber, role } = req.query;
         
         const query = {};
         if (trainNumber) query.trainNumber = trainNumber;
         if (role) query.role = role;
-        
-        const skip = (page - 1) * limit;
-        
-        const staff = await Staff.find(query)
-            .select("-password")
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
-        
-        const total = await Staff.countDocuments(query);
-        
-        res.status(200).json({ 
-            success: true, 
-            data: staff,
-            pagination: { total, page, limit, pages: Math.ceil(total / limit) }
+
+        const result = await paginateModel({
+            model: Staff,
+            query: req.query,
+            filter: query,
+            sort: { createdAt: -1 },
+            select: "-password",
         });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -264,26 +254,20 @@ const getComplaintAnalysis = async (req, res) => {
 // Get all admins
 const getAllAdmins = async (req, res) => {
     try {
-        const { page = 1, limit = 50, role } = req.query;
+        const { role } = req.query;
         
         const query = {};
         if (role) query.role = role;
-        
-        const skip = (page - 1) * limit;
-        
-        const admins = await Admin.find(query)
-            .select("-password")
-            .skip(skip)
-            .limit(parseInt(limit))
-            .sort({ createdAt: -1 });
-        
-        const total = await Admin.countDocuments(query);
-        
-        res.status(200).json({ 
-            success: true, 
-            data: admins,
-            pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / limit) }
+
+        const result = await paginateModel({
+            model: Admin,
+            query: req.query,
+            filter: query,
+            sort: { createdAt: -1 },
+            select: "-password",
         });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }

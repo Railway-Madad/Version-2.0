@@ -204,6 +204,7 @@ const NAV_ITEMS = [
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════════════ */
 const SuperAdminDashboard = () => {
+  const BATCH_SIZE = 25;
   const { apiBase } = useApi();
   const { theme, toggleTheme } = useTheme();
   const dispatch = useDispatch();
@@ -253,6 +254,43 @@ const SuperAdminDashboard = () => {
     loadAllData();
   }, [apiBase]);
 
+  const fetchAllBatches = useCallback(async (url, options = {}, extractor) => {
+    const getItems = extractor || ((payload) => {
+      if (Array.isArray(payload)) return payload;
+      return payload?.data || payload?.items || payload?.complaints || [];
+    });
+
+    let page = 1;
+    let hasMore = true;
+    const seen = new Set();
+    const merged = [];
+
+    while (hasMore && page <= 200) {
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}page=${page}`, options);
+      if (!res.ok) throw new Error(`Failed request: ${res.status}`);
+      const payload = await res.json();
+      const batch = getItems(payload) || [];
+
+      let newCount = 0;
+      for (const item of batch) {
+        const key = item?._id || `${page}-${newCount}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(item);
+          newCount += 1;
+        }
+      }
+
+      const responseHasMore = typeof payload?.hasMore === "boolean" ? payload.hasMore : null;
+      hasMore = responseHasMore !== null ? responseHasMore : batch.length === BATCH_SIZE;
+      if (newCount === 0) break;
+      page += 1;
+    }
+
+    return merged;
+  }, [BATCH_SIZE]);
+
   const logout = async () => {
     try {
       await axios.post(`${apiBase}/admin/logout`, {}, { withCredentials: true });
@@ -267,38 +305,41 @@ const SuperAdminDashboard = () => {
     try {
       setLoading(true);
       
-      const [sysRes, trainsRes, perfRes, complAnalysisRes, usersRes, staffRes] = await Promise.all([
+      const [sysRes, trainsRes, perfRes, complAnalysisRes] = await Promise.all([
         fetch(`${apiBase}/superadmin/stats/system`, { credentials: "include" }).catch(() => null),
         fetch(`${apiBase}/superadmin/stats/trains`, { credentials: "include" }).catch(() => null),
         fetch(`${apiBase}/superadmin/stats/performance`, { credentials: "include" }).catch(() => null),
         fetch(`${apiBase}/superadmin/stats/complaints-analysis`, { credentials: "include" }).catch(() => null),
-        fetch(`${apiBase}/superadmin/users?limit=500`, { credentials: "include" }).catch(() => null),
-        fetch(`${apiBase}/superadmin/staff?limit=500`, { credentials: "include" }).catch(() => null),
       ]);
 
       if (sysRes?.ok) setSystemStats((await sysRes.json()).data);
       if (trainsRes?.ok) setTrainsStats((await trainsRes.json()).data || []);
       if (perfRes?.ok) setPerformanceMetrics((await perfRes.json()).data || []);
       if (complAnalysisRes?.ok) setComplaintAnalysis((await complAnalysisRes.json()).data || []);
-      if (usersRes?.ok) setAllUsers((await usersRes.json()).data || []);
-      if (staffRes?.ok) setAllStaff((await staffRes.json()).data || []);
+      const [allUsersData, allStaffData] = await Promise.all([
+        fetchAllBatches(`${apiBase}/superadmin/users`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/superadmin/staff`, { credentials: "include" }),
+      ]);
+
+      setAllUsers(allUsersData);
+      setAllStaff(allStaffData);
       
       // Load additional data for analytics
       const [ordersRes, complaintsRes, emgRes, lnfRes, fbRes, adminsRes] = await Promise.all([
-        fetch(`${apiBase}/admin/all-orders`, { credentials: "include" }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${apiBase}/admin/all-complaints`, { credentials: "include" }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${apiBase}/emergency/getEmg`, { credentials: "include" }).then(r => r.json()).catch(() => []),
-        fetch(`${apiBase}/admin/all-lostnfound`, { credentials: "include" }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${apiBase}/feedback`, { credentials: "include" }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${apiBase}/superadmin/admins?limit=500`, { credentials: "include" }).then(r => r.json()).catch(() => ({ data: [] })),
+        fetchAllBatches(`${apiBase}/admin/all-orders`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/admin/all-complaints`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/emergency/getEmg`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/admin/all-lostnfound`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/feedback`, { credentials: "include" }),
+        fetchAllBatches(`${apiBase}/superadmin/admins`, { credentials: "include" }),
       ]);
 
-      setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : Array.isArray(ordersRes) ? ordersRes : []);
-      setComplaints(Array.isArray(complaintsRes.data) ? complaintsRes.data : Array.isArray(complaintsRes) ? complaintsRes : []);
-      setEmergencies(Array.isArray(emgRes) ? emgRes : Array.isArray(emgRes?.data) ? emgRes.data : []);
-      setLostFound(Array.isArray(lnfRes.data) ? lnfRes.data : Array.isArray(lnfRes) ? lnfRes : []);
-      setFeedbacks(Array.isArray(fbRes.data) ? fbRes.data : Array.isArray(fbRes) ? fbRes : []);
-      setAllAdmins(Array.isArray(adminsRes.data) ? adminsRes.data : Array.isArray(adminsRes) ? adminsRes : []);
+      setOrders(ordersRes);
+      setComplaints(complaintsRes);
+      setEmergencies(emgRes);
+      setLostFound(lnfRes);
+      setFeedbacks(fbRes);
+      setAllAdmins(adminsRes);
       
     } catch (error) {
       console.error("Error loading data:", error);

@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const { setAuthCookie, clearAuthCookie } = require('../utils/cookieHelper');
+const { paginateModel } = require('../utils/pagination');
 
 const registerSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -101,9 +102,15 @@ const logout = async (req, res) => {
 // ── GET staff for admin's current train ──
 const getTrainStaff = async (req, res) => {
     try {
-        const trainNo = req.trainNo;
-        const staff = await staffModel.find({ trainNumber: trainNo }).select('-password');
-        res.status(200).json({ success: true, data: staff });
+        const result = await paginateModel({
+            model: staffModel,
+            query: req.query,
+            filter: { trainNumber: req.trainNo },
+            sort: { createdAt: -1 },
+            select: '-password'
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -156,8 +163,14 @@ const getTrainComplaints = async (req, res) => {
         if (status) filter.status = status;
         if (domain) filter.issueDomain = domain;
 
-        const complaints = await complaintModel.find(filter).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: complaints });
+        const result = await paginateModel({
+            model: complaintModel,
+            query: req.query,
+            filter,
+            sort: { createdAt: -1 }
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -171,11 +184,18 @@ const getTrainOrders = async (req, res) => {
         const filter = { trainNumber: trainNo };
         if (status) filter.status = status;
 
-        const orders = await cateringModel.find(filter)
-            .sort({ createdAt: -1 })
-            .populate("user", "name email")
-            .populate("items.foodItem", "name price");
-        res.status(200).json({ success: true, data: orders });
+        const result = await paginateModel({
+            model: cateringModel,
+            query: req.query,
+            filter,
+            sort: { createdAt: -1 },
+            populate: [
+                { path: "user", select: "name email" },
+                { path: "items.foodItem", select: "name price" }
+            ]
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -207,11 +227,15 @@ const sendCommand = async (req, res) => {
 // ── GET all commands sent by admin for this train ──
 const getTrainCommands = async (req, res) => {
     try {
-        const trainNo = req.trainNo;
-        const commands = await commandModel.find({ trainNumber: trainNo })
-            .sort({ createdAt: -1 })
-            .populate('staffId', 'name role email');
-        res.status(200).json({ success: true, data: commands });
+        const result = await paginateModel({
+            model: commandModel,
+            query: req.query,
+            filter: { trainNumber: req.trainNo },
+            sort: { createdAt: -1 },
+            populate: { path: 'staffId', select: 'name role email' }
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -330,8 +354,14 @@ const getTrainStatistics = async (req, res) => {
 // ── GET all orders across all trains ──
 const getAllOrdersAll = async (req, res) => {
     try {
-        const orders = await cateringModel.find({}).select('-__v');
-        res.status(200).json({ success: true, data: orders });
+        const result = await paginateModel({
+            model: cateringModel,
+            query: req.query,
+            sort: { createdAt: -1 },
+            select: '-__v'
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -340,8 +370,14 @@ const getAllOrdersAll = async (req, res) => {
 // ── GET all complaints across all trains ──
 const getAllComplaintsAll = async (req, res) => {
     try {
-        const complaints = await complaintModel.find({}).select('-__v');
-        res.status(200).json({ success: true, data: complaints });
+        const result = await paginateModel({
+            model: complaintModel,
+            query: req.query,
+            sort: { createdAt: -1 },
+            select: '-__v'
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -350,8 +386,16 @@ const getAllComplaintsAll = async (req, res) => {
 // ── GET all lost and found across all trains ──
 const getAllLostFoundAll = async (req, res) => {
     try {
-        const lostFound = await require("../models/lostnfoundModel").find({}).select('-__v');
-        res.status(200).json({ success: true, data: lostFound });
+        const LostFound = require("../models/lostnfoundModel");
+
+        const result = await paginateModel({
+            model: LostFound,
+            query: req.query,
+            sort: { createdAt: -1 },
+            select: '-__v'
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
@@ -378,8 +422,14 @@ const updateLostFoundStatus = async (req, res) => {
 // ── GET all staff across all trains ──
 const getAllStaffAll = async (req, res) => {
     try {
-        const staff = await staffModel.find({}).select('-password -__v');
-        res.status(200).json({ success: true, data: staff });
+        const result = await paginateModel({
+            model: staffModel,
+            query: req.query,
+            sort: { createdAt: -1 },
+            select: '-password -__v'
+        });
+
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }

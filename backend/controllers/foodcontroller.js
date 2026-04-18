@@ -1,14 +1,21 @@
 const Food = require("../models/foodModel");
 const { cloudinary } = require("../config/cloudinary");
 const streamifier = require("streamifier");
+const { paginateModel } = require("../utils/pagination");
 
 const getAllFoods = async (req, res) => {
   try {
-    const foods = await Food.find({});
+    const result = await paginateModel({
+      model: Food,
+      query: req.query,
+      sort: { createdAt: -1 },
+    });
+
     res.status(200).json({
       success: true,
-      count: foods.length,
-      data: foods,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
     });
   } catch (error) {
     console.error(error);

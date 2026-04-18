@@ -1,6 +1,7 @@
 const { cloudinary } = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const News = require("../models/NewsModel");
+const { paginateModel } = require("../utils/pagination");
 
 const addNews = async (req, res) => {
   try {
@@ -41,8 +42,18 @@ const addNews = async (req, res) => {
 
 const getAllNews = async (req, res) => {
   try {
-    const newsList = await News.find({}).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: newsList.length, data: newsList });
+    const result = await paginateModel({
+      model: News,
+      query: req.query,
+      sort: { createdAt: -1 },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
