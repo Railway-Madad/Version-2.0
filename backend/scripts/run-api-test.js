@@ -13,7 +13,7 @@ const reportPath = path.join(os.tmpdir(), `jest-api-${Date.now()}.json`);
 const args = [
   "jest",
   "--config", "../unit-test/jest.config.js",
-  "../unit-test/tests/routes/api-contract.test.js",
+  "../unit-test/tests/routes",
   "-t", pattern,
   "--runInBand",
   "--json",
