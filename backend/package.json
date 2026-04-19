@@ -6,6 +6,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "api": "node scripts/run-api-test.js",
+    "api:all": "node scripts/run-api-test.js --all",
     "test": "jest --config ../unit-test/jest.config.js",
     "test:unit": "jest --config ../unit-test/jest.config.js",
     "test:unit:coverage": "jest --config ../unit-test/jest.config.js --coverage",
