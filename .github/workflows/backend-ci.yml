@@ -23,8 +23,12 @@ jobs:
       run: npm install
       working-directory: ./backend
 
+    - name: Run tests
+      run: npm test
+      working-directory: ./backend
+
     # Only deploy if tests pass
     - name: Trigger Render Deploy
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && success()
       run: |
         curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
