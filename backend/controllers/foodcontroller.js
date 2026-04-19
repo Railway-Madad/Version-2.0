@@ -2,21 +2,54 @@ const Food = require("../models/foodModel");
 const { cloudinary } = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const { paginateModel } = require("../utils/pagination");
+const {
+  getJsonCache,
+  setJsonCache,
+  deleteCacheKey,
+  deleteCachePattern,
+} = require("../config/redis");
+
+const FOOD_LIST_CACHE_PREFIX = "food:list:";
+const FOOD_BY_ID_CACHE_PREFIX = "food:id:";
+
+const buildListCacheKey = (query) => {
+  const queryPayload = JSON.stringify(query || {});
+  return `${FOOD_LIST_CACHE_PREFIX}${encodeURIComponent(queryPayload)}`;
+};
+
+const buildFoodByIdKey = (id) => `${FOOD_BY_ID_CACHE_PREFIX}${id}`;
+
+const invalidateFoodCache = async (foodId) => {
+  await deleteCachePattern(`${FOOD_LIST_CACHE_PREFIX}*`);
+  if (foodId) {
+    await deleteCacheKey(buildFoodByIdKey(foodId));
+  }
+};
 
 const getAllFoods = async (req, res) => {
   try {
+    const cacheKey = buildListCacheKey(req.query);
+    const cached = await getJsonCache(cacheKey);
+
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const result = await paginateModel({
       model: Food,
       query: req.query,
       sort: { createdAt: -1 },
     });
 
-    res.status(200).json({
+    const response = {
       success: true,
       data: result.data,
       nextCursor: result.nextCursor || null,
       hasMore: Boolean(result.hasMore),
-    });
+    };
+
+    await setJsonCache(cacheKey, response, 60);
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -26,6 +59,13 @@ const getAllFoods = async (req, res) => {
 
 const getFoodById = async (req, res) => {
   try {
+    const cacheKey = buildFoodByIdKey(req.params.id);
+    const cached = await getJsonCache(cacheKey);
+
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const food = await Food.findById(req.params.id);
 
     if (!food) {
@@ -34,7 +74,10 @@ const getFoodById = async (req, res) => {
         .json({ success: false, message: "Food item not found" });
     }
 
-    res.status(200).json({ success: true, data: food });
+    const response = { success: true, data: food };
+    await setJsonCache(cacheKey, response, 60);
+
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -84,6 +127,8 @@ const addFood = async (req, res) => {
       isAvailable: isAvailable !== undefined ? isAvailable : true,
     });
 
+    await invalidateFoodCache(newFood._id?.toString());
+
     res.status(201).json({ success: true, data: newFood });
   } catch (error) {
     console.error(error);
@@ -101,6 +146,8 @@ const deleteFood = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Food item not found" });
     }
+
+    await invalidateFoodCache(req.params.id);
 
     res.status(200).json({ success: true, message: "Food item deleted" });
   } catch (error) {
@@ -129,6 +176,8 @@ const updateFood = async (req, res) => {
     if (category) food.category = category;
 
     await food.save();
+
+    await invalidateFoodCache(food._id?.toString());
 
     res.status(200).json({ success: true, data: food });
   } catch (error) {
