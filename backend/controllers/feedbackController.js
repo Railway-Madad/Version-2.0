@@ -1,4 +1,5 @@
 const Feedback = require("../models/feedbackModel");
+const { paginateModel } = require("../utils/pagination");
 
 const addFeedback = async (req, res) => {
   try {
@@ -18,8 +19,20 @@ const addFeedback = async (req, res) => {
 
 const getAllFeedbacks = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: feedbacks.length, data: feedbacks });
+    const result = await paginateModel({
+      model: Feedback,
+      query: req.query,
+      sort: { createdAt: -1 },
+    });
+
+    res.status(200).json({
+      success: true,
+      count: result.data.length,
+      data: result.data,
+      hasMore: result.hasMore,
+      nextPage: result.nextPage || null,
+      nextCursor: result.nextCursor || null,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });

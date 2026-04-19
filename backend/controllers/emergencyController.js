@@ -1,4 +1,5 @@
 const Emergency = require('../models/emergencyModel');
+const { paginateModel } = require('../utils/pagination');
 
 exports.createEmergency = async (req, res) => {
   try {
@@ -24,9 +25,17 @@ exports.createEmergency = async (req, res) => {
 
 exports.getallEmergencies = async (req, res) => {
   try {
-    const query = req.trainNo ? { trainNumber: req.trainNo } : {};
-    const emergencies = await Emergency.find(query).sort({ createdAt: -1 });
-    res.status(200).json(emergencies);
+    const result = await paginateModel({
+      model: Emergency,
+      query: req.query,
+      filter: req.trainNo ? { trainNumber: req.trainNo } : {},
+      sort: { createdAt: -1 },
+    });
+
+    res.set("X-Has-More", String(result.hasMore));
+    if (result.nextPage) res.set("X-Next-Page", String(result.nextPage));
+    if (result.nextCursor) res.set("X-Next-Cursor", String(result.nextCursor));
+    res.status(200).json(result.data);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
@@ -35,9 +44,14 @@ exports.getallEmergencies = async (req, res) => {
 // Admin: Get emergencies for admin's train
 exports.getAdminEmergencies = async (req, res) => {
   try {
-    const query = req.trainNo ? { trainNumber: req.trainNo } : {};
-    const emergencies = await Emergency.find(query).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: emergencies });
+    const result = await paginateModel({
+      model: Emergency,
+      query: req.query,
+      filter: req.trainNo ? { trainNumber: req.trainNo } : {},
+      sort: { createdAt: -1 },
+    });
+
+    res.status(200).json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: "Server error" });
   }
@@ -107,8 +121,19 @@ exports.getUserEmergencies = async (req, res) => {
       query.trainNumber = trainNumber;
     }
     
-    const emergencies = await Emergency.find(query).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: emergencies });
+    const result = await paginateModel({
+      model: Emergency,
+      query: req.query,
+      filter: query,
+      sort: { createdAt: -1 },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      nextCursor: result.nextCursor || null,
+      hasMore: Boolean(result.hasMore),
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: "Server error" });
   }

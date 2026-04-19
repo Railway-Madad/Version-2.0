@@ -37,7 +37,7 @@
             const password = document.getElementById("password").value.trim();
             try {
                 console.log("Attempting login for catering staff:", email);
-                const res = await axios.post("http://localhost:4000/staff/login", {
+                const res = await axios.post("https://version-2-0-ed6g.onrender.com/staff/login", {
                     email,
                     password
                 });

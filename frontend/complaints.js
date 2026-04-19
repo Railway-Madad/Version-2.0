@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:4000';
+const API_BASE = 'https://version-2-0-ed6g.onrender.com';
 
 const form = document.getElementById('complaint-form');
 const successMessage = document.getElementById('success-message');

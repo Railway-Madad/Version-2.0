@@ -98,7 +98,7 @@
                 return;
             }
 
-            const res = await fetch("http://localhost:4000/staff/profile", {
+            const res = await fetch("https://version-2-0-ed6g.onrender.com/staff/profile", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -121,7 +121,7 @@
             }
             console.log("Fetching complaints for staff...");
 
-            const res = await fetch("http://localhost:4000/staff/complaints", {
+            const res = await fetch("https://version-2-0-ed6g.onrender.com/staff/complaints", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -163,7 +163,7 @@
             }
             console.log("Fetching resolved complaints for staff...");
 
-            const res = await fetch("http://localhost:4000/staff/complaints", {
+            const res = await fetch("https://version-2-0-ed6g.onrender.com/staff/complaints", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -181,7 +181,7 @@
                 // fetch staff name by id for each complaint
                 for (const complaint of resolvedComplaints) {
                     if (complaint.resolvedBy) {
-                        const staffRes = await fetch(`http://localhost:4000/staff/getname/${complaint.resolvedBy}`, {
+                        const staffRes = await fetch(`https://version-2-0-ed6g.onrender.com/staff/getname/${complaint.resolvedBy}`, {
                             headers: { "Authorization": `Bearer ${token}` }
                         });
                         if (staffRes.ok) {
@@ -223,7 +223,7 @@
                 return;
             }
 
-            const res = await fetch("http://localhost:4000/staff/complaints", {
+            const res = await fetch("https://version-2-0-ed6g.onrender.com/staff/complaints", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -234,7 +234,7 @@
                 // replace resolvedBy id with name
                 for (const complaint of data.complaints) {
                     if (complaint.resolvedBy) {
-                        const staffRes = await fetch(`http://localhost:4000/staff/getname/${complaint.resolvedBy}`, {
+                        const staffRes = await fetch(`https://version-2-0-ed6g.onrender.com/staff/getname/${complaint.resolvedBy}`, {
                             headers: { "Authorization": `Bearer ${token}` }
                         });
                         if (staffRes.ok) {
@@ -316,7 +316,7 @@
                 return;
             }
 
-            const res = await fetch(`http://localhost:4000/staff/complaints/${complaintId}/resolve`, {
+            const res = await fetch(`https://version-2-0-ed6g.onrender.com/staff/complaints/${complaintId}/resolve`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,
