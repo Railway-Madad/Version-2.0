@@ -10,3 +10,29 @@
 ::ffff:127.0.0.1 - [01/Apr/2026:05:09:40 +0000] "GET /complaint" 401 "-" - 2.002 ms
 ::ffff:127.0.0.1 - [01/Apr/2026:05:09:48 +0000] "POST /complaint/submit-complaint" 401 "-" - 2.967 ms
 ::ffff:127.0.0.1 - [18/Apr/2026:14:10:32 +0000] "POST /user/login" 400 "-" - 300.762 ms
+[2026-04-19T05:52:36.641Z] GET /food - Error: CORS blocked for origin: https://version-2-0-ed6g.onrender.com
+Stack: Error: CORS blocked for origin: https://version-2-0-ed6g.onrender.com
+    at origin (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\index.js:62:23)
+    at E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:342:13)
+    at E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:297:9
+    at processParams (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:582:12)
+    at next (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:291:5)
+    at Function.handle (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:186:3)
+
+[2026-04-19T05:52:39.062Z] GET /food - Error: CORS blocked for origin: https://version-2-0-ed6g.onrender.com
+Stack: Error: CORS blocked for origin: https://version-2-0-ed6g.onrender.com
+    at origin (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\index.js:62:23)
+    at E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:342:13)
+    at E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:297:9
+    at processParams (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:582:12)
+    at next (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:291:5)
+    at Function.handle (E:\COLLEGE\RailMadad\version2\Version-2.0\backend\node_modules\router\index.js:186:3)
+

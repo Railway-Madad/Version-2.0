@@ -9,10 +9,12 @@ const options = {
       description: 'API documentation for the Railway Madad Backend',
     },
     servers: [
+      
       {
-        url: 'http://localhost:4000',
-        description: 'Local development server',
-      },
+        url: 'https://version-2-0-ed6g.onrender.com',
+        description: 'Production server',
+      }
+      
     ],
     components: {
       securitySchemes: {
