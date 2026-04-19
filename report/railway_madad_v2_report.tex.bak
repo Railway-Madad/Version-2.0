@@ -1,0 +1,778 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{pagecolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric}
+
+% ---------- Color Theme ----------
+\definecolor{Primary}{HTML}{1B4332}      % Deep Forest Green
+\definecolor{BgOffWhite}{HTML}{F8F9FA}   % Off White
+\definecolor{TableHeader}{HTML}{1B4332}
+\definecolor{TableHeaderText}{HTML}{FFFFFF}
+\definecolor{TableRowAlt}{HTML}{EEF3F0}
+
+\pagecolor{BgOffWhite}
+\color{black}
+
+% ---------- Hyperlink Style ----------
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Primary,
+  urlcolor=Primary,
+  citecolor=Primary,
+  pdftitle={Railway-Madad Project Report},
+  pdfauthor={Group 26}
+}
+
+% ---------- Heading Style ----------
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{Primary}\Huge}
+  {\chaptertitlename\ \thechapter}{10pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\bfseries\color{Primary}\Large}
+  {\thesection}{0.8em}{}
+\titleformat{\subsection}
+  {\normalfont\bfseries\color{Primary}\large}
+  {\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\color{Primary}\normalsize}
+  {\thesubsubsection}{0.8em}{}
+
+% ---------- Header/Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{Primary}{Railway-Madad}}
+\fancyhead[R]{\textcolor{Primary}{Project Report}}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14.5pt}
+
+% ---------- Table Helpers ----------
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.25}
+
+\begin{document}
+
+% -------------------- TITLE PAGE --------------------
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+
+  {\color{Primary}\bfseries\Huge RAILWAY-MADAD \par}
+    \vspace{0.5cm}
+    {\Large A Role-Based Railway Operations and Passenger Support Backend\par}
+
+    \vspace{1.2cm}
+    \textcolor{Primary}{\rule{0.65\textwidth}{1.2pt}}
+    \vspace{0.5cm}
+
+    {\large\textbf{Web-Based Development -- Project Report} \par}
+
+    \vspace{0.6cm}
+    {\normalsize
+    \textbf{Technology Stack:} Node.js, Express, MongoDB, JWT, Cloudinary, Multer, Swagger, Jest, Supertest \\
+    \textbf{Architecture:} RESTful API with Role-Based Access Control and Modular Domain Layers \\
+    \textbf{Date:} April 2026
+    \par}
+
+    \vspace{0.5cm}
+    \textcolor{Primary}{\rule{0.65\textwidth}{1.2pt}}
+
+    \vspace{1.2cm}
+    {\Large\textbf{Group 26}\par}
+
+    \vspace{0.4cm}
+    {\normalsize
+    Team Members: \underline{Add names and roll numbers here}
+    \par}
+
+    \vfill
+    {\normalsize
+    Under the guidance of:\\
+    \textbf{Dr. Himangshu Sarma}\\
+    \textbf{Dr. B N Pavan Kumar}\\
+    Department of Computer Science / Information Technology
+    \par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% -------------------- 1. PROJECT DESCRIPTION --------------------
+\chapter{Project Description}
+
+A full-stack railway service management system that provides integrated solutions for train passengers including complaint management, food ordering, emergency services, feedback submission, and lost \& found tracking. Features role-based dashboards for users, staff, and administrators with secure JWT authentication.
+
+Railway-Madad is implemented with a Node.js and Express backend, MongoDB persistence through Mongoose, and train-aware operational filtering in all major workflows. The platform exposes RESTful APIs for passenger-facing assistance and operational governance. Core backend modules include complaint lifecycle handling, staff command flows, catering order state transitions, emergency response coordination, and lost-and-found management with optional media upload support.
+
+The platform supports four practical role layers: \textbf{User}, \textbf{Staff}, \textbf{Admin}, and \textbf{Superadmin}, each with role-scoped workflows and authorization boundaries. Users can register complaints with evidence, track complaint history, place catering orders, report emergencies, submit feedback, and manage lost/found records. Staff can authenticate against train context, resolve domain-mapped complaints, and process command notifications from administrators. Admins manage train-level staff rosters, monitor complaints and orders, dispatch operational commands, and update incident states. Superadmins operate system-wide analytics and governance endpoints for cross-train operational intelligence. This layered model ensures strong access control, clear ownership of actions, and auditable operational flow.
+
+The application architecture emphasizes modular separation of concerns. Each module has dedicated route files, controller logic, and model schemas. Cross-cutting concerns such as logging, file upload, cloud media storage, and OpenAPI documentation are integrated in reusable infrastructure layers. Logging is implemented through request/error middleware, media uploads are streamed to Cloudinary, and API documentation is served through Swagger UI. The backend also includes seed logic for bootstrap administration and a train registry for operational scoping.
+
+A significant enhancement in Version 2.0 is the comprehensive test-driven quality layer built using Jest and Supertest. The testing strategy combines route-contract tests (covering all registered endpoints and authorization paths) with controller-level unit tests for business rules and edge cases. Tests run in isolation without real server startup, database dependency, or third-party network calls, making the suite suitable for fast local verification and scalable CI/CD execution.
+
+\section{Project Snapshot}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.34\textwidth}Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Metric} & \textcolor{TableHeaderText}{Value} \\
+\midrule
+Project Name & Railway-Madad Version 2.0 \\
+Primary Runtime & Node.js (Express-based backend) \\
+Data Store & MongoDB (Mongoose ODM) \\
+Authentication Model & JWT via role-specific HTTP-only cookies \\
+Role Layers & User, Staff, Admin, Superadmin \\
+Core Functional Modules & Complaint, Catering, Emergency, Lost \& Found, Commands, News, Feedback \\
+Total Domain Models & 12 MongoDB models \\
+Route Files & 11 modular route files + app-level utility endpoints \\
+Registered Route Handlers & 86 router-level handlers (+ app-level system endpoints) \\
+Test Stack & Jest + Supertest \\
+Current Automated Test Status & 16 test suites, 152 tests passing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% -------------------- 2. DOMAIN-DRIVEN DESIGN --------------------
+\chapter{Domain-Driven Design}
+
+The backend has been organized around practical bounded contexts aligned with railway operations. While implemented as a modular monolith, the service boundaries are explicit enough to support future migration toward service decomposition. Each context owns its routes, controllers, and persistence logic, while context interactions are mediated through train number scoping, shared identities, and role-based middleware.
+
+\section{2a. Bounded Contexts}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  bc/.style={draw=Primary, rounded corners=4pt, thick, fill=TableRowAlt, minimum width=4.3cm, minimum height=2.2cm, align=center},
+  title/.style={font=\bfseries\color{Primary}}
+]
+\node[bc] (iam) at (0,3) {\textbf{Identity \& Access}\\User, Staff, Admin\\JWT + Cookies + RBAC};
+\node[bc] (comp) at (5.2,3) {\textbf{Complaint Operations}\\Complaint lifecycle\\Domain + status flow};
+\node[bc] (cat) at (10.4,3) {\textbf{Catering \& Orders}\\Food catalog\\Order + OTP + status};
+\node[bc] (emg) at (0,0) {\textbf{Emergency Response}\\Active/InProcess/Resolved\\User/Admin controls};
+\node[bc] (lnf) at (5.2,0) {\textbf{Lost \& Found}\\Lost/Found records\\Ownership checks};
+\node[bc] (gov) at (10.4,0) {\textbf{Governance \& Analytics}\\Commands, Feedback, News\\Superadmin insights};
+
+\draw[-{Latex[length=3mm]}, thick, Primary] (iam) -- (comp);
+\draw[-{Latex[length=3mm]}, thick, Primary] (iam) -- (cat);
+\draw[-{Latex[length=3mm]}, thick, Primary] (iam) -- (emg);
+\draw[-{Latex[length=3mm]}, thick, Primary] (iam) -- (lnf);
+\draw[-{Latex[length=3mm]}, thick, Primary] (comp) -- (gov);
+\draw[-{Latex[length=3mm]}, thick, Primary] (cat) -- (gov);
+\draw[-{Latex[length=3mm]}, thick, Primary] (emg) -- (gov);
+\draw[-{Latex[length=3mm]}, thick, Primary] (lnf) -- (gov);
+\end{tikzpicture}
+\caption{Bounded Context Diagram for Railway-Madad}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.2\textwidth}Y Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Context} & \textcolor{TableHeaderText}{Responsibility} & \textcolor{TableHeaderText}{Primary Models / Components} \\
+\midrule
+Identity \& Access & Registration, login/logout, token issuance, role-aware authorization and cookie-based sessions. & User, Staff, Admin, auth middlewares, cookie helper, JWT logic \\
+Complaint Operations & Passenger issue intake, domain-based triage, staff/admin resolution pipeline, satisfaction rollback workflow. & Complaint, complaint controller, staff/admin complaint endpoints \\
+Catering \& Orders & Food catalog consumption, order creation with OTP, order status lifecycle and staff/admin visibility by train. & Food, Catering, catering controller \\
+Emergency Response & High-priority incident raising, admin in-process handoff, user-owned resolution confirmation. & Emergency, emergency controller \\
+Lost \& Found Management & Lost/found item creation with optional media, ownership checks, and resolution tracking. & LostFound, lostnfound controller \\
+Governance \& Analytics & Command dispatch to staff, platform communication, feedback, and superadmin analytics across trains. & Command, News, Feedback, Train, superadmin controller \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{2b. Context Mappings}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={draw=Primary, rounded corners=3pt, thick, fill=white, minimum width=3.6cm, minimum height=1cm, align=center},
+  lbl/.style={font=\scriptsize\color{Primary}}
+]
+\node[box] (iam) at (5.2,5) {Identity \& Access};
+\node[box] (comp) at (1.2,3.4) {Complaint Ops};
+\node[box] (cat) at (5.2,3.4) {Catering \& Orders};
+\node[box] (emg) at (9.2,3.4) {Emergency Response};
+\node[box] (lnf) at (1.2,1.8) {Lost \& Found};
+\node[box] (staff) at (5.2,1.8) {Staff Ops};
+\node[box] (gov) at (9.2,1.8) {Governance \& Analytics};
+
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (iam) -- node[lbl, above left] {Customer/Supplier} (comp);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (iam) -- node[lbl, right] {Customer/Supplier} (cat);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (iam) -- node[lbl, above right] {Customer/Supplier} (emg);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (iam) -- node[lbl, left] {Customer/Supplier} (lnf);
+
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (comp) -- node[lbl, above] {Conformist} (gov);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (cat) -- node[lbl, above] {Conformist} (gov);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (emg) -- node[lbl, right] {Conformist} (gov);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (gov) -- node[lbl, above] {Publisher/Subscriber} (staff);
+\end{tikzpicture}
+\caption{Context Mapping Diagram for Railway-Madad}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.22\textwidth} >{\bfseries}p{0.22\textwidth} >{\bfseries}p{0.18\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Upstream} & \textcolor{TableHeaderText}{Downstream} & \textcolor{TableHeaderText}{Pattern} & \textcolor{TableHeaderText}{Description} \\
+\midrule
+Identity \& Access & Complaint Operations & Customer/Supplier & Complaint creation and querying rely on authenticated user identity and train scope from auth middleware. \\
+Identity \& Access & Catering \& Orders & Customer/Supplier & Order lifecycle operations consume user identity and train number claims from JWT middleware. \\
+Identity \& Access & Emergency Response & Customer/Supplier & Emergency ownership and resolve permissions are enforced using authenticated user identity. \\
+Identity \& Access & Lost \& Found Management & Customer/Supplier & Item creation and mutation are tied to authenticated ownership checks. \\
+Complaint Operations & Governance \& Analytics & Conformist & Aggregated complaint data powers admin and superadmin statistical endpoints. \\
+Catering \& Orders & Governance \& Analytics & Conformist & Order statuses and totals are consumed by train-level and system-level analytics. \\
+Emergency Response & Governance \& Analytics & Conformist & Emergency volume and status metrics feed superadmin dashboards. \\
+Governance \& Analytics & Staff Operations & Publisher/Subscriber (Operational) & Admin commands are produced by admin context and consumed/read by staff context. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{2c. Entities, Value Objects, and Services}
+
+This section enumerates concrete domain artifacts extracted from the implemented Mongoose schemas and controller services. It is intentionally detailed to ensure traceability between conceptual DDD modeling and the live backend code.
+
+\subsection{Identity \& Access Context}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.12\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Type} & \textcolor{TableHeaderText}{Name} & \textcolor{TableHeaderText}{Key Attributes / Responsibility} \\
+\midrule
+Entity & User & email, username, hashed password, createdAt. \\
+Entity & Staff & name, role, email, phone, trainNumber, hashed password, timestamps. \\
+Entity & Admin & username, email, hashed password, trainNo, role (admin/superadmin), createdAt. \\
+Value Object & JWT Claims & userId/staffId/adminId, trainNo, role, expiration window. \\
+Value Object & Auth Cookie State & HTTP-only cookie value and lifecycle (set/clear). \\
+Service & usercontroller & user registration/login/logout and profile retrieval route integration. \\
+Service & staffcontroller & staff registration/login/logout and profile/command access. \\
+Service & admincontroller (auth slice) & admin registration/login/logout with role-aware token payloads. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Complaint Operations Context}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.12\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Type} & \textcolor{TableHeaderText}{Name} & \textcolor{TableHeaderText}{Key Attributes / Responsibility} \\
+\midrule
+Entity & Complaint & userId, username, pnr, bogie/seat, issueDomain, trainNumber, status, resolution metadata, timestamps. \\
+Value Object & Issue Domain & Cleaning, Catering, Security, Maintenance, Medical. \\
+Value Object & Complaint Status & Pending, Important, AwaitingConfirmation, Resolved. \\
+Service & complaintController & submission, retrieval by user/domain/status, delete, resolve, satisfaction-based rollback. \\
+Service & staffcontroller (resolution slice) & role-matched staff resolution flow setting AwaitingConfirmation and resolved metadata. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Catering \& Orders Context}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.12\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Type} & \textcolor{TableHeaderText}{Name} & \textcolor{TableHeaderText}{Key Attributes / Responsibility} \\
+\midrule
+Entity & Food & name, price, category, imageUrl, availability, timestamps. \\
+Entity & Catering & user ref, item list, quantity, priceAtOrder, totalPrice, deliveryAddress, OTP, status, trainNumber. \\
+Value Object & Order Status & pending, preparing, out for delivery, delivered, cancelled. \\
+Service & foodcontroller & food CRUD endpoints for menu lifecycle. \\
+Service & cateringcontroller & place order, user history, staff/admin order listing, status transitions. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Emergency \& Lost \& Found Contexts}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.12\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Type} & \textcolor{TableHeaderText}{Name} & \textcolor{TableHeaderText}{Key Attributes / Responsibility} \\
+\midrule
+Entity & Emergency & userId, username, trainNumber, seatNumber, status (Active/InProcess/Resolved), createdAt. \\
+Entity & LostFound & userId, title, description, category, location, contactInfo, imageUrl, trainNumber, status. \\
+Value Object & Emergency Status & Active, InProcess, Resolved. \\
+Value Object & Lost/Found Category & Lost, Found; with status Open/Resolved. \\
+Service & emergencyController & raise emergency, admin in-process action, owner-only resolve, train-filtered views. \\
+Service & lostnfoundController & item create/read/delete/resolve with ownership and media upload support. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Governance \& Analytics Context}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.12\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Type} & \textcolor{TableHeaderText}{Name} & \textcolor{TableHeaderText}{Key Attributes / Responsibility} \\
+\midrule
+Entity & Command & adminId, staffId, trainNumber, title, message, priority, isRead, createdAt. \\
+Entity & News & title, description, imageUrl, timestamps. \\
+Entity & Feedback & name, email, rating, comment, timestamps. \\
+Entity & Train & trainNumber (unique). \\
+Service & admincontroller (ops slice) & staff ops, train ops, complaint/order oversight, command broadcast. \\
+Service & superadmincontroller & system-wide and train-wise analytics, user/staff/admin details and performance reporting. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{2d. Cardinality Ratios}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  node/.style={draw=Primary, rounded corners=2pt, fill=white, minimum width=2.5cm, minimum height=0.75cm, align=center},
+  rel/.style={-{Latex[length=2.2mm]}, thick, Primary}
+]
+\node[node] (user) at (0,4.2) {User};
+\node[node] (complaint) at (-4,2.6) {Complaint};
+\node[node] (order) at (-1.5,2.6) {Catering Order};
+\node[node] (emergency) at (1.2,2.6) {Emergency};
+\node[node] (lost) at (4,2.6) {LostFound};
+\node[node] (command) at (-1.2,1) {Command};
+\node[node] (staff) at (1.8,1) {Staff};
+\node[node] (admin) at (-3.8,1) {Admin};
+\node[node] (train) at (4.2,1) {Train};
+
+\draw[rel] (user) -- node[midway, above, text=Primary] {1:N} (complaint);
+\draw[rel] (user) -- node[midway, above, text=Primary] {1:N} (order);
+\draw[rel] (user) -- node[midway, above, text=Primary] {1:N} (emergency);
+\draw[rel] (user) -- node[midway, above, text=Primary] {1:N} (lost);
+\draw[rel] (admin) -- node[midway, above, text=Primary] {1:N} (command);
+\draw[rel] (staff) -- node[midway, above, text=Primary] {1:N} (command);
+\draw[rel] (train) -- node[midway, right, text=Primary] {1:N} (complaint);
+\draw[rel] (train) -- node[midway, right, text=Primary] {1:N} (order);
+\draw[rel] (train) -- node[midway, right, text=Primary] {1:N} (emergency);
+\draw[rel] (train) -- node[midway, right, text=Primary] {1:N} (lost);
+\end{tikzpicture}
+\caption{Entity Relationship Cardinality Diagram for Railway-Madad}
+\end{figure}
+
+\begin{longtable}{>{\bfseries}p{0.32\textwidth} p{0.14\textwidth} p{0.5\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Relationship} & \textcolor{TableHeaderText}{Cardinality} & \textcolor{TableHeaderText}{Constraint / Note} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Relationship} & \textcolor{TableHeaderText}{Cardinality} & \textcolor{TableHeaderText}{Constraint / Note} \\
+\midrule
+\endhead
+User to Complaint & 1:N & One user can submit many complaints; each complaint belongs to one userId. \\
+User to Catering Order & 1:N & One user can place many catering orders; each order references a single user. \\
+User to LostFound Item & 1:N & One user can create multiple lost/found records; ownership is enforced for delete/resolve. \\
+User to Emergency & 1:N & One user may create multiple emergency requests over time. \\
+Admin to Command & 1:N & An admin can dispatch multiple commands/notices. \\
+Staff to Command & 1:N & A staff member receives multiple commands and can mark each as read. \\
+Train to Complaint & 1:N & Complaints are train-scoped through trainNumber field. \\
+Train to Catering Order & 1:N & Catering records are train-scoped for operational filtering. \\
+Train to Emergency & 1:N & Emergency incidents are associated with a train route context. \\
+Food to Catering Item & 1:N (embedded usage) & Catering order line items reference foodItem IDs and preserve priceAtOrder. \\
+Staff Role to Complaint Domain & N:1 mapping constraint & Role-specific staff resolution is constrained by complaint issueDomain matching staff role. \\
+\bottomrule
+\end{longtable}
+
+\section{2e. Aggregates}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  aggr/.style={draw=Primary, rounded corners=4pt, thick, fill=TableRowAlt, minimum width=4.2cm, minimum height=1.6cm, align=center},
+  root/.style={font=\bfseries\color{Primary}}
+]
+\node[aggr] (id) at (0,3.2) {\textbf{Identity Aggregate}\\Roots: User, Staff, Admin\\JWT + cookie auth invariants};
+\node[aggr] (cmp) at (5.2,3.2) {\textbf{Complaint Aggregate}\\Root: Complaint\\Status + resolver consistency};
+\node[aggr] (cat) at (10.4,3.2) {\textbf{Catering Aggregate}\\Root: Catering\\Items, OTP, order status};
+\node[aggr] (emg) at (0,0.9) {\textbf{Emergency Aggregate}\\Root: Emergency\\Active \textrightarrow InProcess \textrightarrow Resolved};
+\node[aggr] (lnf) at (5.2,0.9) {\textbf{LostFound Aggregate}\\Root: LostFound\\Owner-bound mutations};
+\node[aggr] (cmd) at (10.4,0.9) {\textbf{Command Aggregate}\\Root: Command\\Dispatch + read state};
+\node[aggr] (analytics) at (5.2,-1.4) {\textbf{Analytics Aggregate (Derived)}\\Root: Superadmin service\\Read-only cross-model composition};
+
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (cmp) -- (analytics);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (cat) -- (analytics);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (emg) -- (analytics);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (lnf) -- (analytics);
+\draw[-{Latex[length=2.6mm]}, thick, Primary] (cmd) -- (analytics);
+\end{tikzpicture}
+\caption{Aggregate Boundaries Diagram for Railway-Madad}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.22\textwidth} >{\bfseries}p{0.2\textwidth} Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Aggregate} & \textcolor{TableHeaderText}{Root} & \textcolor{TableHeaderText}{Contained Behavior / Invariants} \\
+\midrule
+Identity Aggregate & User / Staff / Admin & Credential integrity, uniqueness constraints, role and train-scoped identity behavior. \\
+Complaint Aggregate & Complaint & State transitions (Pending/Important/AwaitingConfirmation/Resolved), resolver metadata consistency. \\
+Catering Aggregate & Catering & Order item consistency, price snapshotting, OTP assignment, valid status transitions. \\
+LostFound Aggregate & LostFound & Ownership-protected state mutations and category-status consistency. \\
+Emergency Aggregate & Emergency & Lifecycle gate: Active \textrightarrow InProcess \textrightarrow Resolved with owner/admin rules. \\
+Command Aggregate & Command & Admin-issued notification with read-state updates only by addressed staff. \\
+Analytics Aggregate (Derived) & Superadmin service layer & Read-only composed views built from multiple model aggregates. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% -------------------- 3. TECHNOLOGY STACK SUMMARY --------------------
+\chapter{Technology Stack Summary}
+
+The technology stack is selected for rapid API development, modular maintainability, and strong operational observability. The runtime is Node.js with Express, MongoDB is used as the primary store, and JWT-based auth with secure cookies enables role-aware session management. Swagger enhances interface transparency, while Jest/Supertest provide deterministic regression protection.
+
+\section{Complete Technology Map}
+
+\begin{longtable}{>{\bfseries}p{0.15\textwidth} p{0.22\textwidth} p{0.16\textwidth} p{0.39\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Layer} & \textcolor{TableHeaderText}{Technology} & \textcolor{TableHeaderText}{Version (pkg)} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Layer} & \textcolor{TableHeaderText}{Technology} & \textcolor{TableHeaderText}{Version (pkg)} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+Backend Runtime & Node.js + Express & express 5.1.0 & HTTP API framework and middleware pipeline. \\
+Data Layer & MongoDB + Mongoose & mongoose 8.19.0 & Schema-based persistence and indexing. \\
+Auth \& Security & jsonwebtoken, bcryptjs, cookie-parser, cors & jwt 9.0.2, bcryptjs 3.0.2 & Token issuance, password hashing, cookie parsing, cross-origin control. \\
+Validation & zod & zod 4.1.11 & Request body validation and typed constraints. \\
+File Upload & multer, streamifier, cloudinary & multer 2.0.2, cloudinary 2.7.0 & Multipart ingestion and streaming media upload. \\
+Observability & morgan, rotating-file-stream, custom logger & morgan 1.10.1 & Access and error log capture for operational diagnosis. \\
+API Documentation & swagger-jsdoc, swagger-ui-express & 6.2.8 / 5.0.1 & Machine-readable and interactive API docs. \\
+Testing & jest, supertest & 30.2.0 / 7.1.4 & Unit and API-contract testing in isolated mode. \\
+Environment & dotenv & 17.2.3 & Environment-driven configuration. \\
+\bottomrule
+\end{longtable}
+
+% -------------------- 4. API ROUTE SUMMARY --------------------
+\chapter{REST API Route Summary}
+
+This chapter presents the implemented API surface grouped by module. The backend uses route-level modularization mounted under path prefixes such as \texttt{/user}, \texttt{/admin}, \texttt{/staff}, \texttt{/complaint}, and others. Authentication-sensitive endpoints are guarded by role-specific middleware.
+
+\section{Identity and Access Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller / Handler} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller / Handler} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+POST & \texttt{/user/register} & usercontroller.register & Passenger registration. \\
+POST & \texttt{/user/login} & usercontroller.login & Passenger authentication and token cookie issue. \\
+POST & \texttt{/user/logout} & usercontroller.logout & Passenger logout and cookie clear. \\
+GET & \texttt{/user/profile} & Inline route handler + user auth & Get authenticated passenger profile. \\
+POST & \texttt{/staff/register} & staffcontroller.register & Staff onboarding. \\
+POST & \texttt{/staff/login} & staffcontroller.login & Staff authentication with train scope. \\
+POST & \texttt{/staff/logout} & staffcontroller.logout & Staff session termination. \\
+GET & \texttt{/staff/profile} & staffcontroller.getProfile & Staff profile details. \\
+POST & \texttt{/admin/register} & admincontroller.register & Admin/superadmin account creation. \\
+POST & \texttt{/admin/login} & admincontroller.login & Admin authentication with role claim. \\
+POST & \texttt{/admin/logout} & admincontroller.logout & Admin session termination. \\
+\bottomrule
+\end{longtable}
+
+\section{Complaint Management Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+GET & \texttt{/complaint/} & complaintController.getAllComplaints & List complaints for authenticated train context. \\
+POST & \texttt{/complaint/submit-complaint} & complaintController.postComplaint & Submit complaint with optional image evidence. \\
+GET & \texttt{/complaint/my-complaints-history} & complaintController.getMyAllComplaints & Passenger complaint history across trains. \\
+GET & \texttt{/complaint/api/complaints/user/:username} & complaintController.getComplaintsByUser & Complaints filtered by username. \\
+PUT & \texttt{/complaint/api/complaints/resolve/:id} & complaintController.resolveComplaint & Mark complaint resolved (admin path). \\
+GET & \texttt{/complaint/api/complaints/:domain} & complaintController.getComplaintsByDomain & Domain-wise complaint retrieval. \\
+DELETE & \texttt{/complaint/api/complaints/:id} & complaintController.deleteComplaint & Delete complaint record. \\
+GET & \texttt{/complaint/complaints/all} & complaintController.getAllComplaints & Alternate route for complaint listing. \\
+GET & \texttt{/complaint/api/images/user/:username} & complaintController.getImagesByUser & Retrieve complaint image evidence by user. \\
+GET & \texttt{/complaint/api/complaintsIMP} & complaintController.getComplaintByStatus & Retrieve important complaints. \\
+GET & \texttt{/complaint/api/complaintsRES} & complaintController.getPendingComplaints & Retrieve unresolved complaints. \\
+PUT & \texttt{/complaint/api/complaints/:id/satisfaction} & complaintController.handleSatisfaction & User confirmation or rollback after resolution. \\
+\bottomrule
+\end{longtable}
+
+\section{Staff Operations and Command Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+GET & \texttt{/staff/complaints} & staffcontroller.getComplaints & Role-matched complaint queue for staff. \\
+PUT & \texttt{/staff/complaints/:id/resolve} & staffcontroller.resolveComplaint & Resolve complaint to AwaitingConfirmation. \\
+GET & \texttt{/staff/getname/:id} & staffcontroller.getStaffById & Staff profile fragment by id. \\
+GET & \texttt{/staff/commands} & staffcontroller.getMyCommands & Retrieve staff command inbox. \\
+PUT & \texttt{/staff/commands/:id/read} & staffcontroller.markCommandRead & Mark notice as read. \\
+GET & \texttt{/admin/train-staff} & admincontroller.getTrainStaff & Staff roster for admin train. \\
+PUT & \texttt{/admin/staff/:id} & admincontroller.updateStaff & Update staff metadata. \\
+DELETE & \texttt{/admin/staff/:id} & admincontroller.deleteStaff & Remove staff account. \\
+POST & \texttt{/admin/commands} & admincontroller.sendCommand & Dispatch command to staff. \\
+GET & \texttt{/admin/commands} & admincontroller.getTrainCommands & List commands sent for train. \\
+DELETE & \texttt{/admin/commands/:id} & admincontroller.deleteCommand & Delete command entry. \\
+GET & \texttt{/admin/all-staff} & admincontroller.getAllStaffAll & Global staff listing for admin consoles. \\
+\bottomrule
+\end{longtable}
+
+\section{Catering and Food Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+GET & \texttt{/food/} & foodcontroller.getAllFoods & List menu items. \\
+POST & \texttt{/food/} & foodcontroller.addFood & Add menu item (image upload supported). \\
+GET & \texttt{/food/:id} & foodcontroller.getFoodById & Fetch menu item details. \\
+PUT & \texttt{/food/:id} & foodcontroller.updateFood & Update menu item. \\
+DELETE & \texttt{/food/:id} & foodcontroller.deleteFood & Delete menu item. \\
+POST & \texttt{/catering/order} & cateringController.placeOrder & Place order with OTP generation. \\
+GET & \texttt{/catering/my-orders} & cateringController.getMyCateringOrders & User orders in current train context. \\
+GET & \texttt{/catering/my-orders-history} & cateringController.getMyAllCateringOrders & User order history across trains. \\
+GET & \texttt{/catering/all-orders} & cateringController.getAllCateringOrders & Staff/admin view of train orders. \\
+PUT & \texttt{/catering/:id/status} & cateringController.updateOrderStatus & Status transition for order lifecycle. \\
+GET & \texttt{/admin/train-orders} & admincontroller.getTrainOrders & Train-scoped order monitoring. \\
+GET & \texttt{/admin/all-orders} & admincontroller.getAllOrdersAll & Global order listing. \\
+\bottomrule
+\end{longtable}
+
+\section{Emergency and Lost \& Found Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+POST & \texttt{/emergency/postEmg} & emergencyController.createEmergency & Raise emergency event by passenger. \\
+GET & \texttt{/emergency/getEmg} & emergencyController.getallEmergencies & Fetch emergencies (train-filter aware). \\
+GET & \texttt{/emergency/my-emergencies} & emergencyController.getUserEmergencies & User-owned emergencies. \\
+GET & \texttt{/emergency/admin/getEmg} & emergencyController.getAdminEmergencies & Admin view of train emergencies. \\
+PUT & \texttt{/emergency/:id/inprocess} & emergencyController.markEmergencyInProcess & Move emergency to InProcess. \\
+PUT & \texttt{/emergency/:id/resolve} & emergencyController.resolveEmergency & Resolve emergency by owner when in-process. \\
+GET & \texttt{/lostnfound/} & lostnfoundController.getAllItems & List items for train. \\
+POST & \texttt{/lostnfound/} & lostnfoundController.addItem & Create lost/found record with optional image. \\
+GET & \texttt{/lostnfound/myitems} & lostnfoundController.getUserItems & Retrieve user-owned items. \\
+GET & \texttt{/lostnfound/:id} & lostnfoundController.getItemById & Item lookup by ID. \\
+DELETE & \texttt{/lostnfound/:id} & lostnfoundController.deleteItem & Owner-only deletion. \\
+PUT & \texttt{/lostnfound/:id/resolve} & lostnfoundController.markAsResolved & Owner-only resolution update. \\
+GET & \texttt{/admin/train-complaints} & admincontroller.getTrainComplaints & Train complaint overview for operations. \\
+GET & \texttt{/admin/all-lostnfound} & admincontroller.getAllLostFoundAll & Global lost/found listing. \\
+PUT & \texttt{/admin/lostnfound/:id/status} & admincontroller.updateLostFoundStatus & Administrative status override. \\
+GET & \texttt{/admin/all-complaints} & admincontroller.getAllComplaintsAll & Global complaint listing. \\
+\bottomrule
+\end{longtable}
+
+\section{News, Feedback, Superadmin, and System Routes}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth} p{0.26\textwidth} p{0.22\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Method} & \textcolor{TableHeaderText}{Endpoint} & \textcolor{TableHeaderText}{Controller} & \textcolor{TableHeaderText}{Purpose} \\
+\midrule
+\endhead
+POST & \texttt{/news/} & newsController.addNews & Publish operational update with optional image. \\
+GET & \texttt{/news/} & newsController.getAllNews & List announcements/news items. \\
+DELETE & \texttt{/news/:id} & newsController.deleteNews & Remove announcement item. \\
+POST & \texttt{/feedback/} & feedbackController.addFeedback & Submit passenger feedback and rating. \\
+GET & \texttt{/feedback/} & feedbackController.getAllFeedbacks & Retrieve feedback entries. \\
+GET & \texttt{/feedback/stats} & feedbackController.getFeedbackStats & Feedback aggregation metrics. \\
+GET & \texttt{/superadmin/stats/system} & superadminController.getSystemStats & Global system-level KPIs. \\
+GET & \texttt{/superadmin/stats/trains} & superadminController.getAllTrainsStats & Train-wise operational summaries. \\
+GET & \texttt{/superadmin/stats/performance} & superadminController.getTrainPerformanceMetrics & Performance indicators by train. \\
+GET & \texttt{/superadmin/stats/complaints-analysis} & superadminController.getComplaintAnalysis & Domain-wise complaint analytics by train. \\
+GET & \texttt{/superadmin/users} & superadminController.getAllUsers & Paginated user registry. \\
+GET & \texttt{/superadmin/users/:userId} & superadminController.getUserDetails & User-centric operational history. \\
+GET & \texttt{/superadmin/staff} & superadminController.getAllStaff & Paginated staff registry. \\
+GET & \texttt{/superadmin/staff/:staffId} & superadminController.getStaffDetails & Staff performance snapshot. \\
+GET & \texttt{/superadmin/admins} & superadminController.getAllAdmins & Admin and superadmin registry. \\
+GET & \texttt{/superadmin/admins/:adminId} & superadminController.getAdminDetails & Admin-specific management metrics. \\
+GET & \texttt{/api/trains} & App-level train handler & Retrieve available trains. \\
+POST & \texttt{/api/trains} & App-level train handler & Create train registry entry. \\
+GET & \texttt{/api-docs} & Swagger UI middleware & Interactive API documentation endpoint. \\
+\bottomrule
+\end{longtable}
+
+% -------------------- 5. TESTING AND QUALITY --------------------
+\chapter{Testing Strategy and Quality Assurance}
+
+Railway-Madad Version 2.0 follows an isolated backend testing architecture designed for deterministic execution and CI/CD scalability. The test strategy combines route-level API contract validation and controller-level business-rule validation. Authentication middleware is mock-driven and supports explicit state simulation (valid, missing, malformed, expired, forbidden), allowing comprehensive negative-path verification without integration coupling.
+
+\section{Test Architecture}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.26\textwidth}Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Layer} & \textcolor{TableHeaderText}{Implementation} \\
+\midrule
+Test Runner & Jest with project-specific config under unit-test workspace. \\
+API Invocation & Supertest against in-memory Express app (no production server startup). \\
+Isolation & No real DB/network dependencies; controller and middleware behavior mocked as required. \\
+Auth Simulation & Explicit state toggles: valid, missing, malformed, expired, forbidden. \\
+Route Contract Scope & Modular route suites covering user/admin/staff/complaint/catering/emergency/food/news/feedback/lost\&found/superadmin/system flows. \\
+Controller Unit Scope & Focused unit suites for user, complaint, catering, emergency, and lost\&found logic. \\
+Error Contract Coverage & Assertions include 400/401/403/404/500 negative path checks. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Current Test Inventory}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.5\textwidth}p{0.2\textwidth}Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Suite Group} & \textcolor{TableHeaderText}{Count} & \textcolor{TableHeaderText}{Notes} \\
+\midrule
+Route Contract Test Suites & 11 & Module-oriented route suites plus auth and error-contract suites. \\
+Controller Unit Test Suites & 5 & Business logic and edge-case checks for major operational controllers. \\
+Total Suites & 16 & Fully automated through npm scripts. \\
+Total Test Cases & 152 & All currently passing. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Edge-Case Coverage Matrix}
+
+\begin{longtable}{>{\bfseries}p{0.2\textwidth} p{0.2\textwidth} p{0.22\textwidth} p{0.3\textwidth}}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Category} & \textcolor{TableHeaderText}{Representative Endpoint} & \textcolor{TableHeaderText}{Expected Outcome} & \textcolor{TableHeaderText}{Validation Intent} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Category} & \textcolor{TableHeaderText}{Representative Endpoint} & \textcolor{TableHeaderText}{Expected Outcome} & \textcolor{TableHeaderText}{Validation Intent} \\
+\midrule
+\endhead
+Auth Missing Token & \texttt{GET /user/profile} & 401 & Prevent unauthorized profile access. \\
+Auth Malformed Token & \texttt{GET /admin/train-staff} & 401 & Reject malformed token payloads. \\
+Auth Expired Token & \texttt{GET /staff/profile} & 401 & Enforce token expiry boundary. \\
+Role Violation & \texttt{GET /staff/profile} (forbidden role) & 403 & Prevent cross-role endpoint misuse. \\
+Validation Failure & \texttt{POST /user/register} (empty payload) & 400 & Enforce request contract quality. \\
+Domain Validation & \texttt{POST /catering/order} (invalid items type) & 400 & Guard schema/semantic correctness. \\
+Boundary Validation & \texttt{POST /feedback} (rating out of range) & 400 & Enforce rating boundaries. \\
+Resource Absence & \texttt{GET /food/non-existent-id} & 404 & Proper not-found semantics. \\
+Unhandled Exception & \texttt{GET /news} (forced throw in test) & 500 & Verify defensive server behavior. \\
+Workflow Integrity & Complaint satisfaction rollback flow & Pending after negative confirmation & Guarantee reversible complaint closure pipeline. \\
+\bottomrule
+\end{longtable}
+
+\section{Execution Commands}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.3\textwidth}Y}
+\toprule
+\rowcolor{TableHeader}
+\textcolor{TableHeaderText}{Use Case} & \textcolor{TableHeaderText}{Command} \\
+\midrule
+Single API Contract Check (example) & \texttt{npm run api -- "GET /user/profile"} \\
+All Unit and API Contract Tests & \texttt{npm run test:unit} \\
+Coverage Run & \texttt{npm run test:unit:coverage} \\
+Single File Run & \texttt{npm run test:unit:file -- <path-to-test-file>} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% -------------------- 6. CI/CD READINESS --------------------
+\chapter{CI/CD Readiness and Operational Notes}
+
+The test suite is now modularized by domain and can be parallelized in CI runners. This allows route contracts to be sharded across independent jobs (for example, user/admin/staff/complaint/catering suites executed concurrently), reducing total pipeline time while retaining deterministic behavior. The in-memory testing approach and mocked external dependencies are particularly suitable for fast pull request verification.
+
+\section{Recommended Pipeline Stages}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item \textbf{Install and Lint Stage}: Install dependencies, run static checks.
+    \item \textbf{Fast Contract Stage}: Execute route contract suites in parallel by module.
+    \item \textbf{Controller Unit Stage}: Execute controller unit tests and edge-case suites.
+    \item \textbf{Coverage Gate Stage}: Run coverage and enforce baseline quality threshold.
+    \item \textbf{Artifact/Report Stage}: Publish JUnit/coverage artifacts for review and traceability.
+\end{enumerate}
+
+\section{Known Improvement Opportunities}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Standardize status literals across modules to avoid mixed-case divergence in analytics queries.
+    \item Extend unit test coverage to remaining controllers (admin, staff, food, feedback, news, superadmin).
+    \item Add OpenAPI response examples for all error envelopes to strengthen client integration guarantees.
+    \item Introduce automated schema drift checks between route contracts and controller behavior.
+\end{itemize}
+
+% -------------------- 7. CONCLUSION --------------------
+\chapter{Conclusion}
+
+Railway-Madad Version 2.0 delivers a practical, production-oriented backend foundation for railway service operations with clear role boundaries, train-aware workflows, and robust module separation. The system balances day-to-day operational needs (complaint handling, catering, emergency response, lost-and-found lifecycle, command dispatch) with governance capabilities (analytics, feedback, and supervisory control). The integrated testing strategy significantly improves confidence for ongoing refactoring and future deployment automation.
+
+From a software engineering perspective, the codebase is now positioned for disciplined evolution: route contracts are modular, business logic is testable in isolation, and operational concerns such as logging, documentation, and environment-driven configuration are already integrated. With incremental standardization and expanded controller coverage, the platform can transition smoothly into a mature CI/CD and observability lifecycle suitable for large-scale usage.
+
+\vfill
+\begin{center}
+\textcolor{Primary}{\rule{0.7\textwidth}{0.8pt}}\\[0.4em]
+\textbf{Railway-Madad -- Group 26}\\
+\small Backend Engineering Project Report (Node.js/Express)
+\end{center}
+
+\end{document}
