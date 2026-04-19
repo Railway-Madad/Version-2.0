@@ -168,6 +168,7 @@ const Home = () => {
         <div className="home-hero-pattern" />
         <div className="home-hero-content">
           
+          
           <h1 className="home-hero-title">
             Experience a Faster Way to{" "}
             <span className="home-hero-title-highlight">Handle Railway Support</span>
